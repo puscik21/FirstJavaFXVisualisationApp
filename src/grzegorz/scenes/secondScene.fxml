@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.SecondSceneController">
+   <children>
+      <Label layoutX="167.0" layoutY="184.0" text="This is second scene">
+         <font>
+            <Font size="30.0" />
+         </font>
+      </Label>
+      <Button fx:id="openFirstSceneBtn" layoutX="219.0" layoutY="253.0" mnemonicParsing="false" onAction="#openFirstScene" text="Go back to first scene" textAlignment="CENTER" />
+   </children>
+</AnchorPane>

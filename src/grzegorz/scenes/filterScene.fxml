@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="root" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.FilterScene">
+   <top>
+      <VBox fx:id="imagesVBox" alignment="TOP_CENTER" scaleX="0.5" scaleY="0.5" spacing="15.0" translateY="-70.0" BorderPane.alignment="TOP_CENTER">
+         <children>
+            <Separator />
+            <HBox fx:id="photonHBox" alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <ImageView fx:id="filterImage11" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/rightDiagPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage1111" fitHeight="150.0" fitWidth="200.0" layoutX="160.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/rightDiagPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage11111" fitHeight="150.0" fitWidth="200.0" layoutX="310.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/rightDiagPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage1111111" fitHeight="150.0" fitWidth="200.0" layoutX="650.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/rightDiagPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage11111111" fitHeight="150.0" fitWidth="200.0" layoutX="810.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/rightDiagPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage111111111" fitHeight="150.0" fitWidth="200.0" layoutX="970.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/rightDiagPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage111" fitHeight="150.0" fitWidth="200.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/rightDiagPhoton.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <HBox fx:id="filterHBox" alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <ImageView fx:id="filterImage112" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage1121" fitHeight="150.0" fitWidth="200.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage11211" fitHeight="150.0" fitWidth="200.0" layoutX="160.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage112111" fitHeight="150.0" fitWidth="200.0" layoutX="310.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage1122" fitHeight="150.0" fitWidth="200.0" layoutX="250.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage112211" fitHeight="150.0" fitWidth="200.0" layoutX="1050.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage11212" fitHeight="150.0" fitWidth="200.0" layoutX="250.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </VBox>
+   </top>
+   <bottom>
+      <AnchorPane fx:id="comparisonPane" stylesheets="@../style/darkTheme.css" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="filterImage1" fitHeight="180.0" fitWidth="180.0" layoutX="41.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0">
+               <image>
+                  <Image url="@../images/horPhoton.png" />
+               </image></ImageView>
+            <ImageView fx:id="filterImage2" fitHeight="180.0" fitWidth="180.0" layoutX="860.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.rightAnchor="40.0">
+               <image>
+                  <Image url="@../images/greenFilter.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+   </bottom>
+</BorderPane>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXTabPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@../style/darkTheme.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.Controller">
+   <children>
+      <AnchorPane fx:id="rootAnchorPane">
+         <children>
+            <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <bottom>
+                  <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label accessibleRole="PARENT" text="Label" textAlignment="CENTER">
+                           <padding>
+                              <Insets left="10.0" />
+                           </padding></Label>
+                     </children>
+                  </HBox>
+               </bottom>
+               <right>
+                  <AnchorPane>
+                     <children>
+                        <Button fx:id="openPopupSceneBtn" layoutX="30.0" layoutY="234.0" mnemonicParsing="false" onAction="#openPopupMessage" text="Popup" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" />
+                        <Button fx:id="openNextSceneBtn" layoutX="14.0" layoutY="299.0" mnemonicParsing="false" onAction="#openNextScene" text="NextScene" />
+                     </children>
+                  </AnchorPane>
+               </right>
+               <top>
+                  <VBox BorderPane.alignment="CENTER">
+                     <children>
+                        <MenuBar>
+                          <menus>
+                            <Menu mnemonicParsing="false" text="File">
+                              <items>
+                                <MenuItem mnemonicParsing="false" text="Close" />
+                              </items>
+                            </Menu>
+                            <Menu mnemonicParsing="false" text="Edit">
+                              <items>
+                                <MenuItem mnemonicParsing="false" text="Delete" />
+                              </items>
+                            </Menu>
+                            <Menu mnemonicParsing="false" text="Help">
+                              <items>
+                                <MenuItem mnemonicParsing="false" text="About" />
+                              </items>
+                            </Menu>
+                          </menus>
+                        </MenuBar>
+                     </children>
+                  </VBox>
+               </top>
+               <center>
+                  <JFXTabPane fx:id="tabPane" prefHeight="40.0" BorderPane.alignment="CENTER">
+                     <tabs>
+                      <Tab fx:id="envTab" text="Second tab">
+                        <content>
+                          <AnchorPane fx:id="envPane" minHeight="0.0" minWidth="0.0">
+                                 <children>
+                                    <ImageView fx:id="envImage" fitHeight="150.0" fitWidth="200.0" layoutX="82.0" layoutY="131.0" onMouseClicked="#moveImage" pickOnBounds="true" preserveRatio="true" styleClass="image">
+                                       <image>
+                                          <Image url="@../images/envelope.jpg" />
+                                       </image>
+                                    </ImageView>
+                                 </children></AnchorPane>
+                        </content>
+                      </Tab>
+                        <Tab fx:id="chartTab" text="Security Measurement">
+                           <content>
+                              <AnchorPane fx:id="chartPane" prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <LineChart fx:id="chart" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                      <xAxis>
+                                        <NumberAxis label="k" side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis label="j(k)" side="LEFT" />
+                                      </yAxis>
+                                    </LineChart>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
+                     </tabs>
+                  </JFXTabPane>
+               </center>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>

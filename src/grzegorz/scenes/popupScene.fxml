@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="BOTTOM_CENTER" prefHeight="336.0" prefWidth="283.0" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.Controller">
+   <children>
+      <Label text="This is popup scene" />
+      <Region prefHeight="109.0" prefWidth="283.0" />
+      <Separator prefWidth="200.0" />
+      <Button fx:id="popupCloseBtn" mnemonicParsing="false" onAction="#closePopup" text="Close" />
+   </children>
+</VBox>
