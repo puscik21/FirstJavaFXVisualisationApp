@@ -38,8 +38,8 @@ public class FilterScene {
     private ArrayList<Image> filterImages;
     private ArrayList<Image> photonImages;
 
-    private ArrayList<Integer> chosenFilters;
-    private ArrayList<Integer> chosenPhotons;
+    private ArrayList<State.FilterState> chosenFilters;
+    private ArrayList<State.QBitState> chosenPhotons;
 
 
     @FXML
@@ -66,27 +66,38 @@ public class FilterScene {
     private void setAllImages() {
         Image whiteFilter = new Image("grzegorz\\images\\whiteFilter.png");
         Image greenFilter = new Image("grzegorz\\images\\greenFilter.png");
-        Image horPhoton = new Image("grzegorz\\images\\horPhoton.png");
         Image verPhoton = new Image("grzegorz\\images\\verPhoton.png");
-        Image leftDiagPhoton = new Image("grzegorz\\images\\leftDiagPhoton.png");
         Image rightDiagPhoton = new Image("grzegorz\\images\\rightDiagPhoton.png");
+        Image horPhoton = new Image("grzegorz\\images\\horPhoton.png");
+        Image leftDiagPhoton = new Image("grzegorz\\images\\leftDiagPhoton.png");
+
 
         filterImages.addAll(Arrays.asList(whiteFilter, greenFilter));
-        photonImages.addAll(Arrays.asList(horPhoton, verPhoton, leftDiagPhoton, rightDiagPhoton));
+        photonImages.addAll(Arrays.asList(verPhoton, rightDiagPhoton, horPhoton, leftDiagPhoton));
     }
 
     private void prepareRandomImages() {
-        prepareHBoxImages(photonHBox, photonImages, chosenPhotons);
-        prepareHBoxImages(filterHBox, filterImages, chosenFilters);
+        prepareHBoxQBitImages(photonHBox, photonImages, chosenPhotons);
+        prepareHBoxFilterImages(filterHBox, filterImages, chosenFilters);
     }
 
-    private void prepareHBoxImages(HBox hBox, ArrayList<Image> images, ArrayList<Integer> chosen) {
+    private void prepareHBoxFilterImages(HBox hBox, ArrayList<Image> images, ArrayList<State.FilterState> chosen) {
         for (int i = 0; i < hBox.getChildren().size(); i++) {
             ImageView imageView = (ImageView) hBox.getChildren().get(i);
 
             int imageNumber = getRandomNumber(images.size());
             imageView.setImage(images.get(imageNumber));
-            chosen.add(imageNumber);
+            chosen.add(State.getFilterState(imageNumber));
+        }
+    }
+
+    private void prepareHBoxQBitImages(HBox hBox, ArrayList<Image> images, ArrayList<State.QBitState> chosen) {
+        for (int i = 0; i < hBox.getChildren().size(); i++) {
+            ImageView imageView = (ImageView) hBox.getChildren().get(i);
+
+            int imageNumber = getRandomNumber(images.size());
+            imageView.setImage(images.get(imageNumber));
+            chosen.add(State.getQBitState(imageNumber));
         }
     }
 
@@ -143,14 +154,22 @@ public class FilterScene {
             transition.setDelay(Duration.seconds(0.5));
             transition.setDuration(Duration.seconds(1));
             transition.play();
-            transition.setOnFinished(e1 -> checkQBitState(compNumber, imageView));
+            transition.setOnFinished(e1 -> {
+                if (imageView == filterImage1)
+                checkQBitState(compNumber, imageView);
+            });
         });
     }
 
     private void checkQBitState(int compNumber, ImageView imageView) {
+        int qBitState;
         // photons > 1 => diagonal
-        if ((chosenPhotons.get(compNumber) > 1 && chosenFilters.get(compNumber) == 0) ||
-                 (chosenPhotons.get(compNumber) <= 1 && chosenFilters.get(compNumber) == 1)){
+        if (!chosenFilters.get(compNumber).isQBitProper(chosenPhotons.get(compNumber))) {
+            System.out.println("Nie pasuje!");
+            System.out.println(chosenPhotons.get(compNumber).state);
+            System.out.println(chosenPhotons.get(compNumber).getQBitValue());
+//        if ((chosenPhotons.get(compNumber) > 1 && chosenFilters.get(compNumber) == 0) ||
+//                (chosenPhotons.get(compNumber) <= 1 && chosenFilters.get(compNumber) == 1)) {
             // TODO some effect if isn't correct
 
             int direction = getRandomNumber(2) == 0 ? -1 : 1;
@@ -160,12 +179,42 @@ public class FilterScene {
             transition.setByAngle(direction * 45);
             transition.play();
             transition.setOnFinished(e -> fadeImage(imageView, false));
-        }
-        else {
+
+
+//            if (chosenPhotons.get(compNumber) == 0 || chosenPhotons.get(compNumber) == 3) {
+//                if (direction == -1) {
+//                    qBitState = 1;
+//                } else {
+//                    qBitState = 0;
+//                }
+//            } else {
+//                if (direction == 1) {
+//                    qBitState = 1;
+//                } else {
+//                    qBitState = 0;
+//                }
+//            }
+            chosenPhotons.get(compNumber).turnQBit(direction);
+        } else {
+//            if (chosenPhotons.get(compNumber) == 0 || chosenPhotons.get(compNumber) == 2) {
+//                qBitState = 0;
+//            } else {
+//                qBitState = 1;
+//            }
             fadeImage(imageView, true);
         }
+        qBitState = chosenPhotons.get(compNumber).getQBitValue();
+        System.out.println("Pozniej");
+        System.out.println(chosenPhotons.get(compNumber).state);
+        System.out.println("qBitState = " + qBitState);
 
-        // TODO save qBit value (also for those after rotation)
+//        (whiteFilter, greenFilter)
+//        (verPhoton, rightDiagPhoton, horPhoton, leftDiagPhoton)
+
+        // TODO * save qBit value (also for those after rotation) *
+        // TODO add label with qBit value and row of values
+        // TODO use some enums or special classes
+
 
     }
 
