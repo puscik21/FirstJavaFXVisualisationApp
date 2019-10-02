@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -8,13 +9,14 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane fx:id="root" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.FilterScene">
    <top>
-      <VBox fx:id="imagesVBox" alignment="TOP_CENTER" scaleX="0.5" scaleY="0.5" spacing="15.0" translateY="-70.0" BorderPane.alignment="TOP_CENTER">
+      <VBox fx:id="imagesVBox" alignment="TOP_CENTER" prefWidth="1110.0" scaleX="0.5" scaleY="0.5" spacing="15.0" translateY="-70.0" BorderPane.alignment="TOP_CENTER">
          <children>
             <Separator />
-            <HBox fx:id="photonHBox" alignment="TOP_CENTER" spacing="10.0">
+            <HBox fx:id="photonHBox" alignment="CENTER" spacing="10.0">
                <children>
                   <ImageView fx:id="filterImage11" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -54,43 +56,86 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <HBox fx:id="filterHBox" alignment="TOP_CENTER" spacing="10.0">
+            <HBox fx:id="filterHBox" alignment="CENTER" spacing="10.0">
                <children>
-                  <ImageView fx:id="filterImage112" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="filterImage1121" fitHeight="150.0" fitWidth="200.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="filterImage11211" fitHeight="150.0" fitWidth="200.0" layoutX="160.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="filterImage112111" fitHeight="150.0" fitWidth="200.0" layoutX="310.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="filterImage1122" fitHeight="150.0" fitWidth="200.0" layoutX="250.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="filterImage112211" fitHeight="150.0" fitWidth="200.0" layoutX="1050.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fx:id="filterImage11212" fitHeight="150.0" fitWidth="200.0" layoutX="250.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="filterImage112" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/horPhoton.png" />
+                           </image>
+                        </ImageView>
+                        <Label textAlignment="CENTER">
+                           <font>
+                              <Font name="Lato Regular" size="30.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox alignment="BOTTOM_CENTER" layoutX="490.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="filterImage1121" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/horPhoton.png" />
+                           </image>
+                        </ImageView>
+                        <Label textAlignment="CENTER">
+                           <font>
+                              <Font name="Lato Bold" size="30.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="570.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="filterImage11211" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/horPhoton.png" />
+                           </image>
+                        </ImageView>
+                        <Label textAlignment="CENTER" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="650.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="filterImage112111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/horPhoton.png" />
+                           </image>
+                        </ImageView>
+                        <Label textAlignment="CENTER" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="730.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="filterImage1121111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/horPhoton.png" />
+                           </image>
+                        </ImageView>
+                        <Label textAlignment="CENTER" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="810.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="filterImage11211111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/horPhoton.png" />
+                           </image>
+                        </ImageView>
+                        <Label textAlignment="CENTER" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="890.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="filterImage112111111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/horPhoton.png" />
+                           </image>
+                        </ImageView>
+                        <Label textAlignment="CENTER" />
+                     </children>
+                  </VBox>
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
