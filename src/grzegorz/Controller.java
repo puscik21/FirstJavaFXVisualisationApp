@@ -133,6 +133,7 @@ public class Controller {
                 else if (newVal.intValue() == 1 && chart.getData().size() == 0) {
                     loadMeasurementChartData(1000.0, 10);
                 }
+                //TODO add 3'th tab from code, load filterScene there
                 else if (newVal.intValue() == 2) {
                     BorderPane root = FXMLLoader.load(getClass().getResource("scenes/filterScene.fxml"));
                     tabPane.getTabs().get(2).setContent(root);
@@ -140,8 +141,6 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            //TODO add 3'th tab from code, load filterScene there
         });
 
 //        // chart

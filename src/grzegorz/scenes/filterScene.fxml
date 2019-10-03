@@ -13,7 +13,7 @@
 
 <BorderPane fx:id="root" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.FilterScene">
    <top>
-      <VBox fx:id="imagesVBox" alignment="TOP_CENTER" prefWidth="1110.0" scaleX="0.5" scaleY="0.5" spacing="15.0" translateY="-70.0" BorderPane.alignment="TOP_CENTER">
+      <VBox fx:id="imagesVBox" alignment="TOP_CENTER" scaleX="0.5" scaleY="0.5" spacing="15.0" translateY="-70.0" BorderPane.alignment="TOP_CENTER">
          <children>
             <Separator />
             <HBox fx:id="photonHBox" alignment="CENTER" spacing="10.0">
@@ -58,87 +58,83 @@
             <Separator prefWidth="200.0" />
             <HBox fx:id="filterHBox" alignment="CENTER" spacing="10.0">
                <children>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ImageView fx:id="filterImage112" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/horPhoton.png" />
-                           </image>
-                        </ImageView>
-                        <Label textAlignment="CENTER">
-                           <font>
-                              <Font name="Lato Regular" size="30.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </VBox>
-                  <VBox alignment="BOTTOM_CENTER" layoutX="490.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ImageView fx:id="filterImage1121" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/horPhoton.png" />
-                           </image>
-                        </ImageView>
-                        <Label textAlignment="CENTER">
-                           <font>
-                              <Font name="Lato Bold" size="30.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" layoutX="570.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ImageView fx:id="filterImage11211" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/horPhoton.png" />
-                           </image>
-                        </ImageView>
-                        <Label textAlignment="CENTER" />
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" layoutX="650.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ImageView fx:id="filterImage112111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/horPhoton.png" />
-                           </image>
-                        </ImageView>
-                        <Label textAlignment="CENTER" />
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" layoutX="730.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ImageView fx:id="filterImage1121111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/horPhoton.png" />
-                           </image>
-                        </ImageView>
-                        <Label textAlignment="CENTER" />
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" layoutX="810.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ImageView fx:id="filterImage11211111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/horPhoton.png" />
-                           </image>
-                        </ImageView>
-                        <Label textAlignment="CENTER" />
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER" layoutX="890.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ImageView fx:id="filterImage112111111" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/horPhoton.png" />
-                           </image>
-                        </ImageView>
-                        <Label textAlignment="CENTER" />
-                     </children>
-                  </VBox>
+                  <ImageView fx:id="filterImage112" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage1121" fitHeight="150.0" fitWidth="200.0" layoutX="490.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage11211" fitHeight="150.0" fitWidth="200.0" layoutX="570.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage112111" fitHeight="150.0" fitWidth="200.0" layoutX="650.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage1121111" fitHeight="150.0" fitWidth="200.0" layoutX="730.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage11211111" fitHeight="150.0" fitWidth="200.0" layoutX="810.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="filterImage112111111" fitHeight="150.0" fitWidth="200.0" layoutX="890.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/horPhoton.png" />
+                     </image>
+                  </ImageView>
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
+            <HBox fx:id="labelHBox" alignment="CENTER" layoutX="10.0" layoutY="211.0" spacing="10.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="200.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="465.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="570.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="675.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="780.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="885.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="943.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
          </children>
          <BorderPane.margin>
             <Insets />
