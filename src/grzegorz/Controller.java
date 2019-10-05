@@ -88,18 +88,31 @@ public class Controller {
     public Button popupCloseBtn;
 
 
+    private boolean envelopeSent = false;
+
     @FXML
     public void initialize() {
 //        ///////
+
+//        *FOR TEST PURPOSES*
 //        tabPane.getSelectionModel().select(1);
 //        loadMeasurementChartData(1000.0, 10);
+
 //        ////////
 
 
-        final double envStartHeight = envImage.getTranslateX();
         envImage.minWidth(100);
         envImage.minHeight(75);
 
+        initEvents();
+
+
+        // TODO: 05.10.2019 run on event (like end of previous tab)
+        Tab filterTab = new Tab("Measure photons");
+        tabPane.getTabs().add(filterTab);
+    }
+
+    private void initEvents() {
         envPane.heightProperty().addListener((observable, oldValue, newValue) ->
                 envImage.setFitHeight(newValue.doubleValue() / 3)
         );
@@ -111,19 +124,16 @@ public class Controller {
         envImage.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 showDialog("This is encrypted message");
-                // TODO also translateY
-            } else if (envStartHeight == envImage.getTranslateX()){
+            } else if (!envelopeSent){
+                envelopeSent = true;
                 moveImage();
             }
         });
 
-        Tab filterTab = new Tab("Measure photons");
-        tabPane.getTabs().add(filterTab);
-
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
             try {
                 if (newVal.intValue() == 0) {
-                    // FIXME: 22.09.2019 add to tab only
+                    // FIXME: 22.09.2019 add to tab only (without reloading everything?)
                     Parent root = FXMLLoader.load(getClass().getResource("scenes/mainScene.fxml"));
                     Stage stage = (Stage) tabPane.getScene().getWindow();
                     stage.setScene(new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight()));
@@ -133,22 +143,14 @@ public class Controller {
                 else if (newVal.intValue() == 1 && chart.getData().size() == 0) {
                     loadMeasurementChartData(1000.0, 10);
                 }
-                //TODO add 3'th tab from code, load filterScene there
                 else if (newVal.intValue() == 2) {
-                    BorderPane root = FXMLLoader.load(getClass().getResource("scenes/filterScene.fxml"));
+                    StackPane root = FXMLLoader.load(getClass().getResource("scenes/filterScene.fxml"));
                     tabPane.getTabs().get(2).setContent(root);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-
-//        // chart
-//        tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
-//            if (newVal.intValue() == 1 && chart.getData().size() == 0) {
-//                loadMeasurementChartData(1000.0, 10);
-//            }
-//        });
     }
 
     @FXML
@@ -172,6 +174,7 @@ public class Controller {
         pathTransition.setOnFinished(e -> fadeImage());
     }
 
+
     private void fadeImage(){
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(envImage);
@@ -181,6 +184,7 @@ public class Controller {
         fadeTransition.play();
         fadeTransition.setOnFinished(e -> envPane.getChildren().remove(envImage));
     }
+
 
     private void loadMeasurementChartData(double keyLength, int distance) {
         XYChart.Series<Integer, Double> series = new LineChart.Series<>();
@@ -194,6 +198,7 @@ public class Controller {
         chart.setCreateSymbols(false);
         chart.setTitle("Measure of security");
     }
+
 
     // TODO use entropy chart
     private void loadEntropyChartData(double keyLength, int distance) {
@@ -216,6 +221,7 @@ public class Controller {
         rootAnchorPane.setEffect(blurEffect);
 
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(new Text(message));
 
         JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
 
@@ -223,17 +229,18 @@ public class Controller {
 //        button.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> dialog.close());
 //        dialogLayout.setActions(button);
 
-        dialogLayout.setBody(new Text(message));
-
         dialog.setOnDialogClosed(e -> rootAnchorPane.setEffect(null));
         dialog.show();
     }
 
+
+    // *TEST THINGS*
     @FXML
     public void closePopup(){
         Stage stage = (Stage) popupCloseBtn.getScene().getWindow();
         stage.close();
     }
+
 
     @FXML
     public void openPopupMessage() throws IOException {
@@ -246,6 +253,7 @@ public class Controller {
         stage.setTitle("Message window");
         stage.showAndWait();
     }
+
 
     @FXML
     public void openNextScene() throws IOException{
