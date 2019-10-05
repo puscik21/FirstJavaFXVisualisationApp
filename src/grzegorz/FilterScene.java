@@ -31,11 +31,10 @@ public class FilterScene {
     private HBox labelHBox;
 
     @FXML
-    private ImageView filterImage2;
-
-    // TODO photonImage
+    private ImageView qBitImage;
+    
     @FXML
-    private ImageView filterImage1;
+    private ImageView filterImage;
 
     @FXML
     private AnchorPane comparisonPane;
@@ -46,16 +45,14 @@ public class FilterScene {
     private ArrayList<Integer> chosenFilters;
     private ArrayList<QBitState> chosenPhotons;
 
+    private boolean comparisonStarted = false;
+
+    // TODO: 05.10.2019 info boxes
 
     @FXML
     public void initialize() {
-        // if upper VBox is outside of the stage, change translateY in scenebuilder
-        /*
-         * 1. go over all images
-         * 2. write all results
-         * TODO 3. make images and labels fit - probably use width properties
-         * TODO 4. block mouse event
-         */
+        // FIXME: 05.10.2019 if upper VBox is outside of the stage, change translateY in scenebuilder
+
         filterImages = new ArrayList<>(2);
         photonImages = new ArrayList<>(4);
 
@@ -63,13 +60,21 @@ public class FilterScene {
         chosenPhotons = new ArrayList<>(filterHBox.getChildren().size());
         setAllImages();
 
-        filterImage1.setVisible(false);
-        filterImage2.setVisible(false);
-        filterImage1.toFront();
+        qBitImage.setVisible(false);
+        filterImage.setVisible(false);
+        qBitImage.toFront();
 
         prepareRandomImages();
 
-        root.setOnMouseClicked(e -> compare(0));
+        // FIXME: 03.10.2019 - a better way to resize it
+        labelHBox.setMaxWidth(1100);
+
+        root.setOnMouseClicked(e -> {
+            if (!comparisonStarted) {
+                comparisonStarted = true;
+                compare(0);
+            }
+        });
     }
 
     private void setAllImages() {
@@ -121,27 +126,27 @@ public class FilterScene {
 
         highlightCompared(compNumber);
 
-        filterImage1.setVisible(true);
-        filterImage1.setEffect(null);
-        filterImage2.setVisible(true);
+        qBitImage.setVisible(true);
+        qBitImage.setEffect(null);
+        filterImage.setVisible(true);
 
         // FIXME: 02.10.2019  is there a better way to move back FadeTransition effects?
-        showImage(filterImage1);
+        showImage(qBitImage);
 
-        ImageView photonImage = (ImageView) photonHBox.getChildren().get(compNumber);
-        filterImage1.setImage(photonImage.getImage());
+        ImageView photonImg = (ImageView) photonHBox.getChildren().get(compNumber);
+        qBitImage.setImage(photonImg.getImage());
 
-        ImageView filterImage = (ImageView) filterHBox.getChildren().get(compNumber);
-        filterImage2.setImage(filterImage.getImage());
+        ImageView filterImg = (ImageView) filterHBox.getChildren().get(compNumber);
+        filterImage.setImage(filterImg.getImage());
 
-        filterImage1.setTranslateX(-hideLength);
-        filterImage2.setTranslateX(hideLength);
+        qBitImage.setTranslateX(-hideLength);
+        filterImage.setTranslateX(hideLength);
 
-        double photonPath = comparisonPane.getWidth() / 2.0 - filterImage1.getFitWidth() / 2.0 - imageConstraint;
-        double filterPath = -comparisonPane.getWidth() / 2.0 + filterImage2.getFitWidth() / 2.0 + imageConstraint;
+        double photonPath = comparisonPane.getWidth() / 2.0 - qBitImage.getFitWidth() / 2.0 - imageConstraint;
+        double filterPath = -comparisonPane.getWidth() / 2.0 + filterImage.getFitWidth() / 2.0 + imageConstraint;
 
-        makeTransition(compNumber, filterImage1, hideLength, photonPath);
-        makeTransition(compNumber, filterImage2, -hideLength, filterPath);
+        makeTransition(compNumber, qBitImage, hideLength, photonPath);
+        makeTransition(compNumber, filterImage, -hideLength, filterPath);
     }
 
     private void makeTransition(int compNumber, ImageView imageView, double firstPath, double secondPath) {
@@ -158,7 +163,7 @@ public class FilterScene {
             transition.setDuration(Duration.seconds(1));
             transition.play();
             transition.setOnFinished(e1 -> {
-                if (imageView == filterImage1) {
+                if (imageView == qBitImage) {
                     checkQBitState(compNumber, imageView);
                 }
             });
@@ -174,7 +179,7 @@ public class FilterScene {
             int direction = getRandomNumber(2) == 0 ? -1 : 1;
             RotateTransition transition = new RotateTransition();
             transition.setDuration(Duration.seconds(0.5));
-            transition.setNode(filterImage1);
+            transition.setNode(qBitImage);
             transition.setByAngle(direction * 45);
             transition.play();
             transition.setOnFinished(e -> fadeImage(compNumber, imageView, false));
@@ -189,7 +194,6 @@ public class FilterScene {
         qBitValueLabel.setText(String.valueOf(qBitState));
     }
 
-    // FIXME: 02.10.2019  copy of Controller's method - maybe put it in one class later
     private void fadeImage(int compNumber, ImageView imageView, boolean withDelay) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(imageView);
@@ -203,6 +207,9 @@ public class FilterScene {
         fadeTransition.setOnFinished(e -> {
             if (compNumber + 1 != photonHBox.getChildren().size()) {
                 compare(compNumber + 1);
+            } else {
+                qBitImage.setVisible(false);
+                filterImage.setVisible(false);
             }
         });
     }

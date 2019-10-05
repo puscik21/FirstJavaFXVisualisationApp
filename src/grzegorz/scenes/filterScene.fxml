@@ -98,37 +98,37 @@
             <Separator prefWidth="200.0" />
             <HBox fx:id="labelHBox" alignment="CENTER" layoutX="10.0" layoutY="211.0" spacing="10.0">
                <children>
-                  <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="200.0" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="CENTER" maxWidth="200.0" prefWidth="200.0" textAlignment="CENTER">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="465.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="465.0" layoutY="10.0" maxWidth="200.0" prefWidth="200.0" textAlignment="CENTER">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="570.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="570.0" layoutY="10.0" maxWidth="200.0" prefWidth="200.0" textAlignment="CENTER">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="675.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="675.0" layoutY="10.0" maxWidth="200.0" prefWidth="200.0" textAlignment="CENTER">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="780.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="780.0" layoutY="10.0" maxWidth="200.0" prefWidth="200.0" textAlignment="CENTER">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="885.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="885.0" layoutY="10.0" maxWidth="200.0" prefWidth="200.0" textAlignment="CENTER">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="943.0" layoutY="10.0" prefWidth="200.0" textAlignment="CENTER">
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="1060.0" layoutY="10.0" maxWidth="200.0" prefWidth="200.0" textAlignment="CENTER">
                      <font>
                         <Font size="48.0" />
                      </font>
@@ -144,11 +144,11 @@
    <bottom>
       <AnchorPane fx:id="comparisonPane" stylesheets="@../style/darkTheme.css" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fx:id="filterImage1" fitHeight="180.0" fitWidth="180.0" layoutX="41.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0">
+            <ImageView fx:id="qBitImage" fitHeight="180.0" fitWidth="180.0" layoutX="41.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0">
                <image>
                   <Image url="@../images/horPhoton.png" />
                </image></ImageView>
-            <ImageView fx:id="filterImage2" fitHeight="180.0" fitWidth="180.0" layoutX="860.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.rightAnchor="40.0">
+            <ImageView fx:id="filterImage" fitHeight="180.0" fitWidth="180.0" layoutX="860.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.rightAnchor="40.0">
                <image>
                   <Image url="@../images/greenFilter.png" />
                </image>
