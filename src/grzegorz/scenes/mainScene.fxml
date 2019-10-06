@@ -73,9 +73,29 @@
                         <content>
                           <AnchorPane fx:id="envPane" minHeight="0.0" minWidth="0.0">
                                  <children>
-                                    <ImageView fx:id="envImage" fitHeight="150.0" fitWidth="200.0" layoutX="82.0" layoutY="131.0" onMouseClicked="#moveImage" pickOnBounds="true" preserveRatio="true" styleClass="image">
+                                    <ImageView fx:id="electricalCable" fitHeight="25.0" fitWidth="450.0" layoutX="317.0" layoutY="141.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/electricalCable.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="alicePC" fitHeight="150.0" fitWidth="200.0" layoutX="134.0" layoutY="199.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/PCWhite.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="envImage" fitHeight="150.0" fitWidth="200.0" layoutX="114.0" layoutY="141.0" onMouseClicked="#moveImage" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
                                        <image>
                                           <Image url="@../images/envelope.jpg" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="photonCable" fitHeight="25.0" fitWidth="450.0" layoutX="317.0" layoutY="387.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/photonCable.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="bobPC" fitHeight="150.0" fitWidth="200.0" layoutX="783.0" layoutY="199.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
                                  </children></AnchorPane>

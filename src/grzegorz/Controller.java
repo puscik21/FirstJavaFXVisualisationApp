@@ -6,16 +6,19 @@ import com.jfoenix.controls.JFXTabPane;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.effect.BoxBlur;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polyline;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -57,7 +60,7 @@ public class Controller {
     @FXML
     public JFXTabPane tabPane;
 
-    // envelope
+    // envelope Scene
     @FXML
     public Tab envTab;
 
@@ -66,6 +69,18 @@ public class Controller {
 
     @FXML
     public ImageView envImage;
+
+    @FXML
+    public ImageView alicePC;
+
+    @FXML
+    public ImageView bobPC;
+
+    @FXML
+    public ImageView electricalCable;
+
+    @FXML
+    public ImageView photonCable;
 
     // chart
     @FXML
@@ -87,7 +102,7 @@ public class Controller {
     @FXML
     public Button popupCloseBtn;
 
-
+    private DropShadow borderGlow;
     private boolean envelopeSent = false;
 
     @FXML
@@ -101,9 +116,6 @@ public class Controller {
 //        ////////
 
 
-        envImage.minWidth(100);
-        envImage.minHeight(75);
-
         initEvents();
 
 
@@ -113,23 +125,36 @@ public class Controller {
     }
 
     private void initEvents() {
+        initResizeEvents();
+        initMouseEvents();
+    }
+
+    private void initResizeEvents() {
+        envImage.minWidth(100);
+        envImage.minHeight(75);
+
+        // TODO: 06.10.2019 resize the rest of nodes
         envPane.heightProperty().addListener((observable, oldValue, newValue) ->
-                envImage.setFitHeight(newValue.doubleValue() / 3)
+                envImage.setFitHeight(newValue.doubleValue() / 6)
         );
 
         envPane.widthProperty().addListener((observable, oldVal, newVal) ->
-                envImage.setFitWidth(newVal.doubleValue() / 3)
+                envImage.setFitWidth(newVal.doubleValue() / 6)
         );
+    }
 
-        envImage.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("This is encrypted message");
-            } else if (!envelopeSent){
-                envelopeSent = true;
-                moveImage();
-            }
-        });
+    private void initMouseEvents() {
+        initBorderGlowEffect();
+        initMainTabPane();
+        initOnMouseClickedEvents();
 
+        setBorderGlowEffect(alicePC);
+        setBorderGlowEffect(bobPC);
+        setBorderGlowEffect(electricalCable);
+        setBorderGlowEffect(photonCable);
+    }
+
+    private void initMainTabPane() {
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
             try {
                 if (newVal.intValue() == 0) {
@@ -153,10 +178,69 @@ public class Controller {
         });
     }
 
+    // TODO: 06.10.2019 .properties file for all comments
+    private void initOnMouseClickedEvents() {
+        envImage.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("This is encrypted message");
+            } else if (!envelopeSent){
+                envelopeSent = true;
+                moveImage();
+            }
+        });
+
+        alicePC.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("Alice's PC");
+            } else if (!envelopeSent){
+                envelopeSent = true;
+                moveImage();
+            }
+        });
+
+        bobPC.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("Bob's PC");
+            } else if (!envelopeSent){
+                envelopeSent = true;
+                moveImage();
+            }
+        });
+
+        electricalCable.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("Electrical Cable - used for communication in unsecure channel");
+            }
+        });
+
+        photonCable.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("Quantum cable - used for the key establishment");
+            }
+        });
+    }
+
+    private void initBorderGlowEffect() {
+        borderGlow = new DropShadow();
+        borderGlow.setColor(Color.WHITESMOKE);
+        borderGlow.setOffsetX(0f);
+        borderGlow.setOffsetY(0f);
+        borderGlow.setHeight(50);
+        borderGlow.setWidth(50);
+    }
+
+    private void setBorderGlowEffect(Node node) {
+        node.setOnMouseEntered(e -> node.setEffect(borderGlow));
+        node.setOnMouseExited(e -> node.setEffect(null));
+    }
+
     @FXML
     public void moveImage(){
-        double moveX = rootPane.getWidth() / 2;
-        double moveY = rootPane.getHeight() / 4;
+        envImage.setVisible(true);
+
+        int dir = -1;
+        double moveX = bobPC.getLayoutX() - alicePC.getLayoutX();
+        double moveY = dir * rootPane.getHeight() / 4;
 
         Polyline polylinePath = new Polyline();
         double startX = envImage.getX() + envImage.getFitWidth() / 2;
