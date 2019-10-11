@@ -12,9 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
@@ -24,7 +24,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.IOException;
 
 
@@ -48,60 +47,64 @@ public class Controller {
 //        image1.fitHeightProperty().bind(imagePane2.heightProperty());
     // ###############################
 
-    @FXML
-    public StackPane rootPane;
 
     @FXML
-    public AnchorPane rootAnchorPane;
+    private StackPane rootPane;
 
     @FXML
-    public BorderPane borderPane;
+    private AnchorPane rootAnchorPane;
 
     @FXML
-    public JFXTabPane tabPane;
+    private BorderPane borderPane;
+
+    @FXML
+    private JFXTabPane tabPane;
 
     // envelope Scene
     @FXML
-    public Tab envTab;
+    private Tab envTab;
 
     @FXML
-    public AnchorPane envPane;
+    private AnchorPane envPane;
 
     @FXML
-    public ImageView envImage;
+    private ImageView envImage;
 
     @FXML
-    public ImageView alicePC;
+    private ImageView alicePC;
 
     @FXML
-    public ImageView bobPC;
+    private ImageView bobPC;
 
     @FXML
-    public ImageView electricalCable;
+    private ImageView electricalCable;
 
     @FXML
-    public ImageView photonCable;
+    private ImageView photonCable;
 
     // chart
     @FXML
-    public Tab chartTab;
+    private Tab chartTab;
 
     @FXML
-    public AnchorPane chartPane;
+    private AnchorPane chartPane;
 
     @FXML
-    public LineChart<Integer, Double> chart;
+    private LineChart<Integer, Double> chart;
 
     // test items
     @FXML
-    public Button openPopupSceneBtn;
+    private Button openPopupSceneBtn;
 
     @FXML
-    public Button openNextSceneBtn;
+    private Button openNextSceneBtn;
 
     @FXML
-    public Button popupCloseBtn;
+    private Button popupCloseBtn;
 
+    // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
+    private final double START_PANE_WIDTH = 1076;
+    private final double START_PANE_HEIGHT = 710;
     private DropShadow borderGlow;
     private boolean envelopeSent = false;
 
@@ -130,16 +133,30 @@ public class Controller {
     }
 
     private void initResizeEvents() {
-        envImage.minWidth(100);
-        envImage.minHeight(75);
+        electricalCable.setPreserveRatio(false);
+        photonCable.setPreserveRatio(false);
 
-        // TODO: 06.10.2019 resize the rest of nodes
-        envPane.heightProperty().addListener((observable, oldValue, newValue) ->
-                envImage.setFitHeight(newValue.doubleValue() / 6)
+        setResizeEvent(alicePC);
+        setResizeEvent(bobPC);
+        setResizeEvent(electricalCable);
+        setResizeEvent(photonCable);
+        setResizeEvent(envImage);
+    }
+
+    private void setResizeEvent(ImageView node) {
+        double widthScale = START_PANE_WIDTH / node.getFitWidth();
+        double heightScale = START_PANE_HEIGHT / node.getFitHeight();
+        double layoutXScale = START_PANE_WIDTH / node.getLayoutX();
+        double layoutYScale = START_PANE_HEIGHT / node.getLayoutY();
+
+        node.fitWidthProperty().bind(envPane.widthProperty().divide(widthScale));
+        node.fitHeightProperty().bind(envPane.heightProperty().divide(heightScale));
+
+        envPane.widthProperty().addListener((observable, oldValue, newValue) ->
+                node.setLayoutX(newValue.doubleValue() / layoutXScale)
         );
-
-        envPane.widthProperty().addListener((observable, oldVal, newVal) ->
-                envImage.setFitWidth(newVal.doubleValue() / 6)
+        envPane.heightProperty().addListener((observable, oldValue, newValue) ->
+                node.setLayoutY(newValue.doubleValue() / layoutYScale)
         );
     }
 
@@ -240,11 +257,11 @@ public class Controller {
 
         int dir = -1;
         double moveX = bobPC.getLayoutX() - alicePC.getLayoutX();
-        double moveY = dir * rootPane.getHeight() / 4;
+        double moveY = dir * rootPane.getHeight() / 7;
 
         Polyline polylinePath = new Polyline();
-        double startX = envImage.getX() + envImage.getFitWidth() / 2;
-        double startY = envImage.getY() + envImage.getFitHeight() / 2;
+        double startX = envImage.getFitWidth() / 2.0;
+        double startY = envImage.getFitHeight() / 2.0;
         polylinePath.getPoints().addAll(startX, startY,
                 startX + 0.0, startY + moveY,
                 startX + moveX, startY + moveY,
