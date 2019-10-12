@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
 import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -13,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import java.util.ArrayList;
@@ -151,6 +153,14 @@ public class FilterScene {
                 showDialog("Randomly chosen detectors by Bob");
             }
         });
+
+        labelHBox.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+
+                e.consume();
+                showDialog("Result key that Bob receive");
+            }
+        });
     }
 
 
@@ -247,6 +257,7 @@ public class FilterScene {
             } else {
                 qBitImage.setVisible(false);
                 filterImage.setVisible(false);
+                makeResultTransition();
             }
         });
     }
@@ -268,10 +279,33 @@ public class FilterScene {
             filterHBox.getChildren().get(compNumber - 1).setEffect(null);
         }
 
-        Bloom highLightEffect = new Bloom(0.1);
+        DropShadow highLightEffect = new DropShadow();
+        highLightEffect.setColor(Color.WHITESMOKE);
+        highLightEffect.setOffsetX(0f);
+        highLightEffect.setOffsetY(0f);
+        highLightEffect.setHeight(40);
+        highLightEffect.setWidth(40);
+
         qBitHBox.getChildren().get(compNumber).setEffect(highLightEffect);
         filterHBox.getChildren().get(compNumber).setEffect(highLightEffect);
     }
+
+    private void makeResultTransition() {
+        double transitionLength = root.getHeight() - labelHBox.getLayoutY();
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.seconds(1));
+        transition.setNode(labelHBox);
+        transition.setToY(transitionLength);
+        transition.play();
+
+        ScaleTransition scaleTransition = new ScaleTransition();
+        scaleTransition.setNode(labelHBox);
+        scaleTransition.setToX(1.75);
+        scaleTransition.setToY(1.75);
+        scaleTransition.setDuration(Duration.seconds(1));
+        scaleTransition.play();
+    }
+
 
 
     // TODO: 05.10.2019 1 class with many general methods like this one
