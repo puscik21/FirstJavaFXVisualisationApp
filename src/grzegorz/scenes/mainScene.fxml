@@ -83,7 +83,7 @@
                                           <Image url="@../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
-                                    <ImageView fx:id="envImage" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="141.0" onMouseClicked="#moveImage" pickOnBounds="true" preserveRatio="true" styleClass="image">
+                                    <ImageView fx:id="envImage" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="141.0" onMouseClicked="#moveImage" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
                                        <image>
                                           <Image url="@../images/envelope.jpg" />
                                        </image>

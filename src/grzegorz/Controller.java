@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import javafx.animation.*;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -136,11 +137,10 @@ public class Controller {
         electricalCable.setPreserveRatio(false);
         photonCable.setPreserveRatio(false);
 
-        setResizeEvent(alicePC);
-        setResizeEvent(bobPC);
-        setResizeEvent(electricalCable);
-        setResizeEvent(photonCable);
-        setResizeEvent(envImage);
+        for (Node node : envPane.getChildren()){
+            ImageView imgView = (ImageView) node;
+            setResizeEvent(imgView);
+        }
     }
 
     private void setResizeEvent(ImageView node) {
