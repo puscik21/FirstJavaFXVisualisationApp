@@ -1,10 +1,10 @@
 package grzegorz;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import javafx.animation.*;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -26,6 +26,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 
 public class Controller {
@@ -46,6 +47,14 @@ public class Controller {
     // fitProperty
 //        image1.fitWidthProperty().bind(imagePane2.widthProperty());
 //        image1.fitHeightProperty().bind(imagePane2.heightProperty());
+
+    // dialog button
+//        JFXButton button = new JFXButton("Click me!");
+//        button.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> dialog.close());
+//        dialogLayout.setActions(button);
+
+    //fade image
+//    pathTransition.setOnFinished(e -> fadeImage(publicKey));
     // ###############################
 
 
@@ -69,19 +78,31 @@ public class Controller {
     private AnchorPane envPane;
 
     @FXML
-    private ImageView envImage;
-
-    @FXML
     private ImageView alicePC;
 
     @FXML
+    private ImageView envImage;
+
+    @FXML
     private ImageView bobPC;
+
+    @FXML
+    private ImageView publicKey;
+
+    @FXML
+    private ImageView privateKey;
 
     @FXML
     private ImageView electricalCable;
 
     @FXML
     private ImageView photonCable;
+
+    @FXML
+    private StackPane commentPane;
+
+    @FXML
+    private JFXButton showButton;
 
     // chart
     @FXML
@@ -106,8 +127,12 @@ public class Controller {
     // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
+
     private DropShadow borderGlow;
+
+    // TODO: 13.10.2019 to remove probably
     private boolean envelopeSent = false;
+
 
     @FXML
     public void initialize() {
@@ -122,35 +147,63 @@ public class Controller {
 
         initEvents();
 
+        showDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \nAlice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \nMessage can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm");
+
+        // TODO: 13.10.2019 rsa algorithm schema
+        //  Bob send public key     X
+        //  Alice send encrypted message (change colour of the envelope)
+        //  Bob decrypt the message (make colour white again)
+        //  but this can be brake with specially prepared quantum computers
+        //  So there is algorithm called BB84
+        //  Bob send message with qbits through quantum cable
+        //  go to the Filter Scene
+        //  Alice send her filters combination
+        //  comparison of filters
+        //  take good values
+
+        // TODO: 13.10.2019 eventually
+        //  send back part of the current key to make sure that no one is eavesdropping
+        //  charts scene
+
 
         // TODO: 05.10.2019 run on event (like end of previous tab)
         Tab filterTab = new Tab("Measure photons");
         tabPane.getTabs().add(filterTab);
     }
 
+
     private void initEvents() {
         initResizeEvents();
         initMouseEvents();
     }
 
+
     private void initResizeEvents() {
         electricalCable.setPreserveRatio(false);
         photonCable.setPreserveRatio(false);
 
-        for (Node node : envPane.getChildren()){
+        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())){
             ImageView imgView = (ImageView) node;
             setResizeEvent(imgView);
+            setMoveEvent(node);
         }
+
+        setMoveEvent(showButton);
     }
+
 
     private void setResizeEvent(ImageView node) {
         double widthScale = START_PANE_WIDTH / node.getFitWidth();
         double heightScale = START_PANE_HEIGHT / node.getFitHeight();
-        double layoutXScale = START_PANE_WIDTH / node.getLayoutX();
-        double layoutYScale = START_PANE_HEIGHT / node.getLayoutY();
 
         node.fitWidthProperty().bind(envPane.widthProperty().divide(widthScale));
         node.fitHeightProperty().bind(envPane.heightProperty().divide(heightScale));
+    }
+
+
+    private void setMoveEvent(Node node) {
+        double layoutXScale = START_PANE_WIDTH / node.getLayoutX();
+        double layoutYScale = START_PANE_HEIGHT / node.getLayoutY();
 
         envPane.widthProperty().addListener((observable, oldValue, newValue) ->
                 node.setLayoutX(newValue.doubleValue() / layoutXScale)
@@ -160,16 +213,17 @@ public class Controller {
         );
     }
 
+
     private void initMouseEvents() {
-        initBorderGlowEffect();
         initMainTabPane();
         initOnMouseClickedEvents();
 
-        setBorderGlowEffect(alicePC);
-        setBorderGlowEffect(bobPC);
-        setBorderGlowEffect(electricalCable);
-        setBorderGlowEffect(photonCable);
+        initBorderGlowEffectInstance();
+        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())){
+            setBorderGlowEffect(node);
+        }
     }
+
 
     private void initMainTabPane() {
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
@@ -195,32 +249,37 @@ public class Controller {
         });
     }
 
+
     // TODO: 06.10.2019 .properties file for all comments
     private void initOnMouseClickedEvents() {
-        envImage.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("This is encrypted message");
-            } else if (!envelopeSent){
-                envelopeSent = true;
-                moveImage();
+        showButton.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) {
+                startScene();
             }
         });
 
+        // TODO: 13.10.2019 move to comment dialogs probably
         alicePC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 showDialog("Alice's PC");
-            } else if (!envelopeSent){
-                envelopeSent = true;
-                moveImage();
             }
         });
 
+        // TODO: 13.10.2019 move to comment dialogs probably
         bobPC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 showDialog("Bob's PC");
-            } else if (!envelopeSent){
-                envelopeSent = true;
-                moveImage();
+            }
+        });
+
+        initCommentDialogs();
+    }
+
+
+    private void initCommentDialogs() {
+        envImage.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("This is encrypted message");
             }
         });
 
@@ -235,9 +294,22 @@ public class Controller {
                 showDialog("Quantum cable - used for the key establishment");
             }
         });
+
+        publicKey.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("Bob's public key");
+            }
+        });
+
+        privateKey.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                showDialog("Bob's private key");
+            }
+        });
     }
 
-    private void initBorderGlowEffect() {
+
+    private void initBorderGlowEffectInstance() {
         borderGlow = new DropShadow();
         borderGlow.setColor(Color.WHITESMOKE);
         borderGlow.setOffsetX(0f);
@@ -246,44 +318,67 @@ public class Controller {
         borderGlow.setWidth(50);
     }
 
+
     private void setBorderGlowEffect(Node node) {
         node.setOnMouseEntered(e -> node.setEffect(borderGlow));
         node.setOnMouseExited(e -> node.setEffect(null));
     }
 
-    @FXML
-    public void moveImage(){
-        envImage.setVisible(true);
 
-        int dir = -1;
-        double moveX = bobPC.getLayoutX() - alicePC.getLayoutX();
-        double moveY = dir * rootPane.getHeight() / 7;
+    private void startScene() {
+        envPane.getChildren().remove(showButton);
+        showCommentDialog("Bob send his public key to Alice");
+
+        double toX = alicePC.getLayoutX() - alicePC.getFitWidth() / 2.0;
+        double moveY = -1 * rootPane.getHeight() / 7.0;
+        Polyline polylinePath = getTransitionPath(publicKey, toX, moveY);
+
+        PathTransition pathTransition = moveImage(publicKey, polylinePath);
+        // TODO: 13.10.2019 do some onFinished event
+
+
+        // TODO: 13.10.2019 Alice sending logic
+//        showCommentDialog("Alice is sending the message encrypted with Bob's public key");
+    }
+
+
+    private Polyline getTransitionPath(ImageView imgView, double toX, double moveY) {
+        double moveX = toX - imgView.getLayoutX();
 
         Polyline polylinePath = new Polyline();
-        double startX = envImage.getFitWidth() / 2.0;
-        double startY = envImage.getFitHeight() / 2.0;
+        double startX = imgView.getFitWidth() / 2.0;
+        double startY = imgView.getFitHeight() / 2.0;
         polylinePath.getPoints().addAll(startX, startY,
                 startX + 0.0, startY + moveY,
                 startX + moveX, startY + moveY,
                 startX + moveX, startY + 0.0);
 
-        PathTransition pathTransition = new PathTransition();
-        pathTransition.setNode(envImage);
-        pathTransition.setDuration(Duration.seconds(2));
-        pathTransition.setPath(polylinePath);
-        pathTransition.play();
-        pathTransition.setOnFinished(e -> fadeImage());
+        return polylinePath;
     }
 
 
-    private void fadeImage(){
+    // TODO: 13.10.2019 resize images when moving through cables
+    private PathTransition moveImage(ImageView imgView, Polyline polylinePath) {
+        imgView.setVisible(true);
+
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setNode(imgView);
+        pathTransition.setDuration(Duration.seconds(2.0));
+        pathTransition.setPath(polylinePath);
+        pathTransition.play();
+
+        return pathTransition;
+    }
+
+
+    private void fadeImage(ImageView imgView){
         FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(envImage);
+        fadeTransition.setNode(imgView);
         fadeTransition.setDuration(Duration.seconds(1.5));
         fadeTransition.setFromValue(1.0);
         fadeTransition.setToValue(0.0);
         fadeTransition.play();
-        fadeTransition.setOnFinished(e -> envPane.getChildren().remove(envImage));
+        fadeTransition.setOnFinished(e -> envPane.getChildren().remove(imgView));
     }
 
 
@@ -318,19 +413,35 @@ public class Controller {
 
     // others
     private void showDialog(String message) {
+        showDialog(message, "");
+    }
+
+
+    private void showDialog(String message, String title) {
         BoxBlur blurEffect = new BoxBlur(3, 3, 3);
         rootAnchorPane.setEffect(blurEffect);
 
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setBody(new Text(message));
+        if (!title.isEmpty()) {
+            dialogLayout.setHeading(new Text(title));
+        }
+        Text text = new Text(message);
+//        text.setWrappingWidth(START_PANE_WIDTH / 1.5);
+        dialogLayout.setBody(text);
 
         JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-
-//        JFXButton button = new JFXButton("Click me!");
-//        button.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> dialog.close());
-//        dialogLayout.setActions(button);
-
         dialog.setOnDialogClosed(e -> rootAnchorPane.setEffect(null));
+        dialog.show();
+    }
+
+
+    private void showCommentDialog(String message) {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        Text text = new Text(message);
+        text.setWrappingWidth(commentPane.getWidth());
+        dialogLayout.setBody(text);
+
+        JFXDialog dialog = new JFXDialog(commentPane, dialogLayout, JFXDialog.DialogTransition.RIGHT);
         dialog.show();
     }
 

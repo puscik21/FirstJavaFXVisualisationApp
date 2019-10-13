@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTabPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.LineChart?>
@@ -69,7 +70,7 @@
                <center>
                   <JFXTabPane fx:id="tabPane" prefHeight="40.0" BorderPane.alignment="CENTER">
                      <tabs>
-                      <Tab fx:id="envTab" text="Second tab">
+                      <Tab fx:id="envTab" text="Basics">
                         <content>
                           <AnchorPane fx:id="envPane" minHeight="0.0" minWidth="0.0">
                                  <children>
@@ -83,7 +84,7 @@
                                           <Image url="@../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
-                                    <ImageView fx:id="envImage" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="141.0" onMouseClicked="#moveImage" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
+                                    <ImageView fx:id="envImage" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image">
                                        <image>
                                           <Image url="@../images/envelope.jpg" />
                                        </image>
@@ -98,6 +99,18 @@
                                           <Image url="@../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
+                                    <StackPane fx:id="commentPane" layoutX="543.0" layoutY="514.0" prefHeight="150.0" prefWidth="520.0" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="20.0" />
+                                    <ImageView fx:id="privateKey" fitHeight="45.0" fitWidth="75.0" layoutX="959.0" layoutY="274.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/keyBlue.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="publicKey" fitHeight="45.0" fitWidth="75.0" layoutX="959.0" layoutY="212.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../images/keyYellow.png" />
+                                       </image>
+                                    </ImageView>
+                                    <JFXButton fx:id="showButton" layoutX="466.0" layoutY="560.0" prefHeight="54.0" prefWidth="153.0" text="Show me!" textAlignment="CENTER" />
                                  </children></AnchorPane>
                         </content>
                       </Tab>

@@ -10,7 +10,7 @@
    <children>
       <VBox id="helloLabel" alignment="CENTER" opacity="0.75" spacing="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label id="helloLabel" prefHeight="117.0" prefWidth="374.0" stylesheets="@../style/darkTheme.css" text="Hello there!" textAlignment="CENTER" textOverrun="CLIP">
+            <Label id="helloLabel" prefHeight="117.0" prefWidth="485.0" stylesheets="@../style/darkTheme.css" text="Quantum Key Distribution" textAlignment="CENTER" textOverrun="CLIP">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
