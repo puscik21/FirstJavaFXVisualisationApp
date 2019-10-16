@@ -16,11 +16,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Polyline;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -128,6 +128,9 @@ public class Controller {
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
 
+    private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
+    private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
+
     private DropShadow borderGlow;
 
     // TODO: 13.10.2019 to remove probably
@@ -146,15 +149,17 @@ public class Controller {
 
 
         initEvents();
+        envImage.toFront();
+        publicKey.toFront();
+        privateKey.toFront();
 
         showDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \nAlice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \nMessage can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm");
 
         // TODO: 13.10.2019 rsa algorithm schema
         //  Bob send public key     X
-        //  Alice send encrypted message (change colour of the envelope)
-        //  Bob decrypt the message (make colour white again)
-        //  but this can be brake with specially prepared quantum computers
-        //  So there is algorithm called BB84
+        //  Alice send encrypted message (change image of the envelope)     X
+        //  Bob decrypt the message (make default image again)
+        //  but this can be brake with specially prepared quantum computers, so there is algorithm called BB84
         //  Bob send message with qbits through quantum cable
         //  go to the Filter Scene
         //  Alice send her filters combination
@@ -329,45 +334,83 @@ public class Controller {
         envPane.getChildren().remove(showButton);
         showCommentDialog("Bob send his public key to Alice");
 
-        double toX = alicePC.getLayoutX() - alicePC.getFitWidth() / 2.0;
-        double moveY = -1 * rootPane.getHeight() / 7.0;
-        Polyline polylinePath = getTransitionPath(publicKey, toX, moveY);
+        SequentialTransition publicKeyTransition = preparePublicKeyAnimation();
 
-        PathTransition pathTransition = moveImage(publicKey, polylinePath);
-        // TODO: 13.10.2019 do some onFinished event
+//        SequentialTransition privateKeyTransition = preparePrivateKeyAnimation();
 
+        SequentialTransition wholeAnimation = new SequentialTransition(publicKeyTransition);
+        wholeAnimation.play();
+    }
 
-        // TODO: 13.10.2019 Alice sending logic
-//        showCommentDialog("Alice is sending the message encrypted with Bob's public key");
+    private SequentialTransition preparePublicKeyAnimation() {
+        double moveX = envImage.getLayoutX() - publicKey.getLayoutX() - envImage.getFitWidth() / 2.0;
+        double moveY = electricalCable.getLayoutY() - publicKey.getLayoutY() - publicKey.getFitHeight();
+        double toMessageX = moveX + publicKey.getFitWidth() + envImage.getFitWidth() / 2.0;
+        double toMessageY = -envImage.getFitHeight() / 2.0;
+
+        SequentialTransition sendKeyTrans = makeSendingTransition(publicKey, moveX, moveY);
+        TranslateTransition lastTrans = (TranslateTransition) sendKeyTrans.getChildren().get(sendKeyTrans.getChildren().size() - 1);
+        lastTrans.setOnFinished(e -> showCommentDialog("Alice encrypt message with Bob's public key and send it to him"));
+
+        TranslateTransition toMessageTrans = getTranslateTransition(publicKey, lastTrans.getToX(), lastTrans.getToY(),  toMessageX, toMessageY);
+        toMessageTrans.setDelay(Duration.seconds(1.0));
+        toMessageTrans.setOnFinished(e -> changeEnvelopeImage(LOCKED_ENVELOPE_PATH));
+
+        ParallelTransition returnTrans = prepareReturnTransitions(lastTrans, toMessageX, toMessageY);
+
+        return new SequentialTransition(sendKeyTrans, toMessageTrans, returnTrans);
     }
 
 
-    private Polyline getTransitionPath(ImageView imgView, double toX, double moveY) {
-        double moveX = toX - imgView.getLayoutX();
+    private ParallelTransition prepareReturnTransitions(TranslateTransition lastTrans, double toMessageX, double toMessageY) {
+        TranslateTransition keyGoBackTrans = getTranslateTransition(publicKey, toMessageX, toMessageY, lastTrans.getToX(), lastTrans.getToY());
+        keyGoBackTrans.setDelay(Duration.seconds(1.0));
 
-        Polyline polylinePath = new Polyline();
-        double startX = imgView.getFitWidth() / 2.0;
-        double startY = imgView.getFitHeight() / 2.0;
-        polylinePath.getPoints().addAll(startX, startY,
-                startX + 0.0, startY + moveY,
-                startX + moveX, startY + moveY,
-                startX + moveX, startY + 0.0);
+        double toX = bobPC.getLayoutX() - alicePC.getLayoutX();
+        double toY = -envImage.getFitHeight();
+        SequentialTransition sendingTrans = makeSendingTransition(envImage, toX, toY);
 
-        return polylinePath;
+        return new ParallelTransition(keyGoBackTrans, sendingTrans);
+    }
+
+
+    private SequentialTransition preparePrivateKeyAnimation() {
+//        changeEnvelopeImage(DEFAULT_ENVELOPE_PATH);
+
+        SequentialTransition privateKeyTransition = new SequentialTransition();
+        return privateKeyTransition;
     }
 
 
     // TODO: 13.10.2019 resize images when moving through cables
-    private PathTransition moveImage(ImageView imgView, Polyline polylinePath) {
-        imgView.setVisible(true);
+    private SequentialTransition makeSendingTransition(ImageView imgView, double toX, double toY) {
+        TranslateTransition tUp = getTranslateTransition(imgView, 0, 0, 0, toY);
+        TranslateTransition tLeft = getTranslateTransition(imgView, tUp.getToX(), tUp.getToY(), toX, toY);
+        TranslateTransition tDown = getTranslateTransition(imgView, tLeft.getToX(), tLeft.getToY(), toX, 0);
 
-        PathTransition pathTransition = new PathTransition();
-        pathTransition.setNode(imgView);
-        pathTransition.setDuration(Duration.seconds(2.0));
-        pathTransition.setPath(polylinePath);
-        pathTransition.play();
+        SequentialTransition sendingAnimation = new SequentialTransition(tUp, tLeft, tDown);
+        sendingAnimation.setDelay(Duration.seconds(0.5));
+        return sendingAnimation;
+    }
 
-        return pathTransition;
+    // TODO: 16.10.2019 implement time
+    private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.seconds(0.5));
+        transition.setNode(imageView);
+        transition.setFromX(fromX);
+        transition.setFromY(fromY);
+        transition.setToX(toX);
+        transition.setToY(toY);
+
+        return transition;
+    }
+
+
+    // TODO: 13.10.2019 maybe some bump up effect or something like that
+    private void changeEnvelopeImage(String url) {
+        Image image = new Image(url);
+        envImage.setImage(image);
     }
 
 
@@ -436,6 +479,12 @@ public class Controller {
 
 
     private void showCommentDialog(String message) {
+        if (commentPane.getChildren().size() > 0) {
+            TranslateTransition transition = getTranslateTransition(commentPane.getChildren().get(0), 0, 0, -2000, 0);
+            transition.play();
+            transition.setOnFinished(e -> commentPane.getChildren().remove(0));
+        }
+
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         Text text = new Text(message);
         text.setWrappingWidth(commentPane.getWidth());
