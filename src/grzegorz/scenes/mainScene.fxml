@@ -70,7 +70,7 @@
                <center>
                   <JFXTabPane fx:id="tabPane" prefHeight="40.0" BorderPane.alignment="CENTER">
                      <tabs>
-                      <Tab fx:id="envTab" text="Basics">
+                      <Tab fx:id="envTab" text="Introduction">
                         <content>
                           <AnchorPane fx:id="envPane" minHeight="0.0" minWidth="0.0">
                                  <children>

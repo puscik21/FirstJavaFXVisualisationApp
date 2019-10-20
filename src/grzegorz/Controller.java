@@ -153,13 +153,15 @@ public class Controller {
         publicKey.toFront();
         privateKey.toFront();
 
-        showDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \nAlice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \nMessage can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm");
+        returnDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \n" +
+                "Alice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \n" +
+                "Message can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm").show();
 
         // TODO: 13.10.2019 rsa algorithm schema
         //  Bob send public key     X
         //  Alice send encrypted message (change image of the envelope)     X
-        //  Bob decrypt the message (make default image again)
-        //  but this can be brake with specially prepared quantum computers, so there is algorithm called BB84
+        //  Bob decrypt the message (make default image again)      X
+        //  but this can be brake with specially prepared quantum computers, so there is algorithm called BB84      X
         //  Bob send message with qbits through quantum cable
         //  go to the Filter Scene
         //  Alice send her filters combination
@@ -187,7 +189,7 @@ public class Controller {
         electricalCable.setPreserveRatio(false);
         photonCable.setPreserveRatio(false);
 
-        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())){
+        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())) {
             ImageView imgView = (ImageView) node;
             setResizeEvent(imgView);
             setMoveEvent(node);
@@ -224,7 +226,7 @@ public class Controller {
         initOnMouseClickedEvents();
 
         initBorderGlowEffectInstance();
-        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())){
+        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())) {
             setBorderGlowEffect(node);
         }
     }
@@ -243,8 +245,7 @@ public class Controller {
                 // chart
                 else if (newVal.intValue() == 1 && chart.getData().size() == 0) {
                     loadMeasurementChartData(1000.0, 10);
-                }
-                else if (newVal.intValue() == 2) {
+                } else if (newVal.intValue() == 2) {
                     StackPane root = FXMLLoader.load(getClass().getResource("scenes/filterScene.fxml"));
                     tabPane.getTabs().get(2).setContent(root);
                 }
@@ -266,14 +267,14 @@ public class Controller {
         // TODO: 13.10.2019 move to comment dialogs probably
         alicePC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Alice's PC");
+                returnDialog("Alice's PC");
             }
         });
 
         // TODO: 13.10.2019 move to comment dialogs probably
         bobPC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Bob's PC");
+                returnDialog("Bob's PC");
             }
         });
 
@@ -284,31 +285,31 @@ public class Controller {
     private void initCommentDialogs() {
         envImage.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("This is encrypted message");
+                returnDialog("This is encrypted message");
             }
         });
 
         electricalCable.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Electrical Cable - used for communication in unsecure channel");
+                returnDialog("Electrical Cable - used for communication in unsecure channel");
             }
         });
 
         photonCable.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Quantum cable - used for the key establishment");
+                returnDialog("Quantum cable - used for the key establishment");
             }
         });
 
         publicKey.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Bob's public key");
+                returnDialog("Bob's public key");
             }
         });
 
         privateKey.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Bob's private key");
+                returnDialog("Bob's private key");
             }
         });
     }
@@ -332,13 +333,14 @@ public class Controller {
 
     private void startScene() {
         envPane.getChildren().remove(showButton);
-        showCommentDialog("Bob send his public key to Alice");
 
         SequentialTransition publicKeyTransition = preparePublicKeyAnimation();
+        SequentialTransition privateKeyTransition = preparePrivateKeyAnimation();
 
-//        SequentialTransition privateKeyTransition = preparePrivateKeyAnimation();
+        showIntroduction(publicKeyTransition, privateKeyTransition);
 
-        SequentialTransition wholeAnimation = new SequentialTransition(publicKeyTransition);
+        SequentialTransition wholeAnimation = new SequentialTransition(publicKeyTransition, privateKeyTransition);
+//        SequentialTransition wholeAnimation = new SequentialTransition(privateKeyTransition);
         wholeAnimation.play();
     }
 
@@ -350,9 +352,9 @@ public class Controller {
 
         SequentialTransition sendKeyTrans = makeSendingTransition(publicKey, moveX, moveY);
         TranslateTransition lastTrans = (TranslateTransition) sendKeyTrans.getChildren().get(sendKeyTrans.getChildren().size() - 1);
-        lastTrans.setOnFinished(e -> showCommentDialog("Alice encrypt message with Bob's public key and send it to him"));
+        lastTrans.setOnFinished(e -> returnCommentDialog("Alice encrypt message with Bob's public key and send it to him"));
 
-        TranslateTransition toMessageTrans = getTranslateTransition(publicKey, lastTrans.getToX(), lastTrans.getToY(),  toMessageX, toMessageY);
+        TranslateTransition toMessageTrans = getTranslateTransition(publicKey, lastTrans.getToX(), lastTrans.getToY(), toMessageX, toMessageY);
         toMessageTrans.setDelay(Duration.seconds(1.0));
         toMessageTrans.setOnFinished(e -> changeEnvelopeImage(LOCKED_ENVELOPE_PATH));
 
@@ -375,10 +377,33 @@ public class Controller {
 
 
     private SequentialTransition preparePrivateKeyAnimation() {
-//        changeEnvelopeImage(DEFAULT_ENVELOPE_PATH);
+        double toMessageX = bobPC.getLayoutX() - privateKey.getLayoutX() + privateKey.getFitWidth();
+        double toMessageY = -privateKey.getFitHeight();
 
-        SequentialTransition privateKeyTransition = new SequentialTransition();
-        return privateKeyTransition;
+        TranslateTransition toMessageTrans = getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
+        toMessageTrans.setDelay(Duration.seconds(1.0));
+        toMessageTrans.setOnFinished(e -> changeEnvelopeImage(DEFAULT_ENVELOPE_PATH));
+
+        TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), -toMessageX, -toMessageY);
+        fromMessageTrans.setDelay(Duration.seconds(0.5));
+
+        return new SequentialTransition(toMessageTrans, fromMessageTrans);
+    }
+
+
+    private void showIntroduction(SequentialTransition publicKeyTransition, SequentialTransition privateKeyTransition) {
+        returnCommentDialog("Bob send his public key to Alice");
+        publicKeyTransition.setOnFinished(e -> returnCommentDialog("Bob use his private key to decrypt Alice's message"));
+        privateKeyTransition.setOnFinished(e -> {
+            JFXDialog d1 = returnDialog("For ordinary computer this algorithm is nearly impossible to break in reasonable time");
+            JFXDialog d2 = returnDialog("This can be quite easy for quantum computers", "BUT!");
+            JFXDialog d3 = returnDialog("Thankfully there are quantum cryptography algorithms that can stop them thanks to the laws of physics. \n\n" +
+                    "One of them is algorithm called BB84, which now we will discuss");
+
+            d1.show();
+            d1.setOnDialogClosed(ev -> d2.show());
+            d2.setOnDialogClosed(ev -> d3.show());
+        });
     }
 
 
@@ -414,7 +439,7 @@ public class Controller {
     }
 
 
-    private void fadeImage(ImageView imgView){
+    private void fadeImage(ImageView imgView) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(imgView);
         fadeTransition.setDuration(Duration.seconds(1.5));
@@ -443,9 +468,9 @@ public class Controller {
     private void loadEntropyChartData(double keyLength, int distance) {
         XYChart.Series<Integer, Double> series = new LineChart.Series<>();
 
-        series.getData().add(new LineChart.Data<>(1,1 / keyLength * Math.log(1 / keyLength)));
+        series.getData().add(new LineChart.Data<>(1, 1 / keyLength * Math.log(1 / keyLength)));
         for (int i = distance; i <= keyLength; i += distance) {
-            series.getData().add(new LineChart.Data<>(i,-1 * i / keyLength * Math.log(i / keyLength)));
+            series.getData().add(new LineChart.Data<>(i, -1 * i / keyLength * Math.log(i / keyLength)));
         }
 
         chart.getData().add(series);
@@ -455,12 +480,12 @@ public class Controller {
 
 
     // others
-    private void showDialog(String message) {
-        showDialog(message, "");
+    private JFXDialog returnDialog(String message) {
+        return returnDialog(message, "");
     }
 
 
-    private void showDialog(String message, String title) {
+    private JFXDialog returnDialog(String message, String title) {
         BoxBlur blurEffect = new BoxBlur(3, 3, 3);
         rootAnchorPane.setEffect(blurEffect);
 
@@ -474,11 +499,11 @@ public class Controller {
 
         JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
         dialog.setOnDialogClosed(e -> rootAnchorPane.setEffect(null));
-        dialog.show();
+        return dialog;
     }
 
 
-    private void showCommentDialog(String message) {
+    private void returnCommentDialog(String message) {
         if (commentPane.getChildren().size() > 0) {
             TranslateTransition transition = getTranslateTransition(commentPane.getChildren().get(0), 0, 0, -2000, 0);
             transition.play();
@@ -497,7 +522,7 @@ public class Controller {
 
     // *TEST THINGS*
     @FXML
-    public void closePopup(){
+    public void closePopup() {
         Stage stage = (Stage) popupCloseBtn.getScene().getWindow();
         stage.close();
     }
@@ -517,7 +542,7 @@ public class Controller {
 
 
     @FXML
-    public void openNextScene() throws IOException{
+    public void openNextScene() throws IOException {
         Stage stage = (Stage) openNextSceneBtn.getScene().getWindow();
         Parent root = FXMLLoader.load(getClass().getResource("scenes/secondScene.fxml"));
         stage.setScene(new Scene(root));
