@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class FilterScene {
+public class FiltersScene {
     @FXML
     public StackPane rootStackPane;
 
