@@ -99,10 +99,10 @@ public class Controller {
     private ImageView photonCable;
 
     @FXML
-    private StackPane commentPane;
+    private JFXButton showButton;
 
     @FXML
-    private JFXButton showButton;
+    private StackPane commentPane;
 
     // chart
     @FXML
@@ -149,6 +149,8 @@ public class Controller {
 
 
         initEvents();
+
+        // TODO: 20.10.2019 replace them in fxml
         envImage.toFront();
         publicKey.toFront();
         privateKey.toFront();
@@ -162,6 +164,7 @@ public class Controller {
         //  Alice send encrypted message (change image of the envelope)     X
         //  Bob decrypt the message (make default image again)      X
         //  but this can be brake with specially prepared quantum computers, so there is algorithm called BB84      X
+        //  random qbits - bubble dialog or just line to dialog
         //  Bob send message with qbits through quantum cable
         //  go to the Filter Scene
         //  Alice send her filters combination
@@ -246,7 +249,7 @@ public class Controller {
                 else if (newVal.intValue() == 1 && chart.getData().size() == 0) {
                     loadMeasurementChartData(1000.0, 10);
                 } else if (newVal.intValue() == 2) {
-                    StackPane root = FXMLLoader.load(getClass().getResource("scenes/filterScene.fxml"));
+                    StackPane root = FXMLLoader.load(getClass().getResource("scenes/filtersScene.fxml"));
                     tabPane.getTabs().get(2).setContent(root);
                 }
             } catch (IOException e) {
@@ -337,7 +340,7 @@ public class Controller {
         SequentialTransition publicKeyTransition = preparePublicKeyAnimation();
         SequentialTransition privateKeyTransition = preparePrivateKeyAnimation();
 
-        showIntroduction(publicKeyTransition, privateKeyTransition);
+        showIntroductionInfo(publicKeyTransition, privateKeyTransition);
 
         SequentialTransition wholeAnimation = new SequentialTransition(publicKeyTransition, privateKeyTransition);
 //        SequentialTransition wholeAnimation = new SequentialTransition(privateKeyTransition);
@@ -391,7 +394,7 @@ public class Controller {
     }
 
 
-    private void showIntroduction(SequentialTransition publicKeyTransition, SequentialTransition privateKeyTransition) {
+    private void showIntroductionInfo(SequentialTransition publicKeyTransition, SequentialTransition privateKeyTransition) {
         returnCommentDialog("Bob send his public key to Alice");
         publicKeyTransition.setOnFinished(e -> returnCommentDialog("Bob use his private key to decrypt Alice's message"));
         privateKeyTransition.setOnFinished(e -> {
@@ -403,6 +406,8 @@ public class Controller {
             d1.show();
             d1.setOnDialogClosed(ev -> d2.show());
             d2.setOnDialogClosed(ev -> d3.show());
+
+            d3.setOnDialogClosed(ev -> returnBobDialog().show());
         });
     }
 
@@ -503,6 +508,7 @@ public class Controller {
     }
 
 
+    // TODO: 20.10.2019 method for removal of this pane - use it here and after private key transition
     private void returnCommentDialog(String message) {
         if (commentPane.getChildren().size() > 0) {
             TranslateTransition transition = getTranslateTransition(commentPane.getChildren().get(0), 0, 0, -2000, 0);
@@ -517,6 +523,25 @@ public class Controller {
 
         JFXDialog dialog = new JFXDialog(commentPane, dialogLayout, JFXDialog.DialogTransition.RIGHT);
         dialog.show();
+    }
+
+
+    private JFXDialog returnBobDialog() {
+        BoxBlur blurEffect = new BoxBlur(3, 3, 3);
+        rootAnchorPane.setEffect(blurEffect);
+
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Text("Bob is choosing the sequence of qBits to send"));
+
+        try {
+            AnchorPane body = FXMLLoader.load(getClass().getResource("scenes/choosingQBits/choosingQBitsScene.fxml"));
+            dialogLayout.setBody(body);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+        dialog.setOnDialogClosed(e -> rootAnchorPane.setEffect(null));
+        return dialog;
     }
 
 
