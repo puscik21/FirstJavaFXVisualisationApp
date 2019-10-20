@@ -16,7 +16,7 @@ public class SecondSceneController {
 
     @FXML
     public void openFirstScene() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("scenes/mainScene.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("scenes/introduction/introductionScene.fxml"));
         Stage stage = (Stage) openFirstSceneBtn.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.show();

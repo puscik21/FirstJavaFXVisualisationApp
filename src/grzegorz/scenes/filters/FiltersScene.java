@@ -1,7 +1,8 @@
-package grzegorz;
+package grzegorz.scenes.filters;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import grzegorz.QBitState;
 import javafx.animation.FadeTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.ScaleTransition;

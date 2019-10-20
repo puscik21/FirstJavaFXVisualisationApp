@@ -1,4 +1,4 @@
-package grzegorz;
+package grzegorz.scenes.introduction;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 
-public class Controller {
+public class IntroductionScene {
 
     // TODO przerozne roznosci
     // ###############################
@@ -240,7 +240,7 @@ public class Controller {
             try {
                 if (newVal.intValue() == 0) {
                     // FIXME: 22.09.2019 add to tab only (without reloading everything?)
-                    Parent root = FXMLLoader.load(getClass().getResource("scenes/mainScene.fxml"));
+                    Parent root = FXMLLoader.load(getClass().getResource("introductionScene.fxml"));
                     Stage stage = (Stage) tabPane.getScene().getWindow();
                     stage.setScene(new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight()));
                     stage.show();
@@ -249,7 +249,7 @@ public class Controller {
                 else if (newVal.intValue() == 1 && chart.getData().size() == 0) {
                     loadMeasurementChartData(1000.0, 10);
                 } else if (newVal.intValue() == 2) {
-                    StackPane root = FXMLLoader.load(getClass().getResource("scenes/filtersScene.fxml"));
+                    StackPane root = FXMLLoader.load(getClass().getResource("../filters/filtersScene.fxml"));
                     tabPane.getTabs().get(2).setContent(root);
                 }
             } catch (IOException e) {
@@ -270,14 +270,14 @@ public class Controller {
         // TODO: 13.10.2019 move to comment dialogs probably
         alicePC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Alice's PC");
+                returnDialog("Alice's PC").show();
             }
         });
 
         // TODO: 13.10.2019 move to comment dialogs probably
         bobPC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's PC");
+                returnDialog("Bob's PC").show();
             }
         });
 
@@ -288,31 +288,31 @@ public class Controller {
     private void initCommentDialogs() {
         envImage.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("This is encrypted message");
+                returnDialog("This is encrypted message").show();
             }
         });
 
         electricalCable.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Electrical Cable - used for communication in unsecure channel");
+                returnDialog("Electrical Cable - used for communication in unsecure channel").show();
             }
         });
 
         photonCable.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Quantum cable - used for the key establishment");
+                returnDialog("Quantum cable - used for the key establishment").show();
             }
         });
 
         publicKey.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's public key");
+                returnDialog("Bob's public key").show();
             }
         });
 
         privateKey.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's private key");
+                returnDialog("Bob's private key").show();
             }
         });
     }
@@ -381,13 +381,13 @@ public class Controller {
 
     private SequentialTransition preparePrivateKeyAnimation() {
         double toMessageX = bobPC.getLayoutX() - privateKey.getLayoutX() + privateKey.getFitWidth();
-        double toMessageY = -privateKey.getFitHeight();
+        double toMessageY = bobPC.getLayoutY() - privateKey.getLayoutY();
 
         TranslateTransition toMessageTrans = getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
         toMessageTrans.setDelay(Duration.seconds(1.0));
         toMessageTrans.setOnFinished(e -> changeEnvelopeImage(DEFAULT_ENVELOPE_PATH));
 
-        TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), -toMessageX, -toMessageY);
+        TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), 0, 0);
         fromMessageTrans.setDelay(Duration.seconds(0.5));
 
         return new SequentialTransition(toMessageTrans, fromMessageTrans);
@@ -534,7 +534,7 @@ public class Controller {
         dialogLayout.setHeading(new Text("Bob is choosing the sequence of qBits to send"));
 
         try {
-            AnchorPane body = FXMLLoader.load(getClass().getResource("scenes/choosingQBits/choosingQBitsScene.fxml"));
+            AnchorPane body = FXMLLoader.load(getClass().getResource("../choosingQBits/choosingQBitsScene.fxml"));
             dialogLayout.setBody(body);
         } catch (IOException e) {
             e.printStackTrace();
@@ -556,7 +556,7 @@ public class Controller {
     @FXML
     public void openPopupMessage() throws IOException {
         Stage stage = new Stage();
-        Parent root = FXMLLoader.load(getClass().getResource("scenes/popupScene.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("../popupScene.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
 
@@ -569,7 +569,7 @@ public class Controller {
     @FXML
     public void openNextScene() throws IOException {
         Stage stage = (Stage) openNextSceneBtn.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("scenes/secondScene.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("../secondScene.fxml"));
         stage.setScene(new Scene(root));
         stage.show();
     }
