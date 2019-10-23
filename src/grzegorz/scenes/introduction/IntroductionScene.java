@@ -133,9 +133,6 @@ public class IntroductionScene {
 
     private DropShadow borderGlow;
 
-    // TODO: 13.10.2019 to remove probably
-    private boolean envelopeSent = false;
-
 
     @FXML
     public void initialize() {
@@ -164,7 +161,7 @@ public class IntroductionScene {
         //  Alice send encrypted message (change image of the envelope)     X
         //  Bob decrypt the message (make default image again)      X
         //  but this can be brake with specially prepared quantum computers, so there is algorithm called BB84      X
-        //  random qbits - bubble dialog or just line to dialog
+        //  random qbits - bubble dialog or just line to dialog     X
         //  Bob send message with qbits through quantum cable
         //  go to the Filter Scene
         //  Alice send her filters combination
@@ -267,25 +264,23 @@ public class IntroductionScene {
             }
         });
 
-        // TODO: 13.10.2019 move to comment dialogs probably
+        initCommentDialogs();
+    }
+
+
+    private void initCommentDialogs() {
         alicePC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 returnDialog("Alice's PC").show();
             }
         });
 
-        // TODO: 13.10.2019 move to comment dialogs probably
         bobPC.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 returnDialog("Bob's PC").show();
             }
         });
 
-        initCommentDialogs();
-    }
-
-
-    private void initCommentDialogs() {
         envImage.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 returnDialog("This is encrypted message").show();
@@ -359,11 +354,12 @@ public class IntroductionScene {
 
         TranslateTransition toMessageTrans = getTranslateTransition(publicKey, lastTrans.getToX(), lastTrans.getToY(), toMessageX, toMessageY);
         toMessageTrans.setDelay(Duration.seconds(1.0));
-        toMessageTrans.setOnFinished(e -> changeEnvelopeImage(LOCKED_ENVELOPE_PATH));
+
+        ParallelTransition bumpUpAnimation = returnChangingEnvelopeAnimation(LOCKED_ENVELOPE_PATH);
 
         ParallelTransition returnTrans = prepareReturnTransitions(lastTrans, toMessageX, toMessageY);
 
-        return new SequentialTransition(sendKeyTrans, toMessageTrans, returnTrans);
+        return new SequentialTransition(sendKeyTrans, toMessageTrans, bumpUpAnimation, returnTrans);
     }
 
 
@@ -385,12 +381,13 @@ public class IntroductionScene {
 
         TranslateTransition toMessageTrans = getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
         toMessageTrans.setDelay(Duration.seconds(1.0));
-        toMessageTrans.setOnFinished(e -> changeEnvelopeImage(DEFAULT_ENVELOPE_PATH));
+
+        ParallelTransition bumpUpAnimation = returnChangingEnvelopeAnimation(DEFAULT_ENVELOPE_PATH);
 
         TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), 0, 0);
         fromMessageTrans.setDelay(Duration.seconds(0.5));
 
-        return new SequentialTransition(toMessageTrans, fromMessageTrans);
+        return new SequentialTransition(toMessageTrans, bumpUpAnimation, fromMessageTrans);
     }
 
 
@@ -412,7 +409,6 @@ public class IntroductionScene {
     }
 
 
-    // TODO: 13.10.2019 resize images when moving through cables
     private SequentialTransition makeSendingTransition(ImageView imgView, double toX, double toY) {
         TranslateTransition tUp = getTranslateTransition(imgView, 0, 0, 0, toY);
         TranslateTransition tLeft = getTranslateTransition(imgView, tUp.getToX(), tUp.getToY(), toX, toY);
@@ -423,7 +419,7 @@ public class IntroductionScene {
         return sendingAnimation;
     }
 
-    // TODO: 16.10.2019 implement time
+
     private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
         TranslateTransition transition = new TranslateTransition();
         transition.setDuration(Duration.seconds(0.5));
@@ -437,10 +433,28 @@ public class IntroductionScene {
     }
 
 
-    // TODO: 13.10.2019 maybe some bump up effect or something like that
-    private void changeEnvelopeImage(String url) {
+    private ParallelTransition returnChangingEnvelopeAnimation(String url) {
         Image image = new Image(url);
-        envImage.setImage(image);
+
+        ScaleTransition scaleUpTransition = makeScaleTransition(envImage, 1.0, 1.2, 0.25, 0.0);
+        scaleUpTransition.setOnFinished(e -> envImage.setImage(image));
+        ScaleTransition scaleDownTransition = makeScaleTransition(envImage, 1.2, 1.0, 0.25, 0.25);
+
+        return new ParallelTransition(scaleUpTransition, scaleDownTransition);
+    }
+
+
+    private ScaleTransition makeScaleTransition(Node node, double from, double to, double time, double delay) {
+        ScaleTransition scaleTransition = new ScaleTransition();
+        scaleTransition.setNode(node);
+        scaleTransition.setDelay(Duration.seconds(delay));
+        scaleTransition.setDuration(Duration.seconds(time));
+        scaleTransition.setFromX(from);
+        scaleTransition.setFromY(from);
+        scaleTransition.setToX(to);
+        scaleTransition.setToY(to);
+
+        return scaleTransition;
     }
 
 
@@ -508,7 +522,6 @@ public class IntroductionScene {
     }
 
 
-    // TODO: 20.10.2019 method for removal of this pane - use it here and after private key transition
     private void returnCommentDialog(String message) {
         if (commentPane.getChildren().size() > 0) {
             TranslateTransition transition = getTranslateTransition(commentPane.getChildren().get(0), 0, 0, -2000, 0);
