@@ -26,6 +26,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 
@@ -81,10 +84,13 @@ public class IntroductionScene {
     private ImageView alicePC;
 
     @FXML
-    private ImageView envImage;
+    private ImageView bobPC;
 
     @FXML
-    private ImageView bobPC;
+    private ImageView aliceMess;
+
+    @FXML
+    private ImageView bobMess;
 
     @FXML
     private ImageView publicKey;
@@ -131,6 +137,8 @@ public class IntroductionScene {
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
 
+    private ArrayList<CommentedAnimation> sceneCAnimations;
+    private int animCounter;
     private DropShadow borderGlow;
 
 
@@ -147,14 +155,14 @@ public class IntroductionScene {
 
         initEvents();
 
-        // TODO: 20.10.2019 replace them in fxml
-        envImage.toFront();
-        publicKey.toFront();
-        privateKey.toFront();
+        sceneCAnimations = new ArrayList<>(10);
+        animCounter = 0;
+
 
         returnDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \n" +
                 "Alice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \n" +
-                "Message can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm").show();
+                "Message can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm")
+                .show();
 
         // TODO: 13.10.2019 rsa algorithm schema
         //  Bob send public key     X
@@ -198,7 +206,7 @@ public class IntroductionScene {
         setMoveEvent(showButton);
     }
 
-
+    // TODO: 26.10.2019 look at transited objects positions
     private void setResizeEvent(ImageView node) {
         double widthScale = START_PANE_WIDTH / node.getFitWidth();
         double heightScale = START_PANE_HEIGHT / node.getFitHeight();
@@ -260,7 +268,7 @@ public class IntroductionScene {
     private void initOnMouseClickedEvents() {
         showButton.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
-                startScene();
+                showNextAnimation();
             }
         });
 
@@ -281,9 +289,15 @@ public class IntroductionScene {
             }
         });
 
-        envImage.setOnMouseClicked(e -> {
+        aliceMess.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 returnDialog("This is encrypted message").show();
+            }
+        });
+
+        bobMess.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                returnDialog("Bob's qubits for key distribution").show();
             }
         });
 
@@ -329,93 +343,125 @@ public class IntroductionScene {
     }
 
 
-    private void startScene() {
-        envPane.getChildren().remove(showButton);
+    private void showNextAnimation() {
+        if (animCounter == 0) {
+            playShowButtonTransition();
+            preparePublicKeyAnimation();
+            preparePrivateKeyAnimation();
+        }
 
-        SequentialTransition publicKeyTransition = preparePublicKeyAnimation();
-        SequentialTransition privateKeyTransition = preparePrivateKeyAnimation();
-
-        showIntroductionInfo(publicKeyTransition, privateKeyTransition);
-
-        SequentialTransition wholeAnimation = new SequentialTransition(publicKeyTransition, privateKeyTransition);
-//        SequentialTransition wholeAnimation = new SequentialTransition(privateKeyTransition);
-        wholeAnimation.play();
+        playAnimation();
     }
 
-    private SequentialTransition preparePublicKeyAnimation() {
-        double moveX = envImage.getLayoutX() - publicKey.getLayoutX() - envImage.getFitWidth() / 2.0;
-        double moveY = electricalCable.getLayoutY() - publicKey.getLayoutY() - publicKey.getFitHeight();
-        double toMessageX = moveX + publicKey.getFitWidth() + envImage.getFitWidth() / 2.0;
-        double toMessageY = -envImage.getFitHeight() / 2.0;
 
-        SequentialTransition sendKeyTrans = makeSendingTransition(publicKey, moveX, moveY);
+    private void playShowButtonTransition() {
+        showButton.setText("Next step");
+        double toX = envPane.getWidth() - showButton.getLayoutX() - 2 * showButton.getWidth();
+        double toY = 0.0;
+        TranslateTransition buttonTrans = getTranslateTransition(showButton, 0, 0, toX, toY);
+        buttonTrans.play();
+    }
+
+
+    private void playAnimation() {
+        CommentedAnimation cAnimation = sceneCAnimations.get(animCounter);
+        cAnimation.getAnimation().play();
+        Transition trans = (Transition) cAnimation.getAnimation();
+        trans.setOnFinished(e -> showButton.setDisable(false));
+        showButton.setDisable(true);
+        returnCommentDialog(cAnimation.getComment());
+
+        if (++animCounter == sceneCAnimations.size()) {
+            envPane.getChildren().remove(showButton);
+        }
+    }
+
+
+    private void preparePublicKeyAnimation() {
+        double moveX = aliceMess.getLayoutX() - publicKey.getLayoutX() - aliceMess.getFitWidth() / 2.0;
+        double moveY = electricalCable.getLayoutY() - publicKey.getLayoutY() - publicKey.getFitHeight();
+
+        SequentialTransition sendKeyTrans = getSendingTransition(publicKey, moveX, moveY);
         TranslateTransition lastTrans = (TranslateTransition) sendKeyTrans.getChildren().get(sendKeyTrans.getChildren().size() - 1);
-        lastTrans.setOnFinished(e -> returnCommentDialog("Alice encrypt message with Bob's public key and send it to him"));
+        SequentialTransition encryptionAnimation = getEncryptionAnimation(lastTrans);
+        SequentialTransition returnTrans = prepareReturnTransitions();
+
+        addToCAnimations(sendKeyTrans, encryptionAnimation, returnTrans);
+    }
+
+
+    private SequentialTransition getEncryptionAnimation(TranslateTransition lastTrans) {
+        double toMessageX = lastTrans.getToX() + publicKey.getFitWidth() + aliceMess.getFitWidth() / 2.0;
+        double toMessageY = -aliceMess.getFitHeight() / 2.0;
 
         TranslateTransition toMessageTrans = getTranslateTransition(publicKey, lastTrans.getToX(), lastTrans.getToY(), toMessageX, toMessageY);
-        toMessageTrans.setDelay(Duration.seconds(1.0));
-
-        ParallelTransition bumpUpAnimation = returnChangingEnvelopeAnimation(LOCKED_ENVELOPE_PATH);
-
-        ParallelTransition returnTrans = prepareReturnTransitions(lastTrans, toMessageX, toMessageY);
-
-        return new SequentialTransition(sendKeyTrans, toMessageTrans, bumpUpAnimation, returnTrans);
-    }
-
-
-    private ParallelTransition prepareReturnTransitions(TranslateTransition lastTrans, double toMessageX, double toMessageY) {
+        SequentialTransition bumpUpAnimation = returnChangingEnvelopeAnimation(LOCKED_ENVELOPE_PATH);
         TranslateTransition keyGoBackTrans = getTranslateTransition(publicKey, toMessageX, toMessageY, lastTrans.getToX(), lastTrans.getToY());
-        keyGoBackTrans.setDelay(Duration.seconds(1.0));
 
-        double toX = bobPC.getLayoutX() - alicePC.getLayoutX();
-        double toY = -envImage.getFitHeight();
-        SequentialTransition sendingTrans = makeSendingTransition(envImage, toX, toY);
-
-        return new ParallelTransition(keyGoBackTrans, sendingTrans);
+        return new SequentialTransition(toMessageTrans, bumpUpAnimation, keyGoBackTrans);
     }
 
 
-    private SequentialTransition preparePrivateKeyAnimation() {
+    private SequentialTransition prepareReturnTransitions() {
+        double toX = bobPC.getLayoutX() - alicePC.getLayoutX();
+        double toY = -aliceMess.getFitHeight();
+        return getSendingTransition(aliceMess, toX, toY);
+    }
+
+
+    private void addToCAnimations(SequentialTransition sendKeyTrans, SequentialTransition encryptionAnimation, SequentialTransition returnTrans) {
+        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendKeyTrans,"Bob send his public key to Alice");
+        CommentedAnimation encryptionCAnimation = new CommentedAnimation(encryptionAnimation, "Alice encrypt message with Bob's public key");
+        CommentedAnimation returnCAnimation = new CommentedAnimation(returnTrans, "Then she send it back to Bob");
+
+        Collection<CommentedAnimation> cAnimations = Arrays.asList(sendKeyCAnimation, encryptionCAnimation, returnCAnimation);
+        sceneCAnimations.addAll(cAnimations);
+    }
+
+
+    private void preparePrivateKeyAnimation() {
+        TranslateTransition toMessageTrans = getBobUseKeyTransition();
+        SequentialTransition bumpUpAnimation = returnChangingEnvelopeAnimation(DEFAULT_ENVELOPE_PATH);
+        TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), 0, 0);
+
+        SequentialTransition privateKeyTransition = new SequentialTransition(toMessageTrans, bumpUpAnimation, fromMessageTrans);
+        fromMessageTrans.setOnFinished(e -> showIntroductionInfo());    // TODO: 26.10.2019 why on privateKeyTransition doesn't it work
+
+        CommentedAnimation privateKeyCAnimation = new CommentedAnimation(privateKeyTransition,
+                "Bob decrypt the message with his private key. Now he can read what Annie wanted to tell him.");
+
+        sceneCAnimations.add(privateKeyCAnimation);
+    }
+
+
+    private TranslateTransition getBobUseKeyTransition() {
         double toMessageX = bobPC.getLayoutX() - privateKey.getLayoutX() + privateKey.getFitWidth();
         double toMessageY = bobPC.getLayoutY() - privateKey.getLayoutY();
 
-        TranslateTransition toMessageTrans = getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
-        toMessageTrans.setDelay(Duration.seconds(1.0));
-
-        ParallelTransition bumpUpAnimation = returnChangingEnvelopeAnimation(DEFAULT_ENVELOPE_PATH);
-
-        TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), 0, 0);
-        fromMessageTrans.setDelay(Duration.seconds(0.5));
-
-        return new SequentialTransition(toMessageTrans, bumpUpAnimation, fromMessageTrans);
+        return getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
     }
 
 
-    private void showIntroductionInfo(SequentialTransition publicKeyTransition, SequentialTransition privateKeyTransition) {
-        returnCommentDialog("Bob send his public key to Alice");
-        publicKeyTransition.setOnFinished(e -> returnCommentDialog("Bob use his private key to decrypt Alice's message"));
-        privateKeyTransition.setOnFinished(e -> {
-            JFXDialog d1 = returnDialog("For ordinary computer this algorithm is nearly impossible to break in reasonable time");
-            JFXDialog d2 = returnDialog("This can be quite easy for quantum computers", "BUT!");
-            JFXDialog d3 = returnDialog("Thankfully there are quantum cryptography algorithms that can stop them thanks to the laws of physics. \n\n" +
-                    "One of them is algorithm called BB84, which now we will discuss");
+    private void showIntroductionInfo() {
+        JFXDialog d1 = returnDialog("For ordinary computer this algorithm is nearly impossible to break in reasonable time");
+        JFXDialog d2 = returnDialog("This can be quite easy for quantum computers", "BUT!");
+        JFXDialog d3 = returnDialog("Thankfully there are quantum cryptography algorithms that can stop them thanks to the laws of physics. \n\n" +
+                "One of them is algorithm called BB84, which now we will discuss");
 
-            d1.show();
-            d1.setOnDialogClosed(ev -> d2.show());
-            d2.setOnDialogClosed(ev -> d3.show());
+        d1.show();
+        d1.setOnDialogClosed(ev -> d2.show());
+        d2.setOnDialogClosed(ev -> d3.show());
 
-            d3.setOnDialogClosed(ev -> returnBobDialog().show());
-        });
+        d3.setOnDialogClosed(ev -> returnBobDialog().show());
     }
 
 
-    private SequentialTransition makeSendingTransition(ImageView imgView, double toX, double toY) {
+    private SequentialTransition getSendingTransition(ImageView imgView, double toX, double toY) {
         TranslateTransition tUp = getTranslateTransition(imgView, 0, 0, 0, toY);
         TranslateTransition tLeft = getTranslateTransition(imgView, tUp.getToX(), tUp.getToY(), toX, toY);
         TranslateTransition tDown = getTranslateTransition(imgView, tLeft.getToX(), tLeft.getToY(), toX, 0);
 
         SequentialTransition sendingAnimation = new SequentialTransition(tUp, tLeft, tDown);
-        sendingAnimation.setDelay(Duration.seconds(0.5));
         return sendingAnimation;
     }
 
@@ -433,21 +479,20 @@ public class IntroductionScene {
     }
 
 
-    private ParallelTransition returnChangingEnvelopeAnimation(String url) {
+    private SequentialTransition returnChangingEnvelopeAnimation(String url) {
         Image image = new Image(url);
 
-        ScaleTransition scaleUpTransition = makeScaleTransition(envImage, 1.0, 1.2, 0.25, 0.0);
-        scaleUpTransition.setOnFinished(e -> envImage.setImage(image));
-        ScaleTransition scaleDownTransition = makeScaleTransition(envImage, 1.2, 1.0, 0.25, 0.25);
+        ScaleTransition scaleUpTransition = getScaleTransition(aliceMess, 1.0, 1.2, 0.25);
+        scaleUpTransition.setOnFinished(e -> aliceMess.setImage(image));
+        ScaleTransition scaleDownTransition = getScaleTransition(aliceMess, 1.2, 1.0, 0.25);
 
-        return new ParallelTransition(scaleUpTransition, scaleDownTransition);
+        return new SequentialTransition(scaleUpTransition, scaleDownTransition);
     }
 
 
-    private ScaleTransition makeScaleTransition(Node node, double from, double to, double time, double delay) {
+    private ScaleTransition getScaleTransition(Node node, double from, double to, double time) {
         ScaleTransition scaleTransition = new ScaleTransition();
         scaleTransition.setNode(node);
-        scaleTransition.setDelay(Duration.seconds(delay));
         scaleTransition.setDuration(Duration.seconds(time));
         scaleTransition.setFromX(from);
         scaleTransition.setFromY(from);
@@ -458,14 +503,14 @@ public class IntroductionScene {
     }
 
 
-    private void fadeImage(ImageView imgView) {
+    private FadeTransition getFadeTransition(Node node) {
         FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(imgView);
-        fadeTransition.setDuration(Duration.seconds(1.5));
+        fadeTransition.setNode(node);
+        fadeTransition.setDuration(Duration.seconds(0.5));
         fadeTransition.setFromValue(1.0);
         fadeTransition.setToValue(0.0);
-        fadeTransition.play();
-        fadeTransition.setOnFinished(e -> envPane.getChildren().remove(imgView));
+
+        return fadeTransition;
     }
 
 
@@ -524,9 +569,14 @@ public class IntroductionScene {
 
     private void returnCommentDialog(String message) {
         if (commentPane.getChildren().size() > 0) {
-            TranslateTransition transition = getTranslateTransition(commentPane.getChildren().get(0), 0, 0, -2000, 0);
-            transition.play();
-            transition.setOnFinished(e -> commentPane.getChildren().remove(0));
+            Node comment = commentPane.getChildren().get(0);
+            TranslateTransition moveTrans = getTranslateTransition(comment, 0, 0, 0, 2000);
+            moveTrans.setDuration(Duration.seconds(2));
+            FadeTransition fadeTrans = getFadeTransition(comment);
+
+            ParallelTransition commentRemovalAnim = new ParallelTransition(moveTrans, fadeTrans);
+            commentRemovalAnim.play();
+            commentRemovalAnim.setOnFinished(e -> commentPane.getChildren().remove(0));
         }
 
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
@@ -534,7 +584,7 @@ public class IntroductionScene {
         text.setWrappingWidth(commentPane.getWidth());
         dialogLayout.setBody(text);
 
-        JFXDialog dialog = new JFXDialog(commentPane, dialogLayout, JFXDialog.DialogTransition.RIGHT);
+        JFXDialog dialog = new JFXDialog(commentPane, dialogLayout, JFXDialog.DialogTransition.LEFT);
         dialog.show();
     }
 

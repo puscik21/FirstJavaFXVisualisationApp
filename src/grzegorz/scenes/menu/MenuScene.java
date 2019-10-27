@@ -22,6 +22,7 @@ public class MenuScene {
     public JFXButton closeButton;
 
 
+    // TODO: 26.10.2019 Make 2 languages
     @FXML
     public void openMainScene() throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("../introduction/introductionScene.fxml"));

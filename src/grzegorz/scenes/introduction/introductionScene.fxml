@@ -79,19 +79,14 @@
                                           <Image url="@../../images/electricalCable.png" />
                                        </image>
                                     </ImageView>
-                                    <ImageView fx:id="alicePC" fitHeight="150.0" fitWidth="200.0" layoutX="134.0" layoutY="199.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../../images/PCWhite.png" />
-                                       </image>
-                                    </ImageView>
-                                    <ImageView fx:id="envImage" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image">
-                                       <image>
-                                          <Image url="@../../images/envelope.jpg" />
-                                       </image>
-                                    </ImageView>
                                     <ImageView fx:id="photonCable" fitHeight="25.0" fitWidth="450.0" layoutX="317.0" layoutY="387.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
                                           <Image url="@../../images/photonCable.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="alicePC" fitHeight="150.0" fitWidth="200.0" layoutX="134.0" layoutY="199.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
                                     <ImageView fx:id="bobPC" fitHeight="150.0" fitWidth="200.0" layoutX="783.0" layoutY="199.0" pickOnBounds="true" preserveRatio="true">
@@ -99,7 +94,16 @@
                                           <Image url="@../../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
-                                    <StackPane fx:id="commentPane" layoutX="543.0" layoutY="514.0" prefHeight="150.0" prefWidth="520.0" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="20.0" />
+                                    <ImageView fx:id="aliceMess" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image">
+                                       <image>
+                                          <Image url="@../../images/envelope.jpg" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="bobMess" fitHeight="90.0" fitWidth="160.0" layoutX="790.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image">
+                                       <image>
+                                          <Image url="@../../images/envelope.jpg" />
+                                       </image>
+                                    </ImageView>
                                     <ImageView fx:id="privateKey" fitHeight="45.0" fitWidth="75.0" layoutX="959.0" layoutY="274.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
                                           <Image url="@../../images/keyBlue.png" />
@@ -110,6 +114,7 @@
                                           <Image url="@../../images/keyYellow.png" />
                                        </image>
                                     </ImageView>
+                                    <StackPane fx:id="commentPane" layoutX="26.0" layoutY="512.0" prefHeight="150.0" prefWidth="560.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="20.0" />
                                     <JFXButton fx:id="showButton" layoutX="466.0" layoutY="560.0" prefHeight="54.0" prefWidth="153.0" text="Show me!" textAlignment="CENTER" />
                                  </children></AnchorPane>
                         </content>
