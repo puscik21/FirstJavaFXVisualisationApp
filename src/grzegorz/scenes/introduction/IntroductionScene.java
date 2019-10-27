@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
+import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -138,7 +139,11 @@ public class IntroductionScene {
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
 
     private ArrayList<CommentedAnimation> sceneCAnimations;
+    private ArrayList<JFXDialog> sceneDialogs;
     private int animCounter;
+    private int dialogCounter;
+    private boolean nextIsDialog = false;
+
     private DropShadow borderGlow;
 
 
@@ -157,6 +162,8 @@ public class IntroductionScene {
 
         sceneCAnimations = new ArrayList<>(10);
         animCounter = 0;
+        sceneDialogs = new ArrayList<>(10);
+        dialogCounter = 0;
 
 
         returnDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \n" +
@@ -348,15 +355,24 @@ public class IntroductionScene {
             playShowButtonTransition();
             preparePublicKeyAnimation();
             preparePrivateKeyAnimation();
+            prepareSceneDialogs();
         }
 
-        playAnimation();
+        if (nextIsDialog) {
+            showDialog();
+        } else {
+            playAnimation();
+        }
+
+        if (animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size()) {
+            envPane.getChildren().remove(showButton);
+        }
     }
 
 
     private void playShowButtonTransition() {
         showButton.setText("Next step");
-        double toX = envPane.getWidth() - showButton.getLayoutX() - 2 * showButton.getWidth();
+        double toX = envPane.getWidth() - showButton.getLayoutX() - 1.5 * showButton.getWidth();
         double toY = 0.0;
         TranslateTransition buttonTrans = getTranslateTransition(showButton, 0, 0, toX, toY);
         buttonTrans.play();
@@ -365,15 +381,19 @@ public class IntroductionScene {
 
     private void playAnimation() {
         CommentedAnimation cAnimation = sceneCAnimations.get(animCounter);
+        showCommentDialog(cAnimation.getComment());
         cAnimation.getAnimation().play();
         Transition trans = (Transition) cAnimation.getAnimation();
         trans.setOnFinished(e -> showButton.setDisable(false));
         showButton.setDisable(true);
-        returnCommentDialog(cAnimation.getComment());
+        animCounter++;
+    }
 
-        if (++animCounter == sceneCAnimations.size()) {
-            envPane.getChildren().remove(showButton);
-        }
+    private void showDialog() {
+        JFXDialog dialog = sceneDialogs.get(dialogCounter);
+        dialog.show();
+        showButton.setDisable(true);
+        dialogCounter++;
     }
 
 
@@ -425,7 +445,7 @@ public class IntroductionScene {
         TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), 0, 0);
 
         SequentialTransition privateKeyTransition = new SequentialTransition(toMessageTrans, bumpUpAnimation, fromMessageTrans);
-        fromMessageTrans.setOnFinished(e -> showIntroductionInfo());    // TODO: 26.10.2019 why on privateKeyTransition doesn't it work
+        fromMessageTrans.setOnFinished(e -> nextIsDialog = true);       // TODO: 26.10.2019 why on privateKeyTransition doesn't it work
 
         CommentedAnimation privateKeyCAnimation = new CommentedAnimation(privateKeyTransition,
                 "Bob decrypt the message with his private key. Now he can read what Annie wanted to tell him.");
@@ -442,17 +462,27 @@ public class IntroductionScene {
     }
 
 
-    private void showIntroductionInfo() {
+    private void prepareSceneDialogs() {
+        sceneDialogs.add(getRSADialogs());
+        sceneDialogs.add(returnBobDialog());
+    }
+
+
+    private JFXDialog getRSADialogs() {
         JFXDialog d1 = returnDialog("For ordinary computer this algorithm is nearly impossible to break in reasonable time");
         JFXDialog d2 = returnDialog("This can be quite easy for quantum computers", "BUT!");
         JFXDialog d3 = returnDialog("Thankfully there are quantum cryptography algorithms that can stop them thanks to the laws of physics. \n\n" +
                 "One of them is algorithm called BB84, which now we will discuss");
 
-        d1.show();
         d1.setOnDialogClosed(ev -> d2.show());
         d2.setOnDialogClosed(ev -> d3.show());
+        d3.setOnDialogClosed(ev -> {
+            nextIsDialog = true;
+            removeSceneEffects();
+            showButton.setDisable(false);
+        });
 
-        d3.setOnDialogClosed(ev -> returnBobDialog().show());
+        return d1;
     }
 
 
@@ -550,9 +580,6 @@ public class IntroductionScene {
 
 
     private JFXDialog returnDialog(String message, String title) {
-        BoxBlur blurEffect = new BoxBlur(3, 3, 3);
-        rootAnchorPane.setEffect(blurEffect);
-
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         if (!title.isEmpty()) {
             dialogLayout.setHeading(new Text(title));
@@ -562,22 +589,14 @@ public class IntroductionScene {
         dialogLayout.setBody(text);
 
         JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-        dialog.setOnDialogClosed(e -> rootAnchorPane.setEffect(null));
+        dialog.setOnDialogOpened(e -> addSceneBlurEffect());
+        dialog.setOnDialogClosed(e -> removeSceneEffects());
         return dialog;
     }
 
 
-    private void returnCommentDialog(String message) {
-        if (commentPane.getChildren().size() > 0) {
-            Node comment = commentPane.getChildren().get(0);
-            TranslateTransition moveTrans = getTranslateTransition(comment, 0, 0, 0, 2000);
-            moveTrans.setDuration(Duration.seconds(2));
-            FadeTransition fadeTrans = getFadeTransition(comment);
-
-            ParallelTransition commentRemovalAnim = new ParallelTransition(moveTrans, fadeTrans);
-            commentRemovalAnim.play();
-            commentRemovalAnim.setOnFinished(e -> commentPane.getChildren().remove(0));
-        }
+    private void showCommentDialog(String message) {
+        removeCommentDialog();
 
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         Text text = new Text(message);
@@ -589,22 +608,57 @@ public class IntroductionScene {
     }
 
 
-    private JFXDialog returnBobDialog() {
-        BoxBlur blurEffect = new BoxBlur(3, 3, 3);
-        rootAnchorPane.setEffect(blurEffect);
+    private void removeCommentDialog() {
+        if (commentPane.getChildren().size() > 0) {
+            Node comment = commentPane.getChildren().get(0);
+            TranslateTransition moveTrans = getTranslateTransition(comment, 0, 0, 0, 2000);
+            moveTrans.setDuration(Duration.seconds(2));
+            FadeTransition fadeTrans = getFadeTransition(comment);
 
+            ParallelTransition commentRemovalAnim = new ParallelTransition(moveTrans, fadeTrans);
+            commentRemovalAnim.play();
+            commentRemovalAnim.setOnFinished(e -> commentPane.getChildren().remove(0));
+        }
+    }
+
+
+    private JFXDialog returnBobDialog() {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         dialogLayout.setHeading(new Text("Bob is choosing the sequence of qBits to send"));
 
         try {
-            AnchorPane body = FXMLLoader.load(getClass().getResource("../choosingQBits/choosingQBitsScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosingQBits/choosingQBitsScene.fxml"));
+            AnchorPane body = loader.load();
+            ChoosingQBitsScene choosingQBitsController = loader.getController();
+
             dialogLayout.setBody(body);
+            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            dialog.setOnDialogOpened(e -> {
+                addSceneBlurEffect();
+                removeCommentDialog();
+                choosingQBitsController.start();
+            });
+            dialog.setOnDialogClosed(e -> {
+                removeSceneEffects();
+                nextIsDialog = false;
+            });
+            return dialog;
+
         } catch (IOException e) {
             e.printStackTrace();
+            return new JFXDialog();
         }
-        JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-        dialog.setOnDialogClosed(e -> rootAnchorPane.setEffect(null));
-        return dialog;
+    }
+
+
+    private void addSceneBlurEffect() {
+        BoxBlur blurEffect = new BoxBlur(3, 3, 3);
+        rootAnchorPane.setEffect(blurEffect);
+    }
+
+
+    private void removeSceneEffects() {
+        rootAnchorPane.setEffect(null);
     }
 
 

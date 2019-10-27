@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class choosingQBitsScene {
+public class ChoosingQBitsScene {
     @FXML
     private HBox qBitValuesHBox;
 
@@ -30,6 +30,10 @@ public class choosingQBitsScene {
     public void initialize() {
         prepareImages();
         getRandomQBits();
+    }
+
+
+    public void start() {
         showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
     }
 
