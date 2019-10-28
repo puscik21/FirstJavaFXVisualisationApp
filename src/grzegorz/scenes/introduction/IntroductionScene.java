@@ -143,6 +143,7 @@ public class IntroductionScene {
     private int animCounter;
     private int dialogCounter;
     private boolean nextIsDialog = false;
+    private boolean animationsShowed = false;
 
     private DropShadow borderGlow;
 
@@ -177,8 +178,8 @@ public class IntroductionScene {
         //  Bob decrypt the message (make default image again)      X
         //  but this can be brake with specially prepared quantum computers, so there is algorithm called BB84      X
         //  random qbits - bubble dialog or just line to dialog     X
-        //  Bob send message with qbits through quantum cable
-        //  go to the Filter Scene
+        //  Bob send message with qbits through quantum cable       X
+        //  enable Filter scene, arrow or something showing its enable, go to the Filter Scene
         //  Alice send her filters combination
         //  comparison of filters
         //  take good values
@@ -251,11 +252,7 @@ public class IntroductionScene {
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
             try {
                 if (newVal.intValue() == 0) {
-                    // FIXME: 22.09.2019 add to tab only (without reloading everything?)
-                    Parent root = FXMLLoader.load(getClass().getResource("introductionScene.fxml"));
-                    Stage stage = (Stage) tabPane.getScene().getWindow();
-                    stage.setScene(new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight()));
-                    stage.show();
+                    reloadIntroductionScene();
                 }
                 // chart
                 else if (newVal.intValue() == 1 && chart.getData().size() == 0) {
@@ -271,11 +268,28 @@ public class IntroductionScene {
     }
 
 
+    private void reloadIntroductionScene() throws IOException {
+        // FIXME: 22.09.2019 add to tab only (without reloading everything?)
+        Parent root = FXMLLoader.load(getClass().getResource("introductionScene.fxml"));
+        Stage stage = (Stage) tabPane.getScene().getWindow();
+        stage.setScene(new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight()));
+        stage.show();
+    }
+
+
     // TODO: 06.10.2019 .properties file for all comments
     private void initOnMouseClickedEvents() {
         showButton.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
-                showNextAnimation();
+                if (animationsShowed) {
+                    try {
+                        reloadIntroductionScene();
+                    } catch (IOException exception) {
+                        exception.printStackTrace();
+                    }
+                } else {
+                    showNextAnimation();
+                }
             }
         });
 
@@ -356,6 +370,7 @@ public class IntroductionScene {
             preparePublicKeyAnimation();
             preparePrivateKeyAnimation();
             prepareSceneDialogs();
+            prepareQuantumAnimation();
         }
 
         if (nextIsDialog) {
@@ -365,14 +380,15 @@ public class IntroductionScene {
         }
 
         if (animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size()) {
-            envPane.getChildren().remove(showButton);
+            showButton.setText("Replay scene");
+            animationsShowed = true;
         }
     }
 
 
     private void playShowButtonTransition() {
         showButton.setText("Next step");
-        double toX = envPane.getWidth() - showButton.getLayoutX() - 1.5 * showButton.getWidth();
+        double toX = envPane.getWidth() - showButton.getLayoutX() - 1.25 * showButton.getWidth();
         double toY = 0.0;
         TranslateTransition buttonTrans = getTranslateTransition(showButton, 0, 0, toX, toY);
         buttonTrans.play();
@@ -483,6 +499,16 @@ public class IntroductionScene {
         });
 
         return d1;
+    }
+
+
+    private void prepareQuantumAnimation() {
+        double moveX = alicePC.getLayoutX() - bobMess.getLayoutX();
+        double moveY = photonCable.getLayoutY() - bobMess.getLayoutY() + bobMess.getFitHeight() / 2.0;
+
+        SequentialTransition sendKeyTrans = getSendingTransition(bobMess, moveX, moveY);
+        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendKeyTrans,"Bob send his public key to Alice");
+        sceneCAnimations.add(sendKeyCAnimation);
     }
 
 
@@ -641,6 +667,7 @@ public class IntroductionScene {
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
                 nextIsDialog = false;
+                showButton.setDisable(false);
             });
             return dialog;
 

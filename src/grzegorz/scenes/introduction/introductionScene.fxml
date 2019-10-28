@@ -115,7 +115,7 @@
                                        </image>
                                     </ImageView>
                                     <StackPane fx:id="commentPane" layoutX="26.0" layoutY="512.0" prefHeight="150.0" prefWidth="560.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="20.0" />
-                                    <JFXButton fx:id="showButton" layoutX="466.0" layoutY="560.0" prefHeight="54.0" prefWidth="153.0" text="Show me!" textAlignment="CENTER" />
+                                    <JFXButton fx:id="showButton" layoutX="452.0" layoutY="560.0" prefHeight="54.0" prefWidth="181.0" text="Show me!" textAlignment="CENTER" />
                                  </children></AnchorPane>
                         </content>
                       </Tab>
