@@ -94,12 +94,12 @@
                                           <Image url="@../../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
-                                    <ImageView fx:id="aliceMess" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image">
+                                    <ImageView fx:id="aliceMess" fitHeight="90.0" fitWidth="160.0" layoutX="141.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
                                        <image>
                                           <Image url="@../../images/envelope.jpg" />
                                        </image>
                                     </ImageView>
-                                    <ImageView fx:id="bobMess" fitHeight="90.0" fitWidth="160.0" layoutX="790.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image">
+                                    <ImageView fx:id="bobMess" fitHeight="90.0" fitWidth="160.0" layoutX="790.0" layoutY="154.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
                                        <image>
                                           <Image url="@../../images/envelope.jpg" />
                                        </image>

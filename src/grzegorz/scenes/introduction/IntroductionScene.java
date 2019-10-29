@@ -6,6 +6,8 @@ import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
 import javafx.animation.*;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -22,6 +24,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -132,8 +135,13 @@ public class IntroductionScene {
     private Button popupCloseBtn;
 
     // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
+    //  primaryStage.setOnShowing(event -> {});     - try it
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
+
+    private final double TABS_Y = 50;
+    private final double TABS_FIRST_X = 53;
+    private final double TABS_SECOND_X = 214;
 
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
@@ -145,6 +153,7 @@ public class IntroductionScene {
     private boolean nextIsDialog = false;
     private boolean animationsShowed = false;
 
+    private Circle highlightCircle;
     private DropShadow borderGlow;
 
 
@@ -397,10 +406,21 @@ public class IntroductionScene {
 
     private void playAnimation() {
         CommentedAnimation cAnimation = sceneCAnimations.get(animCounter);
-        showCommentDialog(cAnimation.getComment());
+        String comment = cAnimation.getComment();
+        if (comment != null) {
+            showCommentDialog(comment);
+        }
+
         cAnimation.getAnimation().play();
         Transition trans = (Transition) cAnimation.getAnimation();
-        trans.setOnFinished(e -> showButton.setDisable(false));
+        EventHandler<ActionEvent> currentEvent = trans.getOnFinished();
+        trans.setOnFinished(e -> {
+            if (currentEvent != null) {
+                currentEvent.handle(e);
+            }
+            showButton.setDisable(false);
+        });
+
         showButton.setDisable(true);
         animCounter++;
     }
@@ -418,7 +438,9 @@ public class IntroductionScene {
         double moveY = electricalCable.getLayoutY() - publicKey.getLayoutY() - publicKey.getFitHeight();
 
         SequentialTransition sendKeyTrans = getSendingTransition(publicKey, moveX, moveY);
+        sendKeyTrans.setOnFinished(e -> aliceMess.setVisible(true));   // TODO: 30.10.2019 show with scaleTransition
         TranslateTransition lastTrans = (TranslateTransition) sendKeyTrans.getChildren().get(sendKeyTrans.getChildren().size() - 1);
+
         SequentialTransition encryptionAnimation = getEncryptionAnimation(lastTrans);
         SequentialTransition returnTrans = prepareReturnTransitions();
 
@@ -507,8 +529,19 @@ public class IntroductionScene {
         double moveY = photonCable.getLayoutY() - bobMess.getLayoutY() + bobMess.getFitHeight() / 2.0;
 
         SequentialTransition sendKeyTrans = getSendingTransition(bobMess, moveX, moveY);
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendKeyTrans,"Bob send his public key to Alice");
+        sendKeyTrans.setOnFinished(e -> highlightCircle.setVisible(true));
+        FadeTransition highlightTransition = getHighlightCircleAnimation();
+
+        SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
+        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send his public key to Alice");
         sceneCAnimations.add(sendKeyCAnimation);
+    }
+
+
+    private FadeTransition getHighlightCircleAnimation() {
+        highlightCircle = getHighlightCircle(TABS_SECOND_X, TABS_Y);
+        borderPane.getChildren().add(highlightCircle);
+        return getHighlightTransition(highlightCircle);
     }
 
 
@@ -517,8 +550,7 @@ public class IntroductionScene {
         TranslateTransition tLeft = getTranslateTransition(imgView, tUp.getToX(), tUp.getToY(), toX, toY);
         TranslateTransition tDown = getTranslateTransition(imgView, tLeft.getToX(), tLeft.getToY(), toX, 0);
 
-        SequentialTransition sendingAnimation = new SequentialTransition(tUp, tLeft, tDown);
-        return sendingAnimation;
+        return new SequentialTransition(tUp, tLeft, tDown);
     }
 
 
@@ -565,6 +597,29 @@ public class IntroductionScene {
         fadeTransition.setDuration(Duration.seconds(0.5));
         fadeTransition.setFromValue(1.0);
         fadeTransition.setToValue(0.0);
+
+        return fadeTransition;
+    }
+
+
+    private Circle getHighlightCircle(double x, double y) {
+        highlightCircle = new Circle(x, y, 50);
+        highlightCircle.setFill(Color.TRANSPARENT);
+        highlightCircle.setStroke(Color.WHITESMOKE);
+        highlightCircle.setEffect(borderGlow);
+        highlightCircle.setStrokeWidth(4);
+        highlightCircle.setVisible(false);
+
+        return highlightCircle;
+    }
+
+
+    private FadeTransition getHighlightTransition(Node node) {
+        FadeTransition fadeTransition = getFadeTransition(node);
+        fadeTransition.setDuration(Duration.seconds(0.25));
+        fadeTransition.setAutoReverse(true);
+        fadeTransition.setCycleCount(5);
+        fadeTransition.setOnFinished(e -> borderPane.getChildren().remove(node));
 
         return fadeTransition;
     }
@@ -638,7 +693,8 @@ public class IntroductionScene {
         if (commentPane.getChildren().size() > 0) {
             Node comment = commentPane.getChildren().get(0);
             TranslateTransition moveTrans = getTranslateTransition(comment, 0, 0, 0, 2000);
-            moveTrans.setDuration(Duration.seconds(2));
+            moveTrans.setInterpolator(Interpolator.EASE_IN);
+            moveTrans.setDuration(Duration.seconds(1));
             FadeTransition fadeTrans = getFadeTransition(comment);
 
             ParallelTransition commentRemovalAnim = new ParallelTransition(moveTrans, fadeTrans);
@@ -666,6 +722,7 @@ public class IntroductionScene {
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
+                bobMess.setVisible(true);   // TODO: 30.10.2019 show with scaleTransition
                 nextIsDialog = false;
                 showButton.setDisable(false);
             });
