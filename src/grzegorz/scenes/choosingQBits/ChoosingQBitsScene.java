@@ -33,8 +33,9 @@ public class ChoosingQBitsScene {
     }
 
 
-    public void start() {
+    public int[] start() {
         showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
+        return qBitValues;
     }
 
 

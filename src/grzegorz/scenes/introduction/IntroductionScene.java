@@ -5,6 +5,8 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
+import grzegorz.scenes.filters.FiltersScene;
+import grzegorz.scenes.measurement.MeasurementScene;
 import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,8 +15,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.effect.BoxBlur;
@@ -114,15 +114,6 @@ public class IntroductionScene {
     @FXML
     private StackPane commentPane;
 
-    // chart
-    @FXML
-    private Tab chartTab;
-
-    @FXML
-    private AnchorPane chartPane;
-
-    @FXML
-    private LineChart<Integer, Double> chart;
 
     // test items
     @FXML
@@ -139,9 +130,12 @@ public class IntroductionScene {
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
 
+    private final int FILTERS_TAB_NUMBER = 1;
+    private final int MEASUREMENT_TAB_NUMBER = 2;
+
     private final double TABS_Y = 50;
     private final double TABS_FIRST_X = 53;
-    private final double TABS_SECOND_X = 214;
+    private final double TABS_SECOND_X = 206;
 
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
@@ -152,6 +146,9 @@ public class IntroductionScene {
     private int dialogCounter;
     private boolean nextIsDialog = false;
     private boolean animationsShowed = false;
+
+    private MeasurementScene measurementController;
+    private int[] qBitValues;
 
     private Circle highlightCircle;
     private DropShadow borderGlow;
@@ -188,19 +185,14 @@ public class IntroductionScene {
         //  but this can be brake with specially prepared quantum computers, so there is algorithm called BB84      X
         //  random qbits - bubble dialog or just line to dialog     X
         //  Bob send message with qbits through quantum cable       X
-        //  enable Filter scene, arrow or something showing its enable, go to the Filter Scene
-        //  Alice send her filters combination
+        //  enable Filter scene, arrow or something showing its enable, go to the Filter Scene      X
+        //  Alice send her filters combination by electrical cable
         //  comparison of filters
         //  take good values
 
         // TODO: 13.10.2019 eventually
         //  send back part of the current key to make sure that no one is eavesdropping
         //  charts scene
-
-
-        // TODO: 05.10.2019 run on event (like end of previous tab)
-        Tab filterTab = new Tab("Measure photons");
-        tabPane.getTabs().add(filterTab);
     }
 
 
@@ -263,12 +255,25 @@ public class IntroductionScene {
                 if (newVal.intValue() == 0) {
                     reloadIntroductionScene();
                 }
+                else if (newVal.intValue() == FILTERS_TAB_NUMBER) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../filters/filtersScene.fxml"));
+                    StackPane body = loader.load();
+                    tabPane.getTabs().get(FILTERS_TAB_NUMBER).setContent(body);
+                    FiltersScene filtersController = loader.getController();
+                    System.out.println(Arrays.toString(qBitValues));
+                    filtersController.start(qBitValues);
+                }
                 // chart
-                else if (newVal.intValue() == 1 && chart.getData().size() == 0) {
-                    loadMeasurementChartData(1000.0, 10);
-                } else if (newVal.intValue() == 2) {
-                    StackPane root = FXMLLoader.load(getClass().getResource("../filters/filtersScene.fxml"));
-                    tabPane.getTabs().get(2).setContent(root);
+                else if (newVal.intValue() == MEASUREMENT_TAB_NUMBER) {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../measurement/measurementScene.fxml"));
+                        AnchorPane body = loader.load();
+                        tabPane.getTabs().get(MEASUREMENT_TAB_NUMBER).setContent(body);
+                        measurementController = loader.getController();
+                        measurementController.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -290,6 +295,8 @@ public class IntroductionScene {
     private void initOnMouseClickedEvents() {
         showButton.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
+//                Tab filterTab = new Tab("Test tab");
+//                tabPane.getTabs().add(filterTab);
                 if (animationsShowed) {
                     try {
                         reloadIntroductionScene();
@@ -375,11 +382,7 @@ public class IntroductionScene {
 
     private void showNextAnimation() {
         if (animCounter == 0) {
-            playShowButtonTransition();
-            preparePublicKeyAnimation();
-            preparePrivateKeyAnimation();
-            prepareSceneDialogs();
-            prepareQuantumAnimation();
+            prepareAllAnimations();
         }
 
         if (nextIsDialog) {
@@ -392,6 +395,15 @@ public class IntroductionScene {
             showButton.setText("Replay scene");
             animationsShowed = true;
         }
+    }
+
+
+    private void prepareAllAnimations() {
+        playShowButtonTransition();
+        preparePublicKeyAnimation();
+        preparePrivateKeyAnimation();
+        prepareSceneDialogs();
+        prepareQuantumAnimation();
     }
 
 
@@ -529,7 +541,11 @@ public class IntroductionScene {
         double moveY = photonCable.getLayoutY() - bobMess.getLayoutY() + bobMess.getFitHeight() / 2.0;
 
         SequentialTransition sendKeyTrans = getSendingTransition(bobMess, moveX, moveY);
-        sendKeyTrans.setOnFinished(e -> highlightCircle.setVisible(true));
+        sendKeyTrans.setOnFinished(e -> {
+            highlightCircle.setVisible(true);
+            Tab filterTab = new Tab("Photons Measurement");
+            tabPane.getTabs().add(filterTab);
+        });
         FadeTransition highlightTransition = getHighlightCircleAnimation();
 
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
@@ -625,34 +641,6 @@ public class IntroductionScene {
     }
 
 
-    private void loadMeasurementChartData(double keyLength, int distance) {
-        XYChart.Series<Integer, Double> series = new LineChart.Series<>();
-
-        series.getData().add(new LineChart.Data<>(1, Math.log(1 / keyLength)));
-        for (int i = distance; i <= keyLength; i += distance) {
-            series.getData().add(new LineChart.Data<>(i, Math.log(i / keyLength)));
-        }
-
-        chart.getData().add(series);
-        chart.setCreateSymbols(false);
-        chart.setTitle("Measure of security");
-    }
-
-
-    // TODO use entropy chart
-    private void loadEntropyChartData(double keyLength, int distance) {
-        XYChart.Series<Integer, Double> series = new LineChart.Series<>();
-
-        series.getData().add(new LineChart.Data<>(1, 1 / keyLength * Math.log(1 / keyLength)));
-        for (int i = distance; i <= keyLength; i += distance) {
-            series.getData().add(new LineChart.Data<>(i, -1 * i / keyLength * Math.log(i / keyLength)));
-        }
-
-        chart.getData().add(series);
-        chart.setCreateSymbols(false);
-        chart.setTitle("Entropy of security");
-    }
-
 
     // others
     private JFXDialog returnDialog(String message) {
@@ -718,7 +706,7 @@ public class IntroductionScene {
             dialog.setOnDialogOpened(e -> {
                 addSceneBlurEffect();
                 removeCommentDialog();
-                choosingQBitsController.start();
+                qBitValues = choosingQBitsController.start();
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();

@@ -55,6 +55,7 @@ public class FiltersScene {
 
     private ArrayList<Integer> chosenFilters;
     private ArrayList<QBitState> chosenPhotons;
+    private int[] qBitValues;
 
     private boolean comparisonStarted = false;
 
@@ -64,15 +65,17 @@ public class FiltersScene {
 
         qBitImage.setVisible(false);
         filterImage.setVisible(false);
-        qBitImage.toFront();
-
-        setAllImages();
-        prepareRandomImages();
-
-        // FIXME: 03.10.2019 - a better way to resize it
+        // FIXME: 03.10.2019 - a better way to resize it (at least that function can be done in fxml?)
         labelHBox.setMaxWidth(1100);
 
+        setAllImages();
         initListeners();
+    }
+
+
+    public void start(int[] qBitValues) {
+        this.qBitValues = qBitValues;
+        prepareQBitsAndFilters();
     }
 
 
@@ -91,34 +94,43 @@ public class FiltersScene {
     }
 
 
-    private void prepareRandomImages() {
+    private void prepareQBitsAndFilters() {
         chosenPhotons = new ArrayList<>(filterHBox.getChildren().size());
         chosenFilters = new ArrayList<>(qBitHBox.getChildren().size());
 
-        prepareHBoxQBitImages(qBitHBox, photonImages, chosenPhotons);
-        prepareHBoxFilterImages(filterHBox, filterImages, chosenFilters);
+        prepareQBitsHBox();
+        prepareFiltersHBox();
     }
 
 
-    private void prepareHBoxFilterImages(HBox hBox, ArrayList<Image> images, ArrayList<Integer> chosen) {
-        for (int i = 0; i < hBox.getChildren().size(); i++) {
-            ImageView imageView = (ImageView) hBox.getChildren().get(i);
+    private void prepareQBitsHBox() {
+        for (int i = 0; i < qBitHBox.getChildren().size(); i++) {
+            ImageView imageView = (ImageView) qBitHBox.getChildren().get(i);
 
-            int imageNumber = getRandomNumber(images.size());
-            imageView.setImage(images.get(imageNumber));
-            chosen.add(imageNumber);
+            int imageNumber = qBitValToImageNumber(qBitValues[i]);
+            imageView.setImage(photonImages.get(imageNumber));
+            chosenPhotons.add(QBitState.getNewQBit(imageNumber));
         }
     }
 
 
-    private void prepareHBoxQBitImages(HBox hBox, ArrayList<Image> images, ArrayList<QBitState> chosen) {
-        for (int i = 0; i < hBox.getChildren().size(); i++) {
-            ImageView imageView = (ImageView) hBox.getChildren().get(i);
+    private void prepareFiltersHBox() {
+        for (int i = 0; i < filterHBox.getChildren().size(); i++) {
+            ImageView imageView = (ImageView) filterHBox.getChildren().get(i);
 
-            int imageNumber = getRandomNumber(images.size());
-            imageView.setImage(images.get(imageNumber));
-            chosen.add(QBitState.getNewQBit(imageNumber));
+            int imageNumber = getRandomNumber(filterImages.size());
+            imageView.setImage(filterImages.get(imageNumber));
+            chosenFilters.add(imageNumber);
         }
+    }
+
+
+    private int qBitValToImageNumber(int val) {
+        int imageNumber = getRandomNumber(2);
+        if (val == 0) {
+            imageNumber += 2;
+        }
+        return imageNumber;
     }
 
 

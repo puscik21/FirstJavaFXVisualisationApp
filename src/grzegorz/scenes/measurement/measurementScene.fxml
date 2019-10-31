@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="chartPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.measurement.MeasurementScene">
+   <children>
+      <LineChart fx:id="chart" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <xAxis>
+            <NumberAxis label="k" side="BOTTOM" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis label="j(k)" side="LEFT" />
+         </yAxis>
+      </LineChart>
+   </children>
+</AnchorPane>

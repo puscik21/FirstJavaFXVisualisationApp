@@ -147,14 +147,14 @@
          <bottom>
             <AnchorPane fx:id="comparisonPane" stylesheets="@../../style/darkTheme.css" BorderPane.alignment="CENTER">
                <children>
-                  <ImageView fx:id="qBitImage" fitHeight="180.0" fitWidth="180.0" layoutX="41.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0">
-                     <image>
-                        <Image url="@../../images/horPhoton.png" />
-                     </image>
-                  </ImageView>
                   <ImageView fx:id="filterImage" fitHeight="180.0" fitWidth="180.0" layoutX="860.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.rightAnchor="40.0">
                      <image>
                         <Image url="@../../images/greenFilter.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="qBitImage" fitHeight="180.0" fitWidth="180.0" layoutX="41.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="40.0">
+                     <image>
+                        <Image url="@../../images/horPhoton.png" />
                      </image>
                   </ImageView>
                </children>
