@@ -139,6 +139,7 @@ public class IntroductionScene {
 
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
+    // TODO: 01.11.2019 message sended by quantum cable could be yellow
 
     private ArrayList<CommentedAnimation> sceneCAnimations;
     private ArrayList<JFXDialog> sceneDialogs;
@@ -450,7 +451,7 @@ public class IntroductionScene {
         double moveY = electricalCable.getLayoutY() - publicKey.getLayoutY() - publicKey.getFitHeight();
 
         SequentialTransition sendKeyTrans = getSendingTransition(publicKey, moveX, moveY);
-        sendKeyTrans.setOnFinished(e -> aliceMess.setVisible(true));   // TODO: 30.10.2019 show with scaleTransition
+        sendKeyTrans.setOnFinished(e -> showMess(aliceMess));
         TranslateTransition lastTrans = (TranslateTransition) sendKeyTrans.getChildren().get(sendKeyTrans.getChildren().size() - 1);
 
         SequentialTransition encryptionAnimation = getEncryptionAnimation(lastTrans);
@@ -524,6 +525,7 @@ public class IntroductionScene {
         JFXDialog d3 = returnDialog("Thankfully there are quantum cryptography algorithms that can stop them thanks to the laws of physics. \n\n" +
                 "One of them is algorithm called BB84, which now we will discuss");
 
+        d1.setOnDialogOpened(ev -> hideMess(aliceMess));
         d1.setOnDialogClosed(ev -> d2.show());
         d2.setOnDialogClosed(ev -> d3.show());
         d3.setOnDialogClosed(ev -> {
@@ -551,6 +553,19 @@ public class IntroductionScene {
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send his public key to Alice");
         sceneCAnimations.add(sendKeyCAnimation);
+    }
+
+
+    private void hideMess(ImageView imgView) {
+        getScaleTransition(imgView, 1.0, 0.0, 0.25).play();
+    }
+
+
+    private void showMess(ImageView imgView) {
+        ScaleTransition hideTransition = getScaleTransition(imgView, 1.0, 0.0, 0.01);
+        hideTransition.setOnFinished(e -> imgView.setVisible(true));
+        ScaleTransition showTransition = getScaleTransition(imgView, 0.0, 1.0, 0.25);
+        new SequentialTransition(hideTransition, showTransition).play();
     }
 
 
@@ -710,7 +725,7 @@ public class IntroductionScene {
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
-                bobMess.setVisible(true);   // TODO: 30.10.2019 show with scaleTransition
+                showMess(bobMess);
                 nextIsDialog = false;
                 showButton.setDisable(false);
             });
