@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -136,6 +137,7 @@ public class IntroductionScene {
     private final double TABS_Y = 50;
     private final double TABS_FIRST_X = 53;
     private final double TABS_SECOND_X = 206;
+    private final double TABS_THIRD_X = 350;
 
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
@@ -149,7 +151,9 @@ public class IntroductionScene {
     private boolean animationsShowed = false;
 
     private MeasurementScene measurementController;
-    private int[] qBitValues;
+    private int[] qBitsValues;
+    private int[] aliceFiltersValues;
+    private int[] bobFiltersValues;
 
     private Circle highlightCircle;
     private DropShadow borderGlow;
@@ -254,15 +258,17 @@ public class IntroductionScene {
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
             try {
                 if (newVal.intValue() == 0) {
-                    reloadIntroductionScene();
+//                    reloadIntroductionScene();
                 }
                 else if (newVal.intValue() == FILTERS_TAB_NUMBER) {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../filters/filtersScene.fxml"));
                     StackPane body = loader.load();
                     tabPane.getTabs().get(FILTERS_TAB_NUMBER).setContent(body);
                     FiltersScene filtersController = loader.getController();
-                    System.out.println(Arrays.toString(qBitValues));
-                    filtersController.start(qBitValues);
+                    filtersController.start(qBitsValues, aliceFiltersValues);
+                    hideMess(bobMess);
+                    aliceMess.setTranslateX(0);
+                    aliceMess.setTranslateY(0);
                 }
                 // chart
                 else if (newVal.intValue() == MEASUREMENT_TAB_NUMBER) {
@@ -405,6 +411,7 @@ public class IntroductionScene {
         preparePrivateKeyAnimation();
         prepareSceneDialogs();
         prepareQuantumAnimation();
+        prepareAliceSendFiltersAnimation();
     }
 
 
@@ -451,11 +458,10 @@ public class IntroductionScene {
         double moveY = electricalCable.getLayoutY() - publicKey.getLayoutY() - publicKey.getFitHeight();
 
         SequentialTransition sendKeyTrans = getSendingTransition(publicKey, moveX, moveY);
-        sendKeyTrans.setOnFinished(e -> showMess(aliceMess));
         TranslateTransition lastTrans = (TranslateTransition) sendKeyTrans.getChildren().get(sendKeyTrans.getChildren().size() - 1);
 
         SequentialTransition encryptionAnimation = getEncryptionAnimation(lastTrans);
-        SequentialTransition returnTrans = prepareReturnTransitions();
+        SequentialTransition returnTrans = getAliceReturnTransition();
 
         addToCAnimations(sendKeyTrans, encryptionAnimation, returnTrans);
     }
@@ -465,15 +471,16 @@ public class IntroductionScene {
         double toMessageX = lastTrans.getToX() + publicKey.getFitWidth() + aliceMess.getFitWidth() / 2.0;
         double toMessageY = -aliceMess.getFitHeight() / 2.0;
 
+        SequentialTransition showMessTrans = showMess(aliceMess);
         TranslateTransition toMessageTrans = getTranslateTransition(publicKey, lastTrans.getToX(), lastTrans.getToY(), toMessageX, toMessageY);
         SequentialTransition bumpUpAnimation = returnChangingEnvelopeAnimation(LOCKED_ENVELOPE_PATH);
         TranslateTransition keyGoBackTrans = getTranslateTransition(publicKey, toMessageX, toMessageY, lastTrans.getToX(), lastTrans.getToY());
 
-        return new SequentialTransition(toMessageTrans, bumpUpAnimation, keyGoBackTrans);
+        return new SequentialTransition(showMessTrans, toMessageTrans, bumpUpAnimation, keyGoBackTrans);
     }
 
 
-    private SequentialTransition prepareReturnTransitions() {
+    private SequentialTransition getAliceReturnTransition() {
         double toX = bobPC.getLayoutX() - alicePC.getLayoutX();
         double toY = -aliceMess.getFitHeight();
         return getSendingTransition(aliceMess, toX, toY);
@@ -548,11 +555,34 @@ public class IntroductionScene {
             Tab filterTab = new Tab("Photons Measurement");
             tabPane.getTabs().add(filterTab);
         });
-        FadeTransition highlightTransition = getHighlightCircleAnimation();
+        FadeTransition highlightTransition = getHighlightCircleAnimation(TABS_SECOND_X);
 
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send his public key to Alice");
         sceneCAnimations.add(sendKeyCAnimation);
+    }
+
+
+    private void prepareAliceSendFiltersAnimation() {
+        ScaleTransition showMessTrans = getScaleTransition(aliceMess, 0.0, 1.0, 0.25);
+        SequentialTransition sendingTrans = getAliceReturnTransition();
+        sendingTrans.setOnFinished(e -> {
+            highlightCircle.setVisible(true);
+            Tab filterTab = new Tab("Filters Comparison");
+            tabPane.getTabs().add(filterTab);
+        });
+
+        FadeTransition highlightTransition = getHighlightCircleAnimation(TABS_THIRD_X);
+
+        SequentialTransition aliceSendFiltersTrans = new SequentialTransition(showMessTrans, sendingTrans, highlightTransition);
+        aliceSendFiltersTrans.setOnFinished(e -> {
+//            highlightCircle.setVisible(true);
+//            Tab filterTab = new Tab("Filters Comparison");
+//            tabPane.getTabs().add(filterTab);
+        });
+
+        CommentedAnimation aliceSendFiltersCAnimation = new CommentedAnimation(aliceSendFiltersTrans, "Alice send filters that she chose");
+        sceneCAnimations.add(aliceSendFiltersCAnimation);
     }
 
 
@@ -561,16 +591,16 @@ public class IntroductionScene {
     }
 
 
-    private void showMess(ImageView imgView) {
+    private SequentialTransition showMess(ImageView imgView) {
         ScaleTransition hideTransition = getScaleTransition(imgView, 1.0, 0.0, 0.01);
         hideTransition.setOnFinished(e -> imgView.setVisible(true));
         ScaleTransition showTransition = getScaleTransition(imgView, 0.0, 1.0, 0.25);
-        new SequentialTransition(hideTransition, showTransition).play();
+        return new SequentialTransition(hideTransition, showTransition);
     }
 
 
-    private FadeTransition getHighlightCircleAnimation() {
-        highlightCircle = getHighlightCircle(TABS_SECOND_X, TABS_Y);
+    private FadeTransition getHighlightCircleAnimation(double x) {
+        highlightCircle = getHighlightCircle(x, TABS_Y);
         borderPane.getChildren().add(highlightCircle);
         return getHighlightTransition(highlightCircle);
     }
@@ -721,11 +751,15 @@ public class IntroductionScene {
             dialog.setOnDialogOpened(e -> {
                 addSceneBlurEffect();
                 removeCommentDialog();
-                qBitValues = choosingQBitsController.start();
+                int[][] bobQbitsAndFilters = choosingQBitsController.start();
+                qBitsValues = bobQbitsAndFilters[0];
+                bobFiltersValues = bobQbitsAndFilters[1];
+                // its kinda workaround to prepare filters with qbits values here
+                aliceFiltersValues = getRandomFilterValues(qBitsValues.length);
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
-                showMess(bobMess);
+                showMess(bobMess).play();
                 nextIsDialog = false;
                 showButton.setDisable(false);
             });
@@ -735,6 +769,18 @@ public class IntroductionScene {
             e.printStackTrace();
             return new JFXDialog();
         }
+    }
+
+
+    private int[] getRandomFilterValues(int length) {
+        Random random = new Random();
+        int[] values = new int[length];
+        int bound = 2;
+
+        for (int i = 0; i < length; i++) {
+            values[i] = random.nextInt(bound);
+        }
+        return values;
     }
 
 

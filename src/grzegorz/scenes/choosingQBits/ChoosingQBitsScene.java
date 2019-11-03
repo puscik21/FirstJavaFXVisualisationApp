@@ -21,7 +21,8 @@ public class ChoosingQBitsScene {
     @FXML
     private HBox qBitImagesHBox;
 
-    private int[] qBitValues;
+    private int[] qBitsValues;
+    private int[] filtersValues;
     private ArrayList<Image> positiveQBitImages;
     private ArrayList<Image> negativeQBitImages;
 
@@ -33,9 +34,9 @@ public class ChoosingQBitsScene {
     }
 
 
-    public int[] start() {
+    public int[][] start() {
         showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
-        return qBitValues;
+        return new int[][] {qBitsValues, filtersValues};
     }
 
 
@@ -57,7 +58,8 @@ public class ChoosingQBitsScene {
         int size = qBitValuesHBox.getChildren().size();
         int bound = 2;
 
-        qBitValues = new int[size];
+        qBitsValues = new int[size];
+        filtersValues = new int[size];
 
         for (int i = 0; i < size; i++) {
             int randomValue = random.nextInt(bound);
@@ -68,7 +70,8 @@ public class ChoosingQBitsScene {
 
 
     private void fillQBitValues(int i, int value, int rotation) {
-        qBitValues[i] = value;
+        qBitsValues[i] = value;
+        filtersValues[i] = rotation;
 
         ImageView qBitImageView = (ImageView) qBitImagesHBox.getChildren().get(i);
         qBitImageView.setImage(getQBitImageView(value, rotation));
@@ -89,7 +92,7 @@ public class ChoosingQBitsScene {
 
     private void showChosenQBits(ObservableList<Node> valuesList, ObservableList<Node> imageViewsList, int index) {
         Label valueLabel = (Label) valuesList.get(index);
-        valueLabel.setText(String.valueOf(qBitValues[index]));
+        valueLabel.setText(String.valueOf(qBitsValues[index]));
         valueLabel.setVisible(true);
 
         ImageView imageView = (ImageView) imageViewsList.get(index);

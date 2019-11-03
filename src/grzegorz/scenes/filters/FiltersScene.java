@@ -55,7 +55,8 @@ public class FiltersScene {
 
     private ArrayList<Integer> chosenFilters;
     private ArrayList<QBitState> chosenPhotons;
-    private int[] qBitValues;
+    private int[] qBitsValues;
+    private int[] filtersValues;
 
     private boolean comparisonStarted = false;
 
@@ -73,8 +74,9 @@ public class FiltersScene {
     }
 
 
-    public void start(int[] qBitValues) {
-        this.qBitValues = qBitValues;
+    public void start(int[] qBitsValues, int[] filtersValues) {
+        this.qBitsValues = qBitsValues;
+        this.filtersValues = filtersValues;
         prepareQBitsAndFilters();
     }
 
@@ -107,7 +109,7 @@ public class FiltersScene {
         for (int i = 0; i < qBitHBox.getChildren().size(); i++) {
             ImageView imageView = (ImageView) qBitHBox.getChildren().get(i);
 
-            int imageNumber = qBitValToImageNumber(qBitValues[i]);
+            int imageNumber = qBitValToImageNumber(qBitsValues[i]);
             imageView.setImage(photonImages.get(imageNumber));
             chosenPhotons.add(QBitState.getNewQBit(imageNumber));
         }
@@ -118,7 +120,7 @@ public class FiltersScene {
         for (int i = 0; i < filterHBox.getChildren().size(); i++) {
             ImageView imageView = (ImageView) filterHBox.getChildren().get(i);
 
-            int imageNumber = getRandomNumber(filterImages.size());
+            int imageNumber = filtersValues[i];
             imageView.setImage(filterImages.get(imageNumber));
             chosenFilters.add(imageNumber);
         }
