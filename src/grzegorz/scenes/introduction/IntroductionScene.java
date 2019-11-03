@@ -137,7 +137,7 @@ public class IntroductionScene {
     private final double TABS_Y = 50;
     private final double TABS_FIRST_X = 53;
     private final double TABS_SECOND_X = 206;
-    private final double TABS_THIRD_X = 350;
+    private final double TABS_THIRD_X = 385;
 
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
@@ -155,7 +155,8 @@ public class IntroductionScene {
     private int[] aliceFiltersValues;
     private int[] bobFiltersValues;
 
-    private Circle highlightCircle;
+    private Circle secondHighlightCircle;
+    private Circle thirdHighlightCircle;
     private DropShadow borderGlow;
 
 
@@ -177,6 +178,8 @@ public class IntroductionScene {
         sceneDialogs = new ArrayList<>(10);
         dialogCounter = 0;
 
+        secondHighlightCircle = getHighlightCircle(TABS_SECOND_X, TABS_Y);
+        thirdHighlightCircle = getHighlightCircle(TABS_THIRD_X, TABS_Y);
 
         returnDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \n" +
                 "Alice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \n" +
@@ -258,6 +261,7 @@ public class IntroductionScene {
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
             try {
                 if (newVal.intValue() == 0) {
+                    // TODO: 04.11.2019 do I want to reload it?
 //                    reloadIntroductionScene();
                 }
                 else if (newVal.intValue() == FILTERS_TAB_NUMBER) {
@@ -267,8 +271,8 @@ public class IntroductionScene {
                     FiltersScene filtersController = loader.getController();
                     filtersController.start(qBitsValues, aliceFiltersValues);
                     hideMess(bobMess);
-                    aliceMess.setTranslateX(0);
-                    aliceMess.setTranslateY(0);
+//                    aliceMess.setTranslateX(0);
+//                    aliceMess.setTranslateY(0);
                 }
                 // chart
                 else if (newVal.intValue() == MEASUREMENT_TAB_NUMBER) {
@@ -300,7 +304,7 @@ public class IntroductionScene {
 
     // TODO: 06.10.2019 .properties file for all comments
     private void initOnMouseClickedEvents() {
-        showButton.setOnMouseClicked(e -> {
+        showButton.setOnMouseClicked(e -> {     // TODO: 04.11.2019 block till user move to next tab
             if (e.getButton() == MouseButton.PRIMARY) {
 //                Tab filterTab = new Tab("Test tab");
 //                tabPane.getTabs().add(filterTab);
@@ -533,7 +537,11 @@ public class IntroductionScene {
                 "One of them is algorithm called BB84, which now we will discuss");
 
         d1.setOnDialogOpened(ev -> hideMess(aliceMess));
-        d1.setOnDialogClosed(ev -> d2.show());
+        d1.setOnDialogClosed(ev -> {
+            d2.show();
+            aliceMess.setTranslateX(0);
+            aliceMess.setTranslateY(0);
+        });
         d2.setOnDialogClosed(ev -> d3.show());
         d3.setOnDialogClosed(ev -> {
             nextIsDialog = true;
@@ -551,11 +559,11 @@ public class IntroductionScene {
 
         SequentialTransition sendKeyTrans = getSendingTransition(bobMess, moveX, moveY);
         sendKeyTrans.setOnFinished(e -> {
-            highlightCircle.setVisible(true);
+            secondHighlightCircle.setVisible(true);
             Tab filterTab = new Tab("Photons Measurement");
             tabPane.getTabs().add(filterTab);
         });
-        FadeTransition highlightTransition = getHighlightCircleAnimation(TABS_SECOND_X);
+        FadeTransition highlightTransition = getHighlightCircleAnimation(secondHighlightCircle);
 
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send his public key to Alice");
@@ -567,20 +575,13 @@ public class IntroductionScene {
         ScaleTransition showMessTrans = getScaleTransition(aliceMess, 0.0, 1.0, 0.25);
         SequentialTransition sendingTrans = getAliceReturnTransition();
         sendingTrans.setOnFinished(e -> {
-            highlightCircle.setVisible(true);
+            thirdHighlightCircle.setVisible(true);
             Tab filterTab = new Tab("Filters Comparison");
             tabPane.getTabs().add(filterTab);
         });
-
-        FadeTransition highlightTransition = getHighlightCircleAnimation(TABS_THIRD_X);
+        FadeTransition highlightTransition = getHighlightCircleAnimation(thirdHighlightCircle);
 
         SequentialTransition aliceSendFiltersTrans = new SequentialTransition(showMessTrans, sendingTrans, highlightTransition);
-        aliceSendFiltersTrans.setOnFinished(e -> {
-//            highlightCircle.setVisible(true);
-//            Tab filterTab = new Tab("Filters Comparison");
-//            tabPane.getTabs().add(filterTab);
-        });
-
         CommentedAnimation aliceSendFiltersCAnimation = new CommentedAnimation(aliceSendFiltersTrans, "Alice send filters that she chose");
         sceneCAnimations.add(aliceSendFiltersCAnimation);
     }
@@ -599,10 +600,8 @@ public class IntroductionScene {
     }
 
 
-    private FadeTransition getHighlightCircleAnimation(double x) {
-        highlightCircle = getHighlightCircle(x, TABS_Y);
-        borderPane.getChildren().add(highlightCircle);
-        return getHighlightTransition(highlightCircle);
+    private FadeTransition getHighlightCircleAnimation(Circle circle) {
+        return getHighlightTransition(circle);
     }
 
 
@@ -664,14 +663,14 @@ public class IntroductionScene {
 
 
     private Circle getHighlightCircle(double x, double y) {
-        highlightCircle = new Circle(x, y, 50);
-        highlightCircle.setFill(Color.TRANSPARENT);
-        highlightCircle.setStroke(Color.WHITESMOKE);
-        highlightCircle.setEffect(borderGlow);
-        highlightCircle.setStrokeWidth(4);
-        highlightCircle.setVisible(false);
-
-        return highlightCircle;
+        Circle circle = new Circle(x, y, 50);
+        circle.setFill(Color.TRANSPARENT);
+        circle.setStroke(Color.WHITESMOKE);
+        circle.setEffect(borderGlow);
+        circle.setStrokeWidth(4);
+        circle.setVisible(false);
+        borderPane.getChildren().add(circle);
+        return circle;
     }
 
 
@@ -703,7 +702,7 @@ public class IntroductionScene {
         dialogLayout.setBody(text);
 
         JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-        dialog.setOnDialogOpened(e -> addSceneBlurEffect());
+        dialog.setOnDialogOpened(e -> addSceneBlurEffect());    // TODO: 04.11.2019 add to event
         dialog.setOnDialogClosed(e -> removeSceneEffects());
         return dialog;
     }
