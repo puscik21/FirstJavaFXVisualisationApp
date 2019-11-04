@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
+import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
 import grzegorz.scenes.filters.FiltersScene;
 import grzegorz.scenes.measurement.MeasurementScene;
@@ -271,8 +272,7 @@ public class IntroductionScene {
                     FiltersScene filtersController = loader.getController();
                     filtersController.start(qBitsValues, aliceFiltersValues);
                     hideMess(bobMess);
-//                    aliceMess.setTranslateX(0);
-//                    aliceMess.setTranslateY(0);
+                    showButton.setDisable(false);
                 }
                 // chart
                 else if (newVal.intValue() == MEASUREMENT_TAB_NUMBER) {
@@ -304,7 +304,7 @@ public class IntroductionScene {
 
     // TODO: 06.10.2019 .properties file for all comments
     private void initOnMouseClickedEvents() {
-        showButton.setOnMouseClicked(e -> {     // TODO: 04.11.2019 block till user move to next tab
+        showButton.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
 //                Tab filterTab = new Tab("Test tab");
 //                tabPane.getTabs().add(filterTab);
@@ -439,10 +439,10 @@ public class IntroductionScene {
         Transition trans = (Transition) cAnimation.getAnimation();
         EventHandler<ActionEvent> currentEvent = trans.getOnFinished();
         trans.setOnFinished(e -> {
+            showButton.setDisable(false);
             if (currentEvent != null) {
                 currentEvent.handle(e);
             }
-            showButton.setDisable(false);
         });
 
         showButton.setDisable(true);
@@ -536,12 +536,19 @@ public class IntroductionScene {
         JFXDialog d3 = returnDialog("Thankfully there are quantum cryptography algorithms that can stop them thanks to the laws of physics. \n\n" +
                 "One of them is algorithm called BB84, which now we will discuss");
 
-        d1.setOnDialogOpened(ev -> hideMess(aliceMess));
+        EventHandler<? super JFXDialogEvent> d1CurrentEvent = d1.getOnDialogOpened();
+        d1.setOnDialogOpened(ev -> {
+            if (d1CurrentEvent != null) {
+                d1CurrentEvent.handle(ev);
+            }
+            hideMess(aliceMess);
+        });
         d1.setOnDialogClosed(ev -> {
             d2.show();
             aliceMess.setTranslateX(0);
             aliceMess.setTranslateY(0);
         });
+
         d2.setOnDialogClosed(ev -> d3.show());
         d3.setOnDialogClosed(ev -> {
             nextIsDialog = true;
@@ -554,7 +561,7 @@ public class IntroductionScene {
 
 
     private void prepareQuantumAnimation() {
-        double moveX = alicePC.getLayoutX() - bobMess.getLayoutX();
+        double moveX = aliceMess.getLayoutX() - bobMess.getLayoutX();
         double moveY = photonCable.getLayoutY() - bobMess.getLayoutY() + bobMess.getFitHeight() / 2.0;
 
         SequentialTransition sendKeyTrans = getSendingTransition(bobMess, moveX, moveY);
@@ -566,6 +573,7 @@ public class IntroductionScene {
         FadeTransition highlightTransition = getHighlightCircleAnimation(secondHighlightCircle);
 
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
+        sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send his public key to Alice");
         sceneCAnimations.add(sendKeyCAnimation);
     }
@@ -702,7 +710,7 @@ public class IntroductionScene {
         dialogLayout.setBody(text);
 
         JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-        dialog.setOnDialogOpened(e -> addSceneBlurEffect());    // TODO: 04.11.2019 add to event
+        dialog.setOnDialogOpened(e -> addSceneBlurEffect());
         dialog.setOnDialogClosed(e -> removeSceneEffects());
         return dialog;
     }
