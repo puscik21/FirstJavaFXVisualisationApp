@@ -5,9 +5,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class MenuScene {
@@ -21,10 +21,23 @@ public class MenuScene {
     @FXML
     public JFXButton closeButton;
 
-
-    // TODO: 26.10.2019 Make 2 languages
     @FXML
-    public void openMainScene() throws IOException {
+    private ChoiceBox<String> languageChoiceBox;
+
+
+    @FXML
+    public void initialize() {
+        languageChoiceBox.getItems().addAll("English", "Polski");
+        languageChoiceBox.setValue(languageChoiceBox.getItems().get(0));
+        languageChoiceBox.setOnAction(e -> changeLanguage());
+    }
+
+    private void changeLanguage() {
+        // TODO: 06.11.2019 change language (languageChoiceBox.getValue())
+    }
+
+    @FXML
+    private void openMainScene() throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("../introduction/introductionScene.fxml"));
         Stage stage = (Stage) startButton.getScene().getWindow();
         stage.setScene(new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight()));
@@ -32,7 +45,7 @@ public class MenuScene {
     }
 
     @FXML
-    public void close(){
+    private void close(){
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
     }
