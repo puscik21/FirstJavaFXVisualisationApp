@@ -77,6 +77,12 @@ public class IntroductionScene {
     private BorderPane borderPane;
 
     @FXML
+    private MenuItem menuItemRefresh;
+
+    @FXML
+    private MenuItem menuItemHelp;
+
+    @FXML
     private JFXTabPane tabPane;
 
     // envelope Scene
@@ -195,13 +201,14 @@ public class IntroductionScene {
         //  random qbits - bubble dialog or just line to dialog     X
         //  Bob send message with qbits through quantum cable       X
         //  enable Filter scene, arrow or something showing its enable, go to the Filter Scene      X
-        //  Alice send her filters combination by electrical cable
+        //  Alice send her filters combination by electrical cable   X
         //  comparison of filters
         //  take good values
 
         // TODO: 13.10.2019 eventually
         //  send back part of the current key to make sure that no one is eavesdropping
         //  charts scene
+        //  eavesdropper and why he cannot read qubits in quantum cable
     }
 
 
@@ -293,12 +300,15 @@ public class IntroductionScene {
     }
 
 
-    private void reloadIntroductionScene() throws IOException {
-        // FIXME: 22.09.2019 add to tab only (without reloading everything?)
-        Parent root = FXMLLoader.load(getClass().getResource("introductionScene.fxml"));
-        Stage stage = (Stage) tabPane.getScene().getWindow();
-        stage.setScene(new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight()));
-        stage.show();
+    private void reloadIntroductionScene() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("introductionScene.fxml"));
+            Stage stage = (Stage) tabPane.getScene().getWindow();
+            stage.setScene(new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight()));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -309,16 +319,15 @@ public class IntroductionScene {
 //                Tab filterTab = new Tab("Test tab");
 //                tabPane.getTabs().add(filterTab);
                 if (animationsShowed) {
-                    try {
-                        reloadIntroductionScene();
-                    } catch (IOException exception) {
-                        exception.printStackTrace();
-                    }
+                    reloadIntroductionScene();
                 } else {
                     showNextAnimation();
                 }
             }
         });
+
+        menuItemRefresh.setOnAction(e -> reloadIntroductionScene());
+        menuItemHelp.setOnAction(e -> returnDialog("Here are many valuable things about this applications", "About").show());
 
         initCommentDialogs();
     }
@@ -574,7 +583,7 @@ public class IntroductionScene {
 
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
         sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send his public key to Alice");
+        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send random qubits by quantum cable");
         sceneCAnimations.add(sendKeyCAnimation);
     }
 
@@ -746,7 +755,7 @@ public class IntroductionScene {
 
     private JFXDialog returnBobDialog() {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setHeading(new Text("Bob is choosing the sequence of qBits to send"));
+        dialogLayout.setHeading(new Text("Bob is choosing the sequence of qubits to send"));
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosingQBits/choosingQBitsScene.fxml"));
