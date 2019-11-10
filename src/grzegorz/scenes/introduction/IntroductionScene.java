@@ -6,6 +6,7 @@ import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
+import grzegorz.scenes.explanations.QBitExplanationScene;
 import grzegorz.scenes.filters.FiltersScene;
 import grzegorz.scenes.measurement.MeasurementScene;
 import javafx.animation.*;
@@ -26,8 +27,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
@@ -209,6 +211,9 @@ public class IntroductionScene {
         //  send back part of the current key to make sure that no one is eavesdropping
         //  charts scene
         //  eavesdropper and why he cannot read qubits in quantum cable
+
+
+       returnExplanationDialog().show();
     }
 
 
@@ -788,6 +793,38 @@ public class IntroductionScene {
     }
 
 
+    private JFXDialog returnExplanationDialog() {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        Text text = new Text("What is qubit?");
+        text.setFont(Font.font(null, FontWeight.BOLD, 24));
+        dialogLayout.setHeading(text);
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../explanations/qBitExplanationScene.fxml"));
+            AnchorPane body = loader.load();
+            QBitExplanationScene qBitExplanationController = loader.getController();
+
+            dialogLayout.setBody(body);
+            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            dialog.setOnDialogOpened(e -> {
+                addSceneBlurEffect();
+                removeCommentDialog();
+                qBitExplanationController.start();
+            });
+            dialog.setOnDialogClosed(e -> {
+                removeSceneEffects();
+//                nextIsDialog = false;
+//                showButton.setDisable(false);
+            });
+            return dialog;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new JFXDialog();
+        }
+    }
+
+
     private int[] getRandomFilterValues(int length) {
         Random random = new Random();
         int[] values = new int[length];
@@ -808,35 +845,5 @@ public class IntroductionScene {
 
     private void removeSceneEffects() {
         rootAnchorPane.setEffect(null);
-    }
-
-
-    // *TEST THINGS*
-    @FXML
-    public void closePopup() {
-        Stage stage = (Stage) popupCloseBtn.getScene().getWindow();
-        stage.close();
-    }
-
-
-    @FXML
-    public void openPopupMessage() throws IOException {
-        Stage stage = new Stage();
-        Parent root = FXMLLoader.load(getClass().getResource("../popupScene.fxml"));
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle("Message window");
-        stage.showAndWait();
-    }
-
-
-    @FXML
-    public void openNextScene() throws IOException {
-        Stage stage = (Stage) openNextSceneBtn.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("../secondScene.fxml"));
-        stage.setScene(new Scene(root));
-        stage.show();
     }
 }

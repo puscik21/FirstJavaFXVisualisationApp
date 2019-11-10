@@ -15,27 +15,27 @@
          <children>
             <HBox fx:id="qBitValuesHBox" alignment="CENTER" prefHeight="100.0" prefWidth="600.0" spacing="25.0">
                <children>
-                  <Label text="8" textAlignment="CENTER" textFill="#ccdd09" visible="false">
+                  <Label text="8" textAlignment="CENTER" textFill="#b3bf0c" visible="false">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label layoutX="10.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#ccdd09" visible="false">
+                  <Label layoutX="10.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#b3bf0c" visible="false">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label layoutX="45.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#ccdd09" visible="false">
+                  <Label layoutX="45.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#b3bf0c" visible="false">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label layoutX="80.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#ccdd09" visible="false">
+                  <Label layoutX="80.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#b3bf0c" visible="false">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label layoutX="115.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#ccdd09" visible="false">
+                  <Label layoutX="115.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#b3bf0c" visible="false">
                      <font>
                         <Font size="48.0" />
                      </font>
@@ -43,12 +43,12 @@
                         <Insets />
                      </HBox.margin>
                   </Label>
-                  <Label layoutX="150.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#ccdd09" visible="false">
+                  <Label layoutX="150.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#b3bf0c" visible="false">
                      <font>
                         <Font size="48.0" />
                      </font>
                   </Label>
-                  <Label layoutX="185.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#ccdd09" visible="false">
+                  <Label layoutX="185.0" layoutY="10.0" text="8" textAlignment="CENTER" textFill="#b3bf0c" visible="false">
                      <font>
                         <Font size="48.0" />
                      </font>

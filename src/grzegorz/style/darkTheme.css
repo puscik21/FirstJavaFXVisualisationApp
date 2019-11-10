@@ -9,6 +9,10 @@
     /*-fx-medium-font : 25px;*/
 }
 
+/*
+    todo 10.11.2019 check what is necessary here
+*/
+
 .root {
     -fx-background-color: -fx-base-color;
     -fx-base: -fx-base-color;
@@ -43,6 +47,10 @@
 
 .context-menu {
     -fx-background-color: derive(-fx-base-color, 20%);
+}
+
+.jfx-dialog-overlay-pane > StackPane {
+    -fx-background-color: lightgrey;
 }
 
 #helloLabel {
