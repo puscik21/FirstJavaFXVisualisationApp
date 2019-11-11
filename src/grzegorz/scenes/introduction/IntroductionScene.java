@@ -213,7 +213,7 @@ public class IntroductionScene {
         //  eavesdropper and why he cannot read qubits in quantum cable
 
 
-       returnExplanationDialog().show();
+
     }
 
 
@@ -540,6 +540,7 @@ public class IntroductionScene {
 
     private void prepareSceneDialogs() {
         sceneDialogs.add(getRSADialogs());
+        sceneDialogs.add(returnExplanationDialog());
         sceneDialogs.add(returnBobDialog());
     }
 
@@ -813,8 +814,7 @@ public class IntroductionScene {
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
-//                nextIsDialog = false;
-//                showButton.setDisable(false);
+                showButton.setDisable(false);
             });
             return dialog;
 

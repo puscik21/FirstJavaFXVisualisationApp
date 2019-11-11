@@ -3,10 +3,7 @@ package grzegorz.scenes.filters;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import grzegorz.QBitState;
-import javafx.animation.FadeTransition;
-import javafx.animation.RotateTransition;
-import javafx.animation.ScaleTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -18,9 +15,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+
+import java.util.*;
 
 public class FiltersScene {
     @FXML
@@ -78,8 +74,20 @@ public class FiltersScene {
         this.qBitsValues = qBitsValues;
         this.filtersValues = filtersValues;
         prepareQBitsAndFilters();
+        scheduleAnimationStart();
     }
 
+    private void scheduleAnimationStart() {
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                compare(0);
+            }
+        };
+        Timer timer = new Timer();
+        long delay = 5000L;
+        timer.schedule(task, delay);
+    }
 
     private void setAllImages() {
         Image whiteFilter = new Image("grzegorz\\images\\whiteFilter.png");
@@ -145,7 +153,6 @@ public class FiltersScene {
     private void initListeners() {
         root.setOnMouseClicked(e -> {
             if (!comparisonStarted && e.getButton() == MouseButton.PRIMARY) {
-                comparisonStarted = true;
                 compare(0);
             } else if (e.getButton() == MouseButton.SECONDARY) {
                 showDialog("Alice sends randomly chosen qubits for key establishment. \n" +
@@ -180,6 +187,7 @@ public class FiltersScene {
 
 
     private void compare(int compNumber) {
+        comparisonStarted = true;
         double hideLength = 300;
         double imageConstraint = 40.0;
 

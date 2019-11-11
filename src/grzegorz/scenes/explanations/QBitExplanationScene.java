@@ -53,8 +53,9 @@ public class QBitExplanationScene {
 
     public void start() {
         prepareImages();
-        SequentialTransition rectPhotonsAnimation = getRectPhotonsPresentation();
-        SequentialTransition diagPhotonsAnimation = getDiagPhotonsPresentation();
+        int cycles = 4;
+        SequentialTransition rectPhotonsAnimation = getRectPhotonsPresentation(cycles);
+        SequentialTransition diagPhotonsAnimation = getDiagPhotonsPresentation(cycles);
         SequentialTransition rotationTransition = getRotationAnimation();
         SequentialTransition presentationAnimation = new SequentialTransition(rectPhotonsAnimation, diagPhotonsAnimation, rotationTransition);
         scheduleAnimationStart(presentationAnimation);
@@ -73,11 +74,11 @@ public class QBitExplanationScene {
         timer.schedule(task, delay);
     }
 
-    private SequentialTransition getRectPhotonsPresentation() {
+    private SequentialTransition getRectPhotonsPresentation(int cycles) {
         ParallelTransition hideTrans = hideNode();
         hideTrans.setOnFinished(e -> changeRectImage());
         SequentialTransition sequentialTransition = new SequentialTransition(hideTrans, showNode());
-        sequentialTransition.setCycleCount(6);
+        sequentialTransition.setCycleCount(cycles);
 
         sequentialTransition.setOnFinished(e -> {
             rotationExpField.setVisible(true);
@@ -88,11 +89,11 @@ public class QBitExplanationScene {
         return sequentialTransition;
     }
 
-    private SequentialTransition getDiagPhotonsPresentation() {
+    private SequentialTransition getDiagPhotonsPresentation(int cycles) {
         ParallelTransition hideTrans = hideNode();
         hideTrans.setOnFinished(e -> changeDiagImage());
         SequentialTransition sequentialTransition = new SequentialTransition(showNode(), hideTrans);
-        sequentialTransition.setCycleCount(6);
+        sequentialTransition.setCycleCount(cycles);
         sequentialTransition.setDelay(Duration.seconds(1.0));
 
         sequentialTransition.setOnFinished(e -> showNode().play());
@@ -130,13 +131,13 @@ public class QBitExplanationScene {
 
     // FIXME: 10.11.2019 pretty same method in introductionScene
     private ParallelTransition showNode() {
-        ScaleTransition scaleTransition = getScaleTransition(imgView, 0.0, 1.0, 0.5);
+        ScaleTransition scaleTransition = getScaleTransition(imgView, 0.0, 1.0, 0.75);
         FadeTransition fadeTransition = getFadeTransition(imgView, 0.0, 1.0);
         return new ParallelTransition(scaleTransition, fadeTransition);
     }
 
     private ParallelTransition hideNode() {
-        ScaleTransition scaleTransition = getScaleTransition(imgView, 1.0, 0.0, 0.5);
+        ScaleTransition scaleTransition = getScaleTransition(imgView, 1.0, 0.0, 0.75);
         FadeTransition fadeTransition = getFadeTransition(imgView, 1.0, 0.0);
         return new ParallelTransition(scaleTransition, fadeTransition);
     }
