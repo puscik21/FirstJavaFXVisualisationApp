@@ -1,5 +1,6 @@
 package grzegorz.scenes.choosingQBits;
 
+import grzegorz.QBitState;
 import javafx.animation.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,7 +10,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -21,10 +21,8 @@ public class ChoosingQBitsScene {
     @FXML
     private HBox qBitImagesHBox;
 
-    private int[] qBitsValues;
-    private int[] filtersValues;
-    private ArrayList<Image> positiveQBitImages;
-    private ArrayList<Image> negativeQBitImages;
+    private QBitState[] bobQBitsStates;
+    private ArrayList<Image> qBitImages;
 
 
     @FXML
@@ -33,12 +31,10 @@ public class ChoosingQBitsScene {
         getRandomQBits();
     }
 
-
-    public int[][] start() {
+    public QBitState[] start() {
         showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
-        return new int[][] {qBitsValues, filtersValues};
+        return bobQBitsStates;
     }
-
 
     private void prepareImages() {
         Image verPhoton = new Image("grzegorz\\images\\verPhoton.png");
@@ -46,53 +42,32 @@ public class ChoosingQBitsScene {
         Image horPhoton = new Image("grzegorz\\images\\horPhoton.png");
         Image leftDiagPhoton = new Image("grzegorz\\images\\leftDiagPhoton.png");
 
-        positiveQBitImages = new ArrayList<>(2);
-        negativeQBitImages = new ArrayList<>(2);
-        positiveQBitImages.addAll(Arrays.asList(verPhoton, rightDiagPhoton));
-        negativeQBitImages.addAll(Arrays.asList(horPhoton, leftDiagPhoton));
+        qBitImages = new ArrayList<>(4);
+        qBitImages.addAll(Arrays.asList(verPhoton, rightDiagPhoton, horPhoton, leftDiagPhoton));
     }
-
 
     private void getRandomQBits() {
         Random random = new Random();
         int size = qBitValuesHBox.getChildren().size();
-        int bound = 2;
-
-        qBitsValues = new int[size];
-        filtersValues = new int[size];
+        bobQBitsStates = new QBitState[size];
+        int bound = 4;
 
         for (int i = 0; i < size; i++) {
-            int randomValue = random.nextInt(bound);
-            int randomRotation = random.nextInt(bound);
-            fillQBitValues(i, randomValue, randomRotation);
+            int randomStateValue = random.nextInt(bound);
+            fillQBitValues(i, randomStateValue);
         }
     }
 
-
-    private void fillQBitValues(int i, int value, int rotation) {
-        qBitsValues[i] = value;
-        filtersValues[i] = rotation;
+    private void fillQBitValues(int i, int state) {
+        bobQBitsStates[i] = QBitState.getNewQBit(state);
 
         ImageView qBitImageView = (ImageView) qBitImagesHBox.getChildren().get(i);
-        qBitImageView.setImage(getQBitImageView(value, rotation));
+        qBitImageView.setImage(qBitImages.get(state));
     }
-
-
-    private Image getQBitImageView(int value, int rotation) {
-        Image image;
-        if (value == 1) {
-            image = positiveQBitImages.get(rotation);
-        } else {
-            image = negativeQBitImages.get(rotation);
-        }
-
-        return image;
-    }
-
 
     private void showChosenQBits(ObservableList<Node> valuesList, ObservableList<Node> imageViewsList, int index) {
         Label valueLabel = (Label) valuesList.get(index);
-        valueLabel.setText(String.valueOf(qBitsValues[index]));
+        valueLabel.setText(String.valueOf(bobQBitsStates[index].getValue()));
         valueLabel.setVisible(true);
 
         ImageView imageView = (ImageView) imageViewsList.get(index);

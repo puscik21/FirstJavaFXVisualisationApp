@@ -51,7 +51,7 @@ public class FiltersScene {
 
     private ArrayList<Integer> chosenFilters;
     private ArrayList<QBitState> chosenPhotons;
-    private int[] qBitsValues;
+    private QBitState[] bobQBitsStates;
     private int[] filtersValues;
 
     private boolean comparisonStarted = false;
@@ -69,9 +69,8 @@ public class FiltersScene {
         initListeners();
     }
 
-
-    public void start(int[] qBitsValues, int[] filtersValues) {
-        this.qBitsValues = qBitsValues;
+    public void start(QBitState[] bobQBitsStates, int[] filtersValues) {
+        this.bobQBitsStates = bobQBitsStates;
         this.filtersValues = filtersValues;
         prepareQBitsAndFilters();
         scheduleAnimationStart();
@@ -85,7 +84,7 @@ public class FiltersScene {
             }
         };
         Timer timer = new Timer();
-        long delay = 5000L;
+        long delay = 4000L;
         timer.schedule(task, delay);
     }
 
@@ -103,7 +102,6 @@ public class FiltersScene {
         filterImages.addAll(Arrays.asList(whiteFilter, greenFilter));
     }
 
-
     private void prepareQBitsAndFilters() {
         chosenPhotons = new ArrayList<>(filterHBox.getChildren().size());
         chosenFilters = new ArrayList<>(qBitHBox.getChildren().size());
@@ -112,43 +110,28 @@ public class FiltersScene {
         prepareFiltersHBox();
     }
 
-
     private void prepareQBitsHBox() {
         for (int i = 0; i < qBitHBox.getChildren().size(); i++) {
+            int imageNumber = bobQBitsStates[i].getState();
             ImageView imageView = (ImageView) qBitHBox.getChildren().get(i);
-
-            int imageNumber = qBitValToImageNumber(qBitsValues[i]);
             imageView.setImage(photonImages.get(imageNumber));
             chosenPhotons.add(QBitState.getNewQBit(imageNumber));
         }
     }
 
-
     private void prepareFiltersHBox() {
         for (int i = 0; i < filterHBox.getChildren().size(); i++) {
-            ImageView imageView = (ImageView) filterHBox.getChildren().get(i);
-
             int imageNumber = filtersValues[i];
+            ImageView imageView = (ImageView) filterHBox.getChildren().get(i);
             imageView.setImage(filterImages.get(imageNumber));
             chosenFilters.add(imageNumber);
         }
     }
 
-
-    private int qBitValToImageNumber(int val) {
-        int imageNumber = getRandomNumber(2);
-        if (val == 0) {
-            imageNumber += 2;
-        }
-        return imageNumber;
-    }
-
-
     private int getRandomNumber(int bound) {
         Random random = new Random();
         return random.nextInt(bound);
     }
-
 
     private void initListeners() {
         root.setOnMouseClicked(e -> {
@@ -185,7 +168,6 @@ public class FiltersScene {
         });
     }
 
-
     private void compare(int compNumber) {
         comparisonStarted = true;
         double hideLength = 300;
@@ -216,7 +198,6 @@ public class FiltersScene {
         makeTransition(compNumber, filterImage, -hideLength, filterPath);
     }
 
-
     private void makeTransition(int compNumber, ImageView imageView, double firstPath, double secondPath) {
         imageView.setRotate(0);     // For every qBit image the same imageView is used, so it's rotation have to be changed to 0
         TranslateTransition transition = new TranslateTransition();
@@ -237,7 +218,6 @@ public class FiltersScene {
             });
         });
     }
-
 
     private void checkQBitState(int compNumber, ImageView imageView) {
         int qBitState;
@@ -263,7 +243,6 @@ public class FiltersScene {
         qBitValueLabel.setText(String.valueOf(qBitState));
     }
 
-
     private void fadeImage(int compNumber, ImageView imageView, boolean withDelay) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(imageView);
@@ -285,7 +264,6 @@ public class FiltersScene {
         });
     }
 
-
     private void showImage(ImageView imageView) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(imageView);
@@ -294,7 +272,6 @@ public class FiltersScene {
         fadeTransition.setToValue(1.0);
         fadeTransition.play();
     }
-
 
     private void highlightCompared(int compNumber) {
         if (compNumber > 0) {
@@ -328,8 +305,6 @@ public class FiltersScene {
         scaleTransition.setDuration(Duration.seconds(1));
         scaleTransition.play();
     }
-
-
 
     // TODO: 05.10.2019 1 class with many general methods like this one
     private void showDialog(String message) {

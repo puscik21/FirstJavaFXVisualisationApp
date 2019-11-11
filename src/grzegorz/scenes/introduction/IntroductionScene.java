@@ -5,9 +5,11 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
+import grzegorz.QBitState;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
 import grzegorz.scenes.filters.FiltersScene;
+import grzegorz.scenes.filtersCheck.FiltersCheckScene;
 import grzegorz.scenes.measurement.MeasurementScene;
 import javafx.animation.*;
 import javafx.event.ActionEvent;
@@ -160,9 +162,8 @@ public class IntroductionScene {
     private boolean animationsShowed = false;
 
     private MeasurementScene measurementController;
-    private int[] qBitsValues;
+    private QBitState[] bobQBitsStates;
     private int[] aliceFiltersValues;
-    private int[] bobFiltersValues;
 
     private Circle secondHighlightCircle;
     private Circle thirdHighlightCircle;
@@ -213,7 +214,7 @@ public class IntroductionScene {
         //  eavesdropper and why he cannot read qubits in quantum cable
 
 
-
+        returnFiltersComparisonDialog().show();
     }
 
 
@@ -282,7 +283,8 @@ public class IntroductionScene {
                     StackPane body = loader.load();
                     tabPane.getTabs().get(FILTERS_TAB_NUMBER).setContent(body);
                     FiltersScene filtersController = loader.getController();
-                    filtersController.start(qBitsValues, aliceFiltersValues);
+//                    filtersController.start(qBitsValues, aliceFiltersValues);
+                    filtersController.start(bobQBitsStates, aliceFiltersValues);
                     hideMess(bobMess);
                     showButton.setDisable(false);
                 }
@@ -773,11 +775,12 @@ public class IntroductionScene {
             dialog.setOnDialogOpened(e -> {
                 addSceneBlurEffect();
                 removeCommentDialog();
-                int[][] bobQbitsAndFilters = choosingQBitsController.start();
-                qBitsValues = bobQbitsAndFilters[0];
-                bobFiltersValues = bobQbitsAndFilters[1];
+//                int[][] bobQbitsAndFilters = choosingQBitsController.start();
+                bobQBitsStates = choosingQBitsController.start();
+//                qBitsValues = bobQbitsAndFilters[0];
+//                bobFiltersValues = bobQbitsAndFilters[1];
                 // its kinda workaround to prepare filters with qbits values here
-                aliceFiltersValues = getRandomFilterValues(qBitsValues.length);
+                aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
@@ -824,6 +827,48 @@ public class IntroductionScene {
         }
     }
 
+    private JFXDialog returnFiltersComparisonDialog() {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        Text text = new Text("Filters check*");
+        text.setFont(Font.font(null, FontWeight.BOLD, 24));
+        dialogLayout.setHeading(text);
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../filtersCheck/filtersCheckScene.fxml"));
+            AnchorPane body = loader.load();
+            FiltersCheckScene filtersCheckScene = loader.getController();
+
+            dialogLayout.setBody(body);
+            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            dialog.setOnDialogOpened(e -> {
+                addSceneBlurEffect();
+                removeCommentDialog();
+
+                //
+                    aliceFiltersValues = new int[] {1, 0, 0, 0, 0, 0, 1};
+                    bobQBitsStates = new QBitState[7];
+                    bobQBitsStates[0] = QBitState.getNewQBit(1);
+                    bobQBitsStates[1] = QBitState.getNewQBit(1);
+                    bobQBitsStates[2] = QBitState.getNewQBit(2);
+                    bobQBitsStates[3] = QBitState.getNewQBit(2);
+                    bobQBitsStates[4] = QBitState.getNewQBit(0);
+                    bobQBitsStates[5] = QBitState.getNewQBit(0);
+                    bobQBitsStates[6] = QBitState.getNewQBit(2);
+                //
+
+                filtersCheckScene.start(aliceFiltersValues, bobQBitsStates);
+            });
+            dialog.setOnDialogClosed(e -> {
+                removeSceneEffects();
+                showButton.setDisable(false);
+            });
+            return dialog;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new JFXDialog();
+        }
+    }
 
     private int[] getRandomFilterValues(int length) {
         Random random = new Random();
