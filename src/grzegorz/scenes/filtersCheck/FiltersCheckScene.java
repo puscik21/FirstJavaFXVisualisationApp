@@ -29,6 +29,9 @@ public class FiltersCheckScene {
     private int[] aliceFilters;
     private QBitState[] bobQBitStates;
 
+    // TODO: 12.11.2019 values on the right
+    // TODO: 12.11.2019 some title or any necessary information
+
     public void start(int[] aliceFilters, QBitState[] bobQBitStates) {
         this.aliceFilters = aliceFilters;
         this.bobQBitStates = bobQBitStates;

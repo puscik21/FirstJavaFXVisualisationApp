@@ -143,7 +143,8 @@ public class IntroductionScene {
     private final double START_PANE_HEIGHT = 710;
 
     private final int FILTERS_TAB_NUMBER = 1;
-    private final int MEASUREMENT_TAB_NUMBER = 2;
+    private final int FILTERS_CHECK_TAB_NUMBER = 2;
+    private final int MEASUREMENT_TAB_NUMBER = 3;
 
     private final double TABS_Y = 50;
     private final double TABS_FIRST_X = 53;
@@ -214,7 +215,7 @@ public class IntroductionScene {
         //  eavesdropper and why he cannot read qubits in quantum cable
 
 
-        returnFiltersComparisonDialog().show();
+        returnFiltersComparisonDialog().show();      // TODO: 12.11.2019 TBR
     }
 
 
@@ -283,10 +284,20 @@ public class IntroductionScene {
                     StackPane body = loader.load();
                     tabPane.getTabs().get(FILTERS_TAB_NUMBER).setContent(body);
                     FiltersScene filtersController = loader.getController();
-//                    filtersController.start(qBitsValues, aliceFiltersValues);
                     filtersController.start(bobQBitsStates, aliceFiltersValues);
                     hideMess(bobMess);
                     showButton.setDisable(false);
+                }
+                else if (newVal.intValue() == FILTERS_CHECK_TAB_NUMBER) {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../filtersCheck/filtersCheckScene.fxml"));
+                        AnchorPane body = loader.load();
+                        tabPane.getTabs().get(FILTERS_CHECK_TAB_NUMBER).setContent(body);
+                        FiltersCheckScene filtersCheckScene = loader.getController();
+                        filtersCheckScene.start(aliceFiltersValues, bobQBitsStates);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 // chart
                 else if (newVal.intValue() == MEASUREMENT_TAB_NUMBER) {
@@ -775,10 +786,7 @@ public class IntroductionScene {
             dialog.setOnDialogOpened(e -> {
                 addSceneBlurEffect();
                 removeCommentDialog();
-//                int[][] bobQbitsAndFilters = choosingQBitsController.start();
                 bobQBitsStates = choosingQBitsController.start();
-//                qBitsValues = bobQbitsAndFilters[0];
-//                bobFiltersValues = bobQbitsAndFilters[1];
                 // its kinda workaround to prepare filters with qbits values here
                 aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
             });
@@ -827,6 +835,7 @@ public class IntroductionScene {
         }
     }
 
+    // TODO: 12.11.2019 TBR - im using it in another scene
     private JFXDialog returnFiltersComparisonDialog() {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         Text text = new Text("Filters check*");
