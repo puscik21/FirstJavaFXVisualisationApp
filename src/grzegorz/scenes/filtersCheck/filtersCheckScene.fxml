@@ -1,128 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.filtersCheck.FiltersCheckScene">
-   <children>
-      <VBox fx:id="filtersVBox" alignment="CENTER" layoutX="-4.0" layoutY="-325.0" maxHeight="800.0" prefHeight="800.0" prefWidth="200.0" scaleX="0.35" scaleY="0.35" AnchorPane.leftAnchor="10.0">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.filtersCheck.FiltersCheckScene">
+   <top>
+      <AnchorPane minHeight="50.0" prefHeight="50.0" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/greenFilter.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="335.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/greenFilter.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="410.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/greenFilter.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="485.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/greenFilter.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="560.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/greenFilter.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="635.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/greenFilter.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="760.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/greenFilter.png" />
-               </image>
-            </ImageView>
+            <Label alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="600.0" text="Title of scene*" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Label>
          </children>
-      </VBox>
-      <VBox fx:id="ticksVBox" alignment="CENTER" layoutX="200.0" layoutY="-325.0" maxHeight="800.0" prefHeight="800.0" prefWidth="200.0" scaleX="0.35" scaleY="0.35" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0">
+      </AnchorPane>
+   </top>
+   <center>
+      <AnchorPane maxHeight="600.0" minHeight="350.0" minWidth="600.0" prefHeight="350.0" prefWidth="600.0" BorderPane.alignment="BOTTOM_CENTER">
          <children>
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false">
-               <image>
-                  <Image url="@../../images/tickIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="335.0" pickOnBounds="true" preserveRatio="true" visible="false">
-               <image>
-                  <Image url="@../../images/tickIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="410.0" pickOnBounds="true" preserveRatio="true" visible="false">
-               <image>
-                  <Image url="@../../images/tickIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="485.0" pickOnBounds="true" preserveRatio="true" visible="false">
-               <image>
-                  <Image url="@../../images/tickIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="560.0" pickOnBounds="true" preserveRatio="true" visible="false">
-               <image>
-                  <Image url="@../../images/tickIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="635.0" pickOnBounds="true" preserveRatio="true" visible="false">
-               <image>
-                  <Image url="@../../images/tickIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="760.0" pickOnBounds="true" preserveRatio="true" visible="false">
-               <image>
-                  <Image url="@../../images/tickIcon.png" />
-               </image>
-            </ImageView>
+            <VBox fx:id="filtersVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="0.0" />
+            <VBox fx:id="ticksVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0" />
+            <VBox fx:id="qBitsVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
          </children>
-      </VBox>
-      <VBox fx:id="qBitsVBox" alignment="CENTER" layoutX="401.0" layoutY="-325.0" maxHeight="800.0" prefHeight="800.0" prefWidth="200.0" scaleX="0.35" scaleY="0.35" AnchorPane.rightAnchor="10.0">
-         <children>
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/rightDiagPhoton.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="335.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/rightDiagPhoton.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="410.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/rightDiagPhoton.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="485.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/rightDiagPhoton.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="560.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/rightDiagPhoton.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="635.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/rightDiagPhoton.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="760.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/rightDiagPhoton.png" />
-               </image>
-            </ImageView>
-         </children>
-      </VBox>
-   </children>
-</AnchorPane>
+      </AnchorPane>
+   </center>
+</BorderPane>

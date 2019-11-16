@@ -139,6 +139,7 @@ public class IntroductionScene {
 
     // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
     //  primaryStage.setOnShowing(event -> {});     - try it
+    //  after initialize call method start I guess and take good value
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
 
@@ -153,7 +154,7 @@ public class IntroductionScene {
 
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
-    // TODO: 01.11.2019 message sended by quantum cable could be yellow
+    // TODO: 01.11.2019 message sent by quantum cable could be yellow
 
     private ArrayList<CommentedAnimation> sceneCAnimations;
     private ArrayList<JFXDialog> sceneDialogs;
@@ -215,7 +216,23 @@ public class IntroductionScene {
         //  eavesdropper and why he cannot read qubits in quantum cable
 
 
-        returnFiltersComparisonDialog().show();      // TODO: 12.11.2019 TBR
+//        returnFiltersComparisonDialog().show();      // TODO: 12.11.2019 TBR
+        aliceFiltersValues = new int[] {1, 0, 0, 0, 0, 0, 1};
+        bobQBitsStates = new QBitState[7];
+        bobQBitsStates[0] = QBitState.getNewQBit(1);
+        bobQBitsStates[1] = QBitState.getNewQBit(1);
+        bobQBitsStates[2] = QBitState.getNewQBit(2);
+        bobQBitsStates[3] = QBitState.getNewQBit(2);
+        bobQBitsStates[4] = QBitState.getNewQBit(0);
+        bobQBitsStates[5] = QBitState.getNewQBit(0);
+        bobQBitsStates[6] = QBitState.getNewQBit(2);
+
+        Tab testTab1 = new Tab("Test tab");
+        tabPane.getTabs().add(testTab1);
+        Tab testTab2 = new Tab("Test tab");
+        tabPane.getTabs().add(testTab2);
+
+        tabPane.getSelectionModel().select(2);
     }
 
 
@@ -291,7 +308,9 @@ public class IntroductionScene {
                 else if (newVal.intValue() == FILTERS_CHECK_TAB_NUMBER) {
                     try {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("../filtersCheck/filtersCheckScene.fxml"));
-                        AnchorPane body = loader.load();
+                        BorderPane body = loader.load();
+//                        AnchorPane body = loader.load();
+//                        ScrollPane body = loader.load();
                         tabPane.getTabs().get(FILTERS_CHECK_TAB_NUMBER).setContent(body);
                         FiltersCheckScene filtersCheckScene = loader.getController();
                         filtersCheckScene.start(aliceFiltersValues, bobQBitsStates);
@@ -534,7 +553,7 @@ public class IntroductionScene {
         TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), 0, 0);
 
         SequentialTransition privateKeyTransition = new SequentialTransition(toMessageTrans, bumpUpAnimation, fromMessageTrans);
-        fromMessageTrans.setOnFinished(e -> nextIsDialog = true);       // TODO: 26.10.2019 why on privateKeyTransition doesn't it work
+        fromMessageTrans.setOnFinished(e -> nextIsDialog = true);       // TODO: 26.10.2019 why on privateKeyTransition doesn't it work - maybe set on finished is overridden
 
         CommentedAnimation privateKeyCAnimation = new CommentedAnimation(privateKeyTransition,
                 "Bob decrypt the message with his private key. Now he can read what Annie wanted to tell him.");

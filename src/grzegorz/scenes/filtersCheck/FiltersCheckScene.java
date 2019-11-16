@@ -31,12 +31,60 @@ public class FiltersCheckScene {
 
     // TODO: 12.11.2019 values on the right
     // TODO: 12.11.2019 some title or any necessary information
+    // TODO: 16.11.2019 comments on right click
 
     public void start(int[] aliceFilters, QBitState[] bobQBitStates) {
         this.aliceFilters = aliceFilters;
         this.bobQBitStates = bobQBitStates;
         prepareQBitsAndFilters();
+
+        int imagesToView = aliceFilters.length;
+        addImageViews(imagesToView);
+        double scaleValue = getScaleValue();
+        System.out.println(ticksVBox.getScaleX());
+        scaleNodes(scaleValue, filtersVBox, ticksVBox, qBitsVBox);      /// scale AnchorPane? but w8 for numbers
+        System.out.println(ticksVBox.getScaleX());
+
+
+        prepareQBitsAndFilters();
         scheduleAnimationStart();
+    }
+
+    private void addImageViews(int quantity) {
+        for (int i = 0; i < quantity; i++) {
+            filtersVBox.getChildren().add(new ImageView(filterImages.get(0)));
+            ticksVBox.getChildren().add(new ImageView("grzegorz\\images\\tickIcon.png"));
+////            ticksVBox.getChildren().add(new ImageView("grzegorz\\images\\oneIcon.png"));
+//            ticksVBox.getChildren().add(new ImageView("grzegorz\\images\\zeroIcon.png"));
+            qBitsVBox.getChildren().add(new ImageView(photonImages.get(0)));
+        }
+    }
+
+    private double getScaleValue() {
+        int size = qBitsVBox.getChildren().size();
+//        double scaleFor7 = 0.35;
+        double scaleFor7 = 1;
+        if (size == 0) {
+            return scaleFor7;
+        }
+
+        double multiplier = 7.0 / size;
+        double scaleValue = multiplier * scaleFor7;
+
+        if (scaleValue < 0.3) {
+            scaleValue = 0.3;
+        } else if (scaleValue > 1.75) {
+            scaleValue = 1.75;
+        }
+        return scaleValue;
+//        return 0.6;
+    }
+
+    private void scaleNodes(double scaleValue, Node... nodes) {
+        for (Node node : nodes) {
+            node.setScaleX(scaleValue);
+            node.setScaleY(scaleValue);
+        }
     }
 
     private void scheduleAnimationStart() {

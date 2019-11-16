@@ -9,6 +9,13 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    // TODO: 13.11.2019
+    //  fix transited objects
+    //  class with animations, class with dialogs
+    //  resizing
+    //  different languages comments
+    //  \/
+    //  refresh for every scene
     public static void main(String[] args){
         launch(args);
     }
