@@ -13,7 +13,7 @@ public class QBitState {
     private int state;
     private int value;
 
-    QBitState(int state, int value) {
+    public QBitState(int state, int value) {
         this.state = state;
         this.value = value;
     }
