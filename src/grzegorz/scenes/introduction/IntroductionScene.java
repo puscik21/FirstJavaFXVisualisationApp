@@ -7,6 +7,7 @@ import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.QBitState;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
+import grzegorz.scenes.choosingQBits.EnterQBitCombination;
 import grzegorz.scenes.explanations.QBitExplanationScene;
 import grzegorz.scenes.filters.FiltersScene;
 import grzegorz.scenes.filtersCheck.FiltersCheckScene;
@@ -20,7 +21,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -50,13 +50,6 @@ public class IntroductionScene {
 //        Tooltip envelopeToolTip = new Tooltip("This is encrypted message");
 //        Tooltip.install(image, envelopeToolTip);
 
-    // Left -> Right transition
-//        TranslateTransition transition = new TranslateTransition();
-//        transition.setDuration(Duration.seconds(2));
-//        transition.setToX(400);
-//        transition.setNode(image);
-//        transition.play();
-
     // fitProperty
 //        image1.fitWidthProperty().bind(imagePane2.widthProperty());
 //        image1.fitHeightProperty().bind(imagePane2.heightProperty());
@@ -65,9 +58,6 @@ public class IntroductionScene {
 //        JFXButton button = new JFXButton("Click me!");
 //        button.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> dialog.close());
 //        dialogLayout.setActions(button);
-
-    //fade image
-//    pathTransition.setOnFinished(e -> fadeImage(publicKey));
     // ###############################
 
 
@@ -89,7 +79,6 @@ public class IntroductionScene {
     @FXML
     private JFXTabPane tabPane;
 
-    // envelope Scene
     @FXML
     private Tab envTab;
 
@@ -126,17 +115,6 @@ public class IntroductionScene {
     @FXML
     private StackPane commentPane;
 
-
-    // test items
-    @FXML
-    private Button openPopupSceneBtn;
-
-    @FXML
-    private Button openNextSceneBtn;
-
-    @FXML
-    private Button popupCloseBtn;
-
     // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
     //  primaryStage.setOnShowing(event -> {});     - try it
     //  after initialize call method start I guess and take good value
@@ -147,8 +125,9 @@ public class IntroductionScene {
     private final int FILTERS_CHECK_TAB_NUMBER = 2;
     private final int MEASUREMENT_TAB_NUMBER = 3;
 
+    // TODO: 19.11.2019  check if they are all correct
     private final double TABS_Y = 50;
-    private final double TABS_FIRST_X = 53;
+    private final double TABS_FIRST_X = 53;     // TODO: 20.11.2019 use circle in another scenes
     private final double TABS_SECOND_X = 206;
     private final double TABS_THIRD_X = 385;
 
@@ -162,6 +141,7 @@ public class IntroductionScene {
     private int dialogCounter;
     private boolean nextIsDialog = false;
     private boolean animationsShowed = false;
+    private boolean isUserInput;
 
     private MeasurementScene measurementController;
     private QBitState[] bobQBitsStates;
@@ -171,6 +151,7 @@ public class IntroductionScene {
     private Circle thirdHighlightCircle;
     private DropShadow borderGlow;
 
+    private JFXDialog enterCombinationDialog;
 
     @FXML
     public void initialize() {
@@ -207,8 +188,8 @@ public class IntroductionScene {
         //  Bob send message with qbits through quantum cable       X
         //  enable Filter scene, arrow or something showing its enable, go to the Filter Scene      X
         //  Alice send her filters combination by electrical cable   X
-        //  comparison of filters
-        //  take good values
+        //  comparison of filters       X
+        //  take good values        X
 
         // TODO: 13.10.2019 eventually
         //  send back part of the current key to make sure that no one is eavesdropping
@@ -216,31 +197,39 @@ public class IntroductionScene {
         //  eavesdropper and why he cannot read qubits in quantum cable
 
 
-//        returnFiltersComparisonDialog().show();      // TODO: 12.11.2019 TBR
-        aliceFiltersValues = new int[] {1, 0, 0, 0, 0, 0, 1};
-        bobQBitsStates = new QBitState[7];
-        bobQBitsStates[0] = QBitState.getNewQBit(1);
-        bobQBitsStates[1] = QBitState.getNewQBit(1);
-        bobQBitsStates[2] = QBitState.getNewQBit(2);
-        bobQBitsStates[3] = QBitState.getNewQBit(2);
-        bobQBitsStates[4] = QBitState.getNewQBit(0);
-        bobQBitsStates[5] = QBitState.getNewQBit(0);
-        bobQBitsStates[6] = QBitState.getNewQBit(2);
-
-        Tab testTab1 = new Tab("Test tab");
-        tabPane.getTabs().add(testTab1);
-        Tab testTab2 = new Tab("Test tab");
-        tabPane.getTabs().add(testTab2);
-
-        tabPane.getSelectionModel().select(2);
+// TODO: 12.11.2019 TBR
+//
+//         filters
+//        isUserInput = true;
+//        enterCombinationDialog = returnEnterCombinationDialog();
+//        enterCombinationDialog.show();
+//        Tab filterTab1 = new Tab("Test tab");
+//        tabPane.getTabs().add(filterTab1);
+//        Tab filterTab2 = new Tab("Test tab");
+//        tabPane.getTabs().add(filterTab2);
     }
 
+    public void setUserCombination(QBitState[] userCombination, boolean isRandom) {
+        isUserInput = isRandom;
+        bobQBitsStates = userCombination;
+        // its kinda workaround to prepare filters with qbits values here
+        aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
+        enterCombinationDialog.close();
+    }
+
+    public void setUserCombination(boolean isRandom) {
+        isUserInput = isRandom;
+        enterCombinationDialog.close();
+    }
+
+    public StackPane getRootPane() {
+        return rootPane;
+    }
 
     private void initEvents() {
         initResizeEvents();
         initMouseEvents();
     }
-
 
     private void initResizeEvents() {
         electricalCable.setPreserveRatio(false);
@@ -251,7 +240,6 @@ public class IntroductionScene {
             setResizeEvent(imgView);
             setMoveEvent(node);
         }
-
         setMoveEvent(showButton);
     }
 
@@ -263,7 +251,6 @@ public class IntroductionScene {
         node.fitWidthProperty().bind(envPane.widthProperty().divide(widthScale));
         node.fitHeightProperty().bind(envPane.heightProperty().divide(heightScale));
     }
-
 
     private void setMoveEvent(Node node) {
         double layoutXScale = START_PANE_WIDTH / node.getLayoutX();
@@ -277,7 +264,6 @@ public class IntroductionScene {
         );
     }
 
-
     private void initMouseEvents() {
         initMainTabPane();
         initOnMouseClickedEvents();
@@ -287,7 +273,6 @@ public class IntroductionScene {
             setBorderGlowEffect(node);
         }
     }
-
 
     private void initMainTabPane() {
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
@@ -309,11 +294,10 @@ public class IntroductionScene {
                     try {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("../filtersCheck/filtersCheckScene.fxml"));
                         BorderPane body = loader.load();
-//                        AnchorPane body = loader.load();
-//                        ScrollPane body = loader.load();
                         tabPane.getTabs().get(FILTERS_CHECK_TAB_NUMBER).setContent(body);
                         FiltersCheckScene filtersCheckScene = loader.getController();
                         filtersCheckScene.start(aliceFiltersValues, bobQBitsStates);
+                        showButton.setDisable(false);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -336,7 +320,6 @@ public class IntroductionScene {
         });
     }
 
-
     private void reloadIntroductionScene() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("introductionScene.fxml"));
@@ -347,7 +330,6 @@ public class IntroductionScene {
             e.printStackTrace();
         }
     }
-
 
     // TODO: 06.10.2019 .properties file for all comments
     private void initOnMouseClickedEvents() {
@@ -368,7 +350,6 @@ public class IntroductionScene {
 
         initCommentDialogs();
     }
-
 
     private void initCommentDialogs() {
         alicePC.setOnMouseClicked(e -> {
@@ -420,7 +401,6 @@ public class IntroductionScene {
         });
     }
 
-
     private void initBorderGlowEffectInstance() {
         borderGlow = new DropShadow();
         borderGlow.setColor(Color.WHITESMOKE);
@@ -430,12 +410,10 @@ public class IntroductionScene {
         borderGlow.setWidth(50);
     }
 
-
     private void setBorderGlowEffect(Node node) {
         node.setOnMouseEntered(e -> node.setEffect(borderGlow));
         node.setOnMouseExited(e -> node.setEffect(null));
     }
-
 
     private void showNextAnimation() {
         if (animCounter == 0) {
@@ -447,13 +425,11 @@ public class IntroductionScene {
         } else {
             playAnimation();
         }
-
-        if (animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size()) {
+        if (noMoreAnimationsOrDialogs()) {
             showButton.setText("Replay scene");
             animationsShowed = true;
         }
     }
-
 
     private void prepareAllAnimations() {
         playShowButtonTransition();
@@ -464,7 +440,6 @@ public class IntroductionScene {
         prepareAliceSendFiltersAnimation();
     }
 
-
     private void playShowButtonTransition() {
         showButton.setText("Next step");
         double toX = envPane.getWidth() - showButton.getLayoutX() - 1.25 * showButton.getWidth();
@@ -473,35 +448,56 @@ public class IntroductionScene {
         buttonTrans.play();
     }
 
-
+    // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
     private void playAnimation() {
+        showButton.setDisable(true);
         CommentedAnimation cAnimation = sceneCAnimations.get(animCounter);
         String comment = cAnimation.getComment();
         if (comment != null) {
             showCommentDialog(comment);
         }
-
         cAnimation.getAnimation().play();
+        animCounter++;
+
         Transition trans = (Transition) cAnimation.getAnimation();
         EventHandler<ActionEvent> currentEvent = trans.getOnFinished();
         trans.setOnFinished(e -> {
-            showButton.setDisable(false);
+            if (noMoreAnimationsOrDialogs()) {
+                showButton.setDisable(true);
+            } else {
+                showButton.setDisable(false);
+            }
             if (currentEvent != null) {
                 currentEvent.handle(e);
             }
         });
-
-        showButton.setDisable(true);
-        animCounter++;
     }
 
     private void showDialog() {
+        showButton.setDisable(true);
         JFXDialog dialog = sceneDialogs.get(dialogCounter);
         dialog.show();
-        showButton.setDisable(true);
         dialogCounter++;
+
+        if (noMoreAnimationsOrDialogs()) {
+            disableButtonForLastDialog(dialog);
+        }
     }
 
+    private boolean noMoreAnimationsOrDialogs() {
+        return animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size();
+    }
+
+    // TODO: 20.11.2019 (LAST) at the end check if its really used
+    private void disableButtonForLastDialog(JFXDialog dialog) {
+        EventHandler<? super JFXDialogEvent> currentCloseEvent = dialog.getOnDialogClosed();
+        dialog.setOnDialogClosed(e -> {
+            if (currentCloseEvent != null) {
+                currentCloseEvent.handle(e);
+            }
+            showButton.setDisable(true);
+        });
+    }
 
     private void preparePublicKeyAnimation() {
         double moveX = aliceMess.getLayoutX() - publicKey.getLayoutX() - aliceMess.getFitWidth() / 2.0;
@@ -516,7 +512,6 @@ public class IntroductionScene {
         addToCAnimations(sendKeyTrans, encryptionAnimation, returnTrans);
     }
 
-
     private SequentialTransition getEncryptionAnimation(TranslateTransition lastTrans) {
         double toMessageX = lastTrans.getToX() + publicKey.getFitWidth() + aliceMess.getFitWidth() / 2.0;
         double toMessageY = -aliceMess.getFitHeight() / 2.0;
@@ -529,13 +524,11 @@ public class IntroductionScene {
         return new SequentialTransition(showMessTrans, toMessageTrans, bumpUpAnimation, keyGoBackTrans);
     }
 
-
     private SequentialTransition getAliceReturnTransition() {
         double toX = bobPC.getLayoutX() - alicePC.getLayoutX();
         double toY = -aliceMess.getFitHeight();
         return getSendingTransition(aliceMess, toX, toY);
     }
-
 
     private void addToCAnimations(SequentialTransition sendKeyTrans, SequentialTransition encryptionAnimation, SequentialTransition returnTrans) {
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendKeyTrans,"Bob send his public key to Alice");
@@ -545,7 +538,6 @@ public class IntroductionScene {
         Collection<CommentedAnimation> cAnimations = Arrays.asList(sendKeyCAnimation, encryptionCAnimation, returnCAnimation);
         sceneCAnimations.addAll(cAnimations);
     }
-
 
     private void preparePrivateKeyAnimation() {
         TranslateTransition toMessageTrans = getBobUseKeyTransition();
@@ -569,13 +561,13 @@ public class IntroductionScene {
         return getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
     }
 
-
     private void prepareSceneDialogs() {
         sceneDialogs.add(getRSADialogs());
         sceneDialogs.add(returnExplanationDialog());
+        enterCombinationDialog = returnEnterCombinationDialog();
+        sceneDialogs.add(enterCombinationDialog);
         sceneDialogs.add(returnBobDialog());
     }
-
 
     private JFXDialog getRSADialogs() {
         JFXDialog d1 = returnDialog("For ordinary computer this algorithm is nearly impossible to break in reasonable time");
@@ -606,7 +598,6 @@ public class IntroductionScene {
         return d1;
     }
 
-
     private void prepareQuantumAnimation() {
         double moveX = aliceMess.getLayoutX() - bobMess.getLayoutX();
         double moveY = photonCable.getLayoutY() - bobMess.getLayoutY() + bobMess.getFitHeight() / 2.0;
@@ -625,7 +616,6 @@ public class IntroductionScene {
         sceneCAnimations.add(sendKeyCAnimation);
     }
 
-
     private void prepareAliceSendFiltersAnimation() {
         ScaleTransition showMessTrans = getScaleTransition(aliceMess, 0.0, 1.0, 0.25);
         SequentialTransition sendingTrans = getAliceReturnTransition();
@@ -641,11 +631,9 @@ public class IntroductionScene {
         sceneCAnimations.add(aliceSendFiltersCAnimation);
     }
 
-
     private void hideMess(ImageView imgView) {
         getScaleTransition(imgView, 1.0, 0.0, 0.25).play();
     }
-
 
     private SequentialTransition showMess(ImageView imgView) {
         ScaleTransition hideTransition = getScaleTransition(imgView, 1.0, 0.0, 0.01);
@@ -654,11 +642,9 @@ public class IntroductionScene {
         return new SequentialTransition(hideTransition, showTransition);
     }
 
-
     private FadeTransition getHighlightCircleAnimation(Circle circle) {
         return getHighlightTransition(circle);
     }
-
 
     private SequentialTransition getSendingTransition(ImageView imgView, double toX, double toY) {
         TranslateTransition tUp = getTranslateTransition(imgView, 0, 0, 0, toY);
@@ -667,7 +653,6 @@ public class IntroductionScene {
 
         return new SequentialTransition(tUp, tLeft, tDown);
     }
-
 
     private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
         TranslateTransition transition = new TranslateTransition();
@@ -681,7 +666,6 @@ public class IntroductionScene {
         return transition;
     }
 
-
     private SequentialTransition returnChangingEnvelopeAnimation(String url) {
         Image image = new Image(url);
 
@@ -691,7 +675,6 @@ public class IntroductionScene {
 
         return new SequentialTransition(scaleUpTransition, scaleDownTransition);
     }
-
 
     private ScaleTransition getScaleTransition(Node node, double from, double to, double time) {
         ScaleTransition scaleTransition = new ScaleTransition();
@@ -705,7 +688,6 @@ public class IntroductionScene {
         return scaleTransition;
     }
 
-
     private FadeTransition getFadeTransition(Node node) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(node);
@@ -715,7 +697,6 @@ public class IntroductionScene {
 
         return fadeTransition;
     }
-
 
     private Circle getHighlightCircle(double x, double y) {
         Circle circle = new Circle(x, y, 50);
@@ -728,7 +709,6 @@ public class IntroductionScene {
         return circle;
     }
 
-
     private FadeTransition getHighlightTransition(Node node) {
         FadeTransition fadeTransition = getFadeTransition(node);
         fadeTransition.setDuration(Duration.seconds(0.25));
@@ -739,13 +719,10 @@ public class IntroductionScene {
         return fadeTransition;
     }
 
-
-
     // others
     private JFXDialog returnDialog(String message) {
         return returnDialog(message, "");
     }
-
 
     private JFXDialog returnDialog(String message, String title) {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
@@ -762,7 +739,6 @@ public class IntroductionScene {
         return dialog;
     }
 
-
     private void showCommentDialog(String message) {
         removeCommentDialog();
 
@@ -774,7 +750,6 @@ public class IntroductionScene {
         JFXDialog dialog = new JFXDialog(commentPane, dialogLayout, JFXDialog.DialogTransition.LEFT);
         dialog.show();
     }
-
 
     private void removeCommentDialog() {
         if (commentPane.getChildren().size() > 0) {
@@ -790,7 +765,6 @@ public class IntroductionScene {
         }
     }
 
-
     private JFXDialog returnBobDialog() {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         dialogLayout.setHeading(new Text("Bob is choosing the sequence of qubits to send"));
@@ -805,9 +779,12 @@ public class IntroductionScene {
             dialog.setOnDialogOpened(e -> {
                 addSceneBlurEffect();
                 removeCommentDialog();
-                bobQBitsStates = choosingQBitsController.start();
-                // its kinda workaround to prepare filters with qbits values here
-                aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
+                if (isUserInput) {
+                    choosingQBitsController.startWithUserInput(bobQBitsStates);
+                } else {
+                    bobQBitsStates = choosingQBitsController.startRandom();
+                    aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
+                }
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
@@ -823,6 +800,36 @@ public class IntroductionScene {
         }
     }
 
+    private JFXDialog returnEnterCombinationDialog() {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Text("Bob is preparing the sequence of qubits to send"));
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosingQBits/EnterQBitCombination.fxml"));
+            AnchorPane body = loader.load();
+            EnterQBitCombination enterQBitCombination = loader.getController();
+
+            dialogLayout.setBody(body);
+            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            dialog.setOverlayClose(false);
+            dialog.setOnDialogOpened(e -> {
+                addSceneBlurEffect();
+                removeCommentDialog();
+                enterQBitCombination.start(this);
+            });
+            dialog.setOnDialogClosed(e -> {
+                removeSceneEffects();
+                showMess(bobMess).play();
+                nextIsDialog = true;
+                showButton.setDisable(false);
+            });
+            return dialog;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new JFXDialog();
+        }
+    }
 
     private JFXDialog returnExplanationDialog() {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
@@ -854,50 +861,6 @@ public class IntroductionScene {
         }
     }
 
-    // TODO: 12.11.2019 TBR - im using it in another scene
-    private JFXDialog returnFiltersComparisonDialog() {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        Text text = new Text("Filters check*");
-        text.setFont(Font.font(null, FontWeight.BOLD, 24));
-        dialogLayout.setHeading(text);
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../filtersCheck/filtersCheckScene.fxml"));
-            AnchorPane body = loader.load();
-            FiltersCheckScene filtersCheckScene = loader.getController();
-
-            dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-            dialog.setOnDialogOpened(e -> {
-                addSceneBlurEffect();
-                removeCommentDialog();
-
-                //
-                    aliceFiltersValues = new int[] {1, 0, 0, 0, 0, 0, 1};
-                    bobQBitsStates = new QBitState[7];
-                    bobQBitsStates[0] = QBitState.getNewQBit(1);
-                    bobQBitsStates[1] = QBitState.getNewQBit(1);
-                    bobQBitsStates[2] = QBitState.getNewQBit(2);
-                    bobQBitsStates[3] = QBitState.getNewQBit(2);
-                    bobQBitsStates[4] = QBitState.getNewQBit(0);
-                    bobQBitsStates[5] = QBitState.getNewQBit(0);
-                    bobQBitsStates[6] = QBitState.getNewQBit(2);
-                //
-
-                filtersCheckScene.start(aliceFiltersValues, bobQBitsStates);
-            });
-            dialog.setOnDialogClosed(e -> {
-                removeSceneEffects();
-                showButton.setDisable(false);
-            });
-            return dialog;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JFXDialog();
-        }
-    }
-
     private int[] getRandomFilterValues(int length) {
         Random random = new Random();
         int[] values = new int[length];
@@ -909,12 +872,10 @@ public class IntroductionScene {
         return values;
     }
 
-
     private void addSceneBlurEffect() {
         BoxBlur blurEffect = new BoxBlur(3, 3, 3);
         rootAnchorPane.setEffect(blurEffect);
     }
-
 
     private void removeSceneEffects() {
         rootAnchorPane.setEffect(null);

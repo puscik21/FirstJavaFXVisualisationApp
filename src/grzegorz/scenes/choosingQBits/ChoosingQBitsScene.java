@@ -5,9 +5,9 @@ import javafx.animation.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 import java.util.ArrayList;
@@ -16,6 +16,9 @@ import java.util.Random;
 
 public class ChoosingQBitsScene {
     @FXML
+    private AnchorPane scenePane;
+
+    @FXML
     private HBox qBitValuesHBox;
 
     @FXML
@@ -23,17 +26,30 @@ public class ChoosingQBitsScene {
 
     private QBitState[] bobQBitsStates;
     private ArrayList<Image> qBitImages;
+    private ArrayList<Image> valuesImages;
+    private Random generator;
+
+    private double sizeScale = 1.0;
+    private double timeScale = 4.0;
 
 
     @FXML
     public void initialize() {
         prepareImages();
-        getRandomQBits();
+        generator = new Random();
     }
 
-    public QBitState[] start() {
+    public QBitState[] startRandom() {
+        getRandomQBits();
+        prepareScene();
         showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
         return bobQBitsStates;
+    }
+
+    public void startWithUserInput(QBitState[] userInput) {
+        bobQBitsStates = userInput;
+        prepareScene();
+        showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
     }
 
     private void prepareImages() {
@@ -41,36 +57,93 @@ public class ChoosingQBitsScene {
         Image rightDiagPhoton = new Image("grzegorz\\images\\rightDiagPhoton.png");
         Image horPhoton = new Image("grzegorz\\images\\horPhoton.png");
         Image leftDiagPhoton = new Image("grzegorz\\images\\leftDiagPhoton.png");
+        Image zeroValue = new Image("grzegorz\\images\\zeroIconGreen.png");
+        Image oneValue = new Image("grzegorz\\images\\oneIconGreen.png");
 
         qBitImages = new ArrayList<>(4);
+        valuesImages = new ArrayList<>(2);
         qBitImages.addAll(Arrays.asList(verPhoton, rightDiagPhoton, horPhoton, leftDiagPhoton));
+        valuesImages.addAll(Arrays.asList(zeroValue, oneValue));
     }
 
     private void getRandomQBits() {
-        Random random = new Random();
-        int size = qBitValuesHBox.getChildren().size();
+        int size = getRandomInt(9) + 8;
         bobQBitsStates = new QBitState[size];
         int bound = 4;
 
         for (int i = 0; i < size; i++) {
-            int randomStateValue = random.nextInt(bound);
-            fillQBitValues(i, randomStateValue);
+            int randomStateValue = getRandomInt(bound);
+            bobQBitsStates[i] = QBitState.getNewQBit(randomStateValue);
         }
     }
 
-    private void fillQBitValues(int i, int state) {
-        bobQBitsStates[i] = QBitState.getNewQBit(state);
+    private void prepareScene() {
+        addImageViews();
+        scaleScenePane();
+    }
 
-        ImageView qBitImageView = (ImageView) qBitImagesHBox.getChildren().get(i);
-        qBitImageView.setImage(qBitImages.get(state));
+    private void addImageViews() {
+        for (QBitState bobQBitsState : bobQBitsStates) {
+            fillQBitValue(bobQBitsState);
+        }
+    }
+
+    private void fillQBitValue(QBitState qBitState) {
+        int state = qBitState.getState();
+        int value = qBitState.getValue();
+
+        ImageView qBitView = new ImageView(qBitImages.get(state));
+        ImageView valueView = new ImageView(valuesImages.get(value));
+        qBitView.setVisible(false);
+        valueView.setVisible(false);
+        qBitImagesHBox.getChildren().add(qBitView);
+        qBitValuesHBox.getChildren().add(valueView);
+    }
+
+    private void scaleScenePane() {
+        prepareScaleValues();
+        scenePane.setScaleX(sizeScale);
+        scenePane.setScaleY(sizeScale);
+    }
+
+    private void prepareScaleValues() {
+        int size = bobQBitsStates.length;
+        if (size == 0) {
+            return;
+        }
+
+        setSizeScale(size);
+        setTimeScale(size);
+    }
+
+    private void setSizeScale(double size) {
+        double multiplier = 7.0 / size;
+        sizeScale *= multiplier;
+
+        if (sizeScale < 0.6) {
+            sizeScale = 0.6;
+        } else if (sizeScale > 1.25) {
+            sizeScale = 1.25;
+        }
+    }
+
+    private void setTimeScale(double size) {
+        timeScale = timeScale / size;
+        if (timeScale < 0.4) {
+            timeScale = 0.4;
+        } else if (timeScale > 0.8) {
+            timeScale = 0.8;
+        }
+    }
+
+    private int getRandomInt(int bound) {
+        return generator.nextInt(bound);
     }
 
     private void showChosenQBits(ObservableList<Node> valuesList, ObservableList<Node> imageViewsList, int index) {
-        Label valueLabel = (Label) valuesList.get(index);
-        valueLabel.setText(String.valueOf(bobQBitsStates[index].getValue()));
+        Node valueLabel =  valuesList.get(index);
+        Node imageView = imageViewsList.get(index);
         valueLabel.setVisible(true);
-
-        ImageView imageView = (ImageView) imageViewsList.get(index);
         imageView.setVisible(true);
 
         ScaleTransition valueScaleTrans = returnScaleTransition(valueLabel);
@@ -88,7 +161,7 @@ public class ChoosingQBitsScene {
     private ScaleTransition returnScaleTransition(Node node) {
         ScaleTransition scaleTransition = new ScaleTransition();
         scaleTransition.setNode(node);
-        scaleTransition.setDuration(Duration.seconds(0.75));
+        scaleTransition.setDuration(Duration.seconds(timeScale));
         scaleTransition.setFromX(0.0);
         scaleTransition.setFromY(0.0);
         scaleTransition.setToX(1.0);
@@ -100,7 +173,7 @@ public class ChoosingQBitsScene {
     private FadeTransition returnFadeTransition(Node node) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(0.75));
+        fadeTransition.setDuration(Duration.seconds(timeScale));
         fadeTransition.setFromValue(0.0);
         fadeTransition.setToValue(1.0);
 

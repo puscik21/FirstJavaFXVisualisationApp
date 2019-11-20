@@ -1,0 +1,26 @@
+* {
+    -fx-base-color : #1F1F1F;
+    -fx-second-color : #3AEA00;
+    -fx-detail-color : #EAE8DC;
+}
+
+.label {
+    -fx-text-fill: -fx-base-color;
+}
+
+.text-field {
+    -fx-background-color: black, white ;
+}
+
+.jfx-button {
+    -fx-base: -fx-base-color;
+    -fx-background-color: -fx-base-color;
+    -fx-font-size: 25px;
+    -fx-text-fill: -fx-second-color;
+    -fx-background-radius: 10px;
+}
+
+.jfx-button:hover {
+    -fx-background-color: derive(-fx-base-color, 50%);
+    -fx-text-fill: -fx-second-color;
+}

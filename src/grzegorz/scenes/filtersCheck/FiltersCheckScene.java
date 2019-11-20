@@ -37,7 +37,7 @@ public class FiltersCheckScene {
     private QBitState[] bobQBitStates;
 
     private double sizeScale = 1.0;
-    private double timeScale = 4.0; // TODO: 17.11.2019 search optimal val (default 4.0)
+    private double timeScale = 4.0;
 
     private final String TICK_ICON_PATH = "grzegorz\\images\\tickIcon.png";
     private final String ONE_ICON_PATH = "grzegorz\\images\\oneIcon.png";
@@ -46,6 +46,8 @@ public class FiltersCheckScene {
 
     // TODO: 16.11.2019 comments on right click
     // TODO: 17.11.2019 scene title
+    // TODO: 20.11.2019 glow effect
+    // TODO: 20.11.2019 what to do when there is no key in result - "X" icon meaning wrong filter, then disappear when changing to 1 or 0
 
     public void start(int[] aliceFilters, QBitState[] bobQBitStates) {
         this.aliceFilters = aliceFilters;
@@ -88,6 +90,12 @@ public class FiltersCheckScene {
         }
     }
 
+    private void scaleComparePane() {
+        prepareScaleValues();
+        comparePane.setScaleX(sizeScale);
+        comparePane.setScaleY(sizeScale);
+    }
+
     private void prepareScaleValues() {
         int size = qBitsVBox.getChildren().size();
         if (size == 0) {
@@ -104,22 +112,16 @@ public class FiltersCheckScene {
 
         if (sizeScale < 0.3) {
             sizeScale = 0.3;
-        } else if (sizeScale > 1.75) {
-            sizeScale = 1.75;
+        } else if (sizeScale > 1.0) {
+            sizeScale = 1.0;
         }
     }
 
     private void setTimeScale(double size) {
         timeScale = timeScale / size;
-        if (timeScale > 1.0) {
-            timeScale = 1.0;
+        if (timeScale > 0.5) {
+            timeScale = 0.5;
         }
-    }
-
-    private void scaleComparePane() {
-        prepareScaleValues();
-        comparePane.setScaleX(sizeScale);
-        comparePane.setScaleY(sizeScale);
     }
 
     private void prepareQBitsHBox() {

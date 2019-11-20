@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.choosingQBits.EnterQBitCombination">
+<AnchorPane fx:id="scenePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@enterQBitCombinationStyle.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.choosingQBits.EnterQBitCombination">
    <children>
       <VBox alignment="CENTER" spacing="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -20,12 +20,12 @@
             <TextField fx:id="numberField" alignment="CENTER" promptText="Enter number" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                <children>
-                  <Label text="Bits to send: " wrapText="true">
+                  <Label text="Bits to send: " textFill="#222121" wrapText="true">
                      <font>
-                        <Font size="20.0" />
+                        <Font name="System Bold" size="20.0" />
                      </font>
                   </Label>
-                  <Label fx:id="bitsText" text="0001" textAlignment="CENTER">
+                  <Label fx:id="bitsText" textAlignment="CENTER">
                      <font>
                         <Font name="System Bold" size="20.0" />
                      </font>
@@ -34,8 +34,8 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
                <children>
-                  <JFXButton fx:id="randomButton" onAction="#sendRandomCombination" text="Random" textAlignment="CENTER" />
-                  <JFXButton fx:id="sendButton" onAction="#sendBitCombination" text="Send bits" textAlignment="CENTER" />
+                  <JFXButton fx:id="randomButton" onAction="#sendRandomCombination" text="Random" textAlignment="CENTER" textFill="WHITE" />
+                  <JFXButton fx:id="sendButton" onAction="#sendBitCombination" text="Send bits" textAlignment="CENTER" textFill="WHITE" />
                </children>
             </HBox>
          </children>

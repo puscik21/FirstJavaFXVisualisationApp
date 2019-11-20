@@ -1,16 +1,23 @@
 package grzegorz.scenes.choosingQBits;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import grzegorz.QBitState;
 import grzegorz.scenes.introduction.IntroductionScene;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 
 import java.math.BigInteger;
 import java.util.Random;
 
 public class EnterQBitCombination {
+    @FXML
+    private AnchorPane scenePane;
+
     @FXML
     private Label sceneTitle;
 
@@ -48,29 +55,34 @@ public class EnterQBitCombination {
 
     private boolean isNewValueProper(String value) {
         if (value == null || value.isEmpty()) {
+            bitsText.setText("");
             return false;
         }
 
         String maxVal = "65535";
         BigInteger bigInt = new BigInteger(value);
-        return bigInt.compareTo(new BigInteger(maxVal)) < 0;
+        return bigInt.compareTo(new BigInteger(maxVal)) <= 0;
     }
 
     public void start(IntroductionScene parentController) {
         this.parentController = parentController;
         generator = new Random();
+        binaryRepresentation = "";
     }
 
     private void convertToBits(String number) {
         binaryRepresentation = Integer.toBinaryString(Integer.parseInt(number));
-        System.out.println(binaryRepresentation);
         bitsText.setText(binaryRepresentation);
     }
 
     @FXML
-    private void sendRandomCombination() {
-        QBitState[] userQBitStates = convertToQBitStates();
-        parentController.setUserCombination(userQBitStates, false);
+    private void sendBitCombination() {
+        if (binaryRepresentation.length() >= 4 && isNewValueProper(numberField.getText())) {
+            QBitState[] userQBitStates = convertToQBitStates();
+            parentController.setUserCombination(userQBitStates, true);
+        } else {
+            showErrorMessage("Binary value must be from 4 to 16 digits long", "Wrong input value");
+        }
     }
 
     private QBitState[] convertToQBitStates() {
@@ -92,8 +104,20 @@ public class EnterQBitCombination {
         return new QBitState(state, val);
     }
 
+    private void showErrorMessage(String message, String title) {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        if (!title.isEmpty()) {
+            dialogLayout.setHeading(new Text(title));
+        }
+        Text text = new Text(message);
+        dialogLayout.setBody(text);
+
+        JFXDialog dialog = new JFXDialog(parentController.getRootPane(), dialogLayout, JFXDialog.DialogTransition.TOP);
+        dialog.show();
+    }
+
     @FXML
-    private void sendBitCombination() {
-        parentController.setUserCombination(true);
+    private void sendRandomCombination() {
+        parentController.setUserCombination(false);
     }
 }
