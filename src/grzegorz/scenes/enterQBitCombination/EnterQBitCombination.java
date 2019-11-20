@@ -1,4 +1,4 @@
-package grzegorz.scenes.choosingQBits;
+package grzegorz.scenes.enterQBitCombination;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;

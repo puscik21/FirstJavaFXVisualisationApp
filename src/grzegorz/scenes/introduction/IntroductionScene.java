@@ -7,7 +7,7 @@ import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.QBitState;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
-import grzegorz.scenes.choosingQBits.EnterQBitCombination;
+import grzegorz.scenes.enterQBitCombination.EnterQBitCombination;
 import grzegorz.scenes.explanations.QBitExplanationScene;
 import grzegorz.scenes.filters.FiltersScene;
 import grzegorz.scenes.filtersCheck.FiltersCheckScene;
@@ -280,8 +280,7 @@ public class IntroductionScene {
                 if (newVal.intValue() == 0) {
                     // TODO: 04.11.2019 do I want to reload it?
 //                    reloadIntroductionScene();
-                }
-                else if (newVal.intValue() == FILTERS_TAB_NUMBER) {
+                } else if (newVal.intValue() == FILTERS_TAB_NUMBER) {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("../filters/filtersScene.fxml"));
                     StackPane body = loader.load();
                     tabPane.getTabs().get(FILTERS_TAB_NUMBER).setContent(body);
@@ -289,8 +288,7 @@ public class IntroductionScene {
                     filtersController.start(bobQBitsStates, aliceFiltersValues);
                     hideMess(bobMess);
                     showButton.setDisable(false);
-                }
-                else if (newVal.intValue() == FILTERS_CHECK_TAB_NUMBER) {
+                } else if (newVal.intValue() == FILTERS_CHECK_TAB_NUMBER) {
                     try {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("../filtersCheck/filtersCheckScene.fxml"));
                         BorderPane body = loader.load();
@@ -531,7 +529,7 @@ public class IntroductionScene {
     }
 
     private void addToCAnimations(SequentialTransition sendKeyTrans, SequentialTransition encryptionAnimation, SequentialTransition returnTrans) {
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendKeyTrans,"Bob send his public key to Alice");
+        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendKeyTrans, "Bob send his public key to Alice");
         CommentedAnimation encryptionCAnimation = new CommentedAnimation(encryptionAnimation, "Alice encrypt message with Bob's public key");
         CommentedAnimation returnCAnimation = new CommentedAnimation(returnTrans, "Then she send it back to Bob");
 
@@ -612,7 +610,7 @@ public class IntroductionScene {
 
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
         sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans,"Bob send random qubits by quantum cable");
+        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans, "Bob send random qubits by quantum cable");
         sceneCAnimations.add(sendKeyCAnimation);
     }
 
@@ -805,7 +803,7 @@ public class IntroductionScene {
         dialogLayout.setHeading(new Text("Bob is preparing the sequence of qubits to send"));
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosingQBits/EnterQBitCombination.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../enterQBitCombination/enterQBitCombination.fxml"));
             AnchorPane body = loader.load();
             EnterQBitCombination enterQBitCombination = loader.getController();
 
