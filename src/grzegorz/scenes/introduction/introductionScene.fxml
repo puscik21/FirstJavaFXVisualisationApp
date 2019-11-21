@@ -83,6 +83,11 @@
                                           <Image url="@../../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
+                                    <ImageView fx:id="evePC" fitHeight="150.0" fitWidth="200.0" layoutX="463.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../images/PCWhite.png" />
+                                       </image>
+                                    </ImageView>
                                     <ImageView fx:id="aliceMess" fitHeight="90.0" fitWidth="160.0" layoutX="130.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
                                        <image>
                                           <Image url="@../../images/envelope.jpg" />

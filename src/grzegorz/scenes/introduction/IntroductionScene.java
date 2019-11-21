@@ -92,6 +92,9 @@ public class IntroductionScene {
     private ImageView bobPC;
 
     @FXML
+    private ImageView evePC;
+
+    @FXML
     private ImageView aliceMess;
 
     @FXML
@@ -154,7 +157,7 @@ public class IntroductionScene {
     private JFXDialog enterCombinationDialog;
 
     @FXML
-    public void initialize() {
+    private void initialize() {
 //        ///////
 
 //        *FOR TEST PURPOSES*
@@ -629,6 +632,115 @@ public class IntroductionScene {
         sceneCAnimations.add(aliceSendFiltersCAnimation);
     }
 
+
+    private JFXDialog returnExplanationDialog() {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        Text text = new Text("What is qubit?");
+        text.setFont(Font.font(null, FontWeight.BOLD, 24));
+        dialogLayout.setHeading(text);
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../explanations/qBitExplanationScene.fxml"));
+            AnchorPane body = loader.load();
+            QBitExplanationScene qBitExplanationController = loader.getController();
+
+            dialogLayout.setBody(body);
+            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            dialog.setOnDialogOpened(e -> {
+                addSceneBlurEffect();
+                removeCommentDialog();
+                qBitExplanationController.start();
+            });
+            dialog.setOnDialogClosed(e -> {
+                removeSceneEffects();
+                showButton.setDisable(false);
+            });
+            return dialog;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new JFXDialog();
+        }
+    }
+
+    private JFXDialog returnEnterCombinationDialog() {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Text("Bob is preparing the sequence of qubits to send"));
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../enterQBitCombination/enterQBitCombination.fxml"));
+            AnchorPane body = loader.load();
+            EnterQBitCombination enterQBitCombination = loader.getController();
+
+            dialogLayout.setBody(body);
+            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            dialog.setOverlayClose(false);
+            dialog.setOnDialogOpened(e -> {
+                addSceneBlurEffect();
+                removeCommentDialog();
+                enterQBitCombination.start(this);
+            });
+            dialog.setOnDialogClosed(e -> {
+                removeSceneEffects();
+                showMess(bobMess).play();
+                nextIsDialog = true;
+                showButton.setDisable(false);
+            });
+            return dialog;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new JFXDialog();
+        }
+    }
+
+    private JFXDialog returnBobDialog() {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Text("Bob is choosing the sequence of qubits to send"));
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosingQBits/choosingQBitsScene.fxml"));
+            AnchorPane body = loader.load();
+            ChoosingQBitsScene choosingQBitsController = loader.getController();
+
+            dialogLayout.setBody(body);
+            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            dialog.setOnDialogOpened(e -> {
+                addSceneBlurEffect();
+                removeCommentDialog();
+                if (isUserInput) {
+                    choosingQBitsController.startWithUserInput(bobQBitsStates);
+                } else {
+                    bobQBitsStates = choosingQBitsController.startRandom();
+                    aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
+                }
+            });
+            dialog.setOnDialogClosed(e -> {
+                removeSceneEffects();
+                showMess(bobMess).play();
+                nextIsDialog = false;
+                showButton.setDisable(false);
+            });
+            return dialog;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new JFXDialog();
+        }
+    }
+
+    private int[] getRandomFilterValues(int length) {
+        Random random = new Random();
+        int[] values = new int[length];
+        int bound = 2;
+
+        for (int i = 0; i < length; i++) {
+            values[i] = random.nextInt(bound);
+        }
+        return values;
+    }
+
+    // general methods
     private void hideMess(ImageView imgView) {
         getScaleTransition(imgView, 1.0, 0.0, 0.25).play();
     }
@@ -640,16 +752,21 @@ public class IntroductionScene {
         return new SequentialTransition(hideTransition, showTransition);
     }
 
-    private FadeTransition getHighlightCircleAnimation(Circle circle) {
-        return getHighlightTransition(circle);
-    }
-
     private SequentialTransition getSendingTransition(ImageView imgView, double toX, double toY) {
         TranslateTransition tUp = getTranslateTransition(imgView, 0, 0, 0, toY);
         TranslateTransition tLeft = getTranslateTransition(imgView, tUp.getToX(), tUp.getToY(), toX, toY);
         TranslateTransition tDown = getTranslateTransition(imgView, tLeft.getToX(), tLeft.getToY(), toX, 0);
 
         return new SequentialTransition(tUp, tLeft, tDown);
+    }
+
+    private SequentialTransition returnChangingEnvelopeAnimation(String url) {
+        Image image = new Image(url);
+        ScaleTransition scaleUpTransition = getScaleTransition(aliceMess, 1.0, 1.2, 0.25);
+        scaleUpTransition.setOnFinished(e -> aliceMess.setImage(image));
+        ScaleTransition scaleDownTransition = getScaleTransition(aliceMess, 1.2, 1.0, 0.25);
+
+        return new SequentialTransition(scaleUpTransition, scaleDownTransition);
     }
 
     private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
@@ -662,16 +779,6 @@ public class IntroductionScene {
         transition.setToY(toY);
 
         return transition;
-    }
-
-    private SequentialTransition returnChangingEnvelopeAnimation(String url) {
-        Image image = new Image(url);
-
-        ScaleTransition scaleUpTransition = getScaleTransition(aliceMess, 1.0, 1.2, 0.25);
-        scaleUpTransition.setOnFinished(e -> aliceMess.setImage(image));
-        ScaleTransition scaleDownTransition = getScaleTransition(aliceMess, 1.2, 1.0, 0.25);
-
-        return new SequentialTransition(scaleUpTransition, scaleDownTransition);
     }
 
     private ScaleTransition getScaleTransition(Node node, double from, double to, double time) {
@@ -707,6 +814,10 @@ public class IntroductionScene {
         return circle;
     }
 
+    private FadeTransition getHighlightCircleAnimation(Circle circle) {
+        return getHighlightTransition(circle);
+    }
+
     private FadeTransition getHighlightTransition(Node node) {
         FadeTransition fadeTransition = getFadeTransition(node);
         fadeTransition.setDuration(Duration.seconds(0.25));
@@ -717,7 +828,6 @@ public class IntroductionScene {
         return fadeTransition;
     }
 
-    // others
     private JFXDialog returnDialog(String message) {
         return returnDialog(message, "");
     }
@@ -761,113 +871,6 @@ public class IntroductionScene {
             commentRemovalAnim.play();
             commentRemovalAnim.setOnFinished(e -> commentPane.getChildren().remove(0));
         }
-    }
-
-    private JFXDialog returnBobDialog() {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setHeading(new Text("Bob is choosing the sequence of qubits to send"));
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosingQBits/choosingQBitsScene.fxml"));
-            AnchorPane body = loader.load();
-            ChoosingQBitsScene choosingQBitsController = loader.getController();
-
-            dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-            dialog.setOnDialogOpened(e -> {
-                addSceneBlurEffect();
-                removeCommentDialog();
-                if (isUserInput) {
-                    choosingQBitsController.startWithUserInput(bobQBitsStates);
-                } else {
-                    bobQBitsStates = choosingQBitsController.startRandom();
-                    aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
-                }
-            });
-            dialog.setOnDialogClosed(e -> {
-                removeSceneEffects();
-                showMess(bobMess).play();
-                nextIsDialog = false;
-                showButton.setDisable(false);
-            });
-            return dialog;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JFXDialog();
-        }
-    }
-
-    private JFXDialog returnEnterCombinationDialog() {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setHeading(new Text("Bob is preparing the sequence of qubits to send"));
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../enterQBitCombination/enterQBitCombination.fxml"));
-            AnchorPane body = loader.load();
-            EnterQBitCombination enterQBitCombination = loader.getController();
-
-            dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-            dialog.setOverlayClose(false);
-            dialog.setOnDialogOpened(e -> {
-                addSceneBlurEffect();
-                removeCommentDialog();
-                enterQBitCombination.start(this);
-            });
-            dialog.setOnDialogClosed(e -> {
-                removeSceneEffects();
-                showMess(bobMess).play();
-                nextIsDialog = true;
-                showButton.setDisable(false);
-            });
-            return dialog;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JFXDialog();
-        }
-    }
-
-    private JFXDialog returnExplanationDialog() {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        Text text = new Text("What is qubit?");
-        text.setFont(Font.font(null, FontWeight.BOLD, 24));
-        dialogLayout.setHeading(text);
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../explanations/qBitExplanationScene.fxml"));
-            AnchorPane body = loader.load();
-            QBitExplanationScene qBitExplanationController = loader.getController();
-
-            dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-            dialog.setOnDialogOpened(e -> {
-                addSceneBlurEffect();
-                removeCommentDialog();
-                qBitExplanationController.start();
-            });
-            dialog.setOnDialogClosed(e -> {
-                removeSceneEffects();
-                showButton.setDisable(false);
-            });
-            return dialog;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JFXDialog();
-        }
-    }
-
-    private int[] getRandomFilterValues(int length) {
-        Random random = new Random();
-        int[] values = new int[length];
-        int bound = 2;
-
-        for (int i = 0; i < length; i++) {
-            values[i] = random.nextInt(bound);
-        }
-        return values;
     }
 
     private void addSceneBlurEffect() {

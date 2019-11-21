@@ -6,7 +6,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-
+// TODO: 21.11.2019
+//  eavesdropper scene "But assume world is not perfect and someone can be eavesdropping - lets see how BB84 is dealing with situation like this"
+//  something why it works
+//  chart scene - checking if some1 was eavesdropping
 public class Main extends Application {
 
     // TODO: 13.11.2019
