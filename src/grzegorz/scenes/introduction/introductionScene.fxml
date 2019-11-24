@@ -83,9 +83,9 @@
                                           <Image url="@../../images/PCWhite.png" />
                                        </image>
                                     </ImageView>
-                                    <ImageView fx:id="evePC" fitHeight="150.0" fitWidth="200.0" layoutX="463.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
+                                    <ImageView fx:id="evePC" fitHeight="150.0" fitWidth="200.0" layoutX="463.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true" visible="false">
                                        <image>
-                                          <Image url="@../../images/PCWhite.png" />
+                                          <Image url="@../../images/PCRed.png" />
                                        </image>
                                     </ImageView>
                                     <ImageView fx:id="aliceMess" fitHeight="90.0" fitWidth="160.0" layoutX="130.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
@@ -94,6 +94,11 @@
                                        </image>
                                     </ImageView>
                                     <ImageView fx:id="bobMess" fitHeight="90.0" fitWidth="160.0" layoutX="779.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
+                                       <image>
+                                          <Image url="@../../images/envelope.jpg" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fx:id="eveMess" fitHeight="90.0" fitWidth="160.0" layoutX="470.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
                                        <image>
                                           <Image url="@../../images/envelope.jpg" />
                                        </image>

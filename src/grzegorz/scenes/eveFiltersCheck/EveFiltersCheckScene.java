@@ -1,32 +1,44 @@
-package grzegorz.scenes.filtersCheck;
+package grzegorz.scenes.eveFiltersCheck;
 
+import com.jfoenix.controls.JFXTabPane;
 import grzegorz.QBitState;
-import javafx.animation.*;
+import grzegorz.scenes.introduction.IntroductionScene;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
+import javafx.animation.SequentialTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FiltersCheckScene {
+public class EveFiltersCheckScene {
     @FXML
     private AnchorPane comparePane;
+
+    @FXML
+    private VBox aliceValuesVBox;
 
     @FXML
     private VBox filtersVBox;
 
     @FXML
+    private VBox ticksVBox;
+
+    @FXML
     private VBox qBitsVBox;
 
     @FXML
-    private VBox ticksVBox;
+    private VBox bobValuesVBox;
 
     @FXML
     private Label sceneTitle;
@@ -34,6 +46,7 @@ public class FiltersCheckScene {
     private ArrayList<Image> filterImages;
     private ArrayList<Image> photonImages;
     private ArrayList<Image> valuesImages;
+    private int[] aliceQBitsValuesAfterEve;
     private int[] aliceFilters;
     private QBitState[] bobQBitStates;
 
@@ -46,9 +59,11 @@ public class FiltersCheckScene {
     // TODO: 20.11.2019 glow effect
     // TODO: 20.11.2019 what to do when there is no key in result - "X" icon meaning wrong filter, then disappear when changing to 1 or 0
     // TODO: 22.11.2019 check incorrect, but when everyone matches write some info
-    public void start(int[] aliceFilters, QBitState[] bobQBitStates) {
+
+    public void start(int[] aliceFilters, QBitState[] bobQBitStates, int[] aliceQBitsValuesAfterEve) {
         this.aliceFilters = aliceFilters;
         this.bobQBitStates = bobQBitStates;
+        this.aliceQBitsValuesAfterEve = aliceQBitsValuesAfterEve;
 
         prepareScene();
         scheduleAnimationStart();
@@ -86,6 +101,10 @@ public class FiltersCheckScene {
     private void addImageViews() {
         int quantity = aliceFilters.length;
         for (int i = 0; i < quantity; i++) {
+            int aliceValueAfterEve = aliceQBitsValuesAfterEve[i];
+            int bobValue = bobQBitStates[i].getValue();
+            aliceValuesVBox.getChildren().add(new ImageView(valuesImages.get(aliceValueAfterEve)));
+            bobValuesVBox.getChildren().add(new ImageView(valuesImages.get(bobValue)));
             filtersVBox.getChildren().add(new ImageView(filterImages.get(0)));
             qBitsVBox.getChildren().add(new ImageView(photonImages.get(0)));
             ImageView invisibleTick = new ImageView(valuesImages.get(2));
@@ -174,7 +193,6 @@ public class FiltersCheckScene {
         transArray = transitions.toArray(transArray);
         SequentialTransition showTicksTransition = new SequentialTransition(transArray);
         SequentialTransition showNumbersTransition = getTicksToNumbersTransition(indexesOfCorrect);
-
         return new SequentialTransition(showTicksTransition, showNumbersTransition);
     }
 

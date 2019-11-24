@@ -38,7 +38,7 @@ public class QBitState {
         return value;
     }
 
-    public void turnQBit(int direction){
+    public void turnQBit(int direction) {
         state += direction;
 
         if (state == 4) {
@@ -57,12 +57,21 @@ public class QBitState {
         }
     }
 
-
-    public boolean isFilterProper(int filterState) {
+    public boolean isFilterWrong(int filterState) {
         if (filterState == RECTILINEAR) {
-            return state == VERTICAL || state == HORIZONTAL;
+            return state != VERTICAL && state != HORIZONTAL;
         } else {
-            return state == RIGHT_DIAGONAL || state == LEFT_DIAGONAL;
+            return state != RIGHT_DIAGONAL && state != LEFT_DIAGONAL;
         }
+    }
+
+    public int getDirectionToState(QBitState qBitState) {
+        int direction = qBitState.getState() - this.getState();
+        if (direction < -1) {
+            direction = 1;
+        } else if (direction > 1) {
+            direction = -1;
+        }
+        return direction;
     }
 }
