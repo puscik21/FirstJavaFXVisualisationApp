@@ -1,7 +1,6 @@
-package grzegorz.scenes.introduction;
+package grzegorz;
 
 import javafx.animation.Animation;
-import javafx.util.Duration;
 
 public class CommentedAnimation {
     private Animation animation;

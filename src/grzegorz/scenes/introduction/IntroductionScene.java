@@ -5,14 +5,12 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
-import grzegorz.QBitState;
-import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
-import grzegorz.scenes.enterQBitCombination.EnterQBitCombination;
-import grzegorz.scenes.eveFiltersCheck.EveFiltersCheckScene;
+import grzegorz.CommentedAnimation;
+import grzegorz.scenes.quantumScene.QuantumScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
-import grzegorz.scenes.filters.FiltersScene;
-import grzegorz.scenes.filtersCheck.FiltersCheckScene;
 import javafx.animation.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -29,8 +27,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -38,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
@@ -94,16 +89,10 @@ public class IntroductionScene {
     private ImageView bobPC;
 
     @FXML
-    private ImageView evePC;
-
-    @FXML
     private ImageView aliceMess;
 
     @FXML
     private ImageView bobMess;
-
-    @FXML
-    private ImageView eveMess;
 
     @FXML
     private ImageView publicKey;
@@ -130,17 +119,8 @@ public class IntroductionScene {
     private final double START_PANE_HEIGHT = 710;
 
     // TODO: 22.11.2019 remove additional tabs
-    private final int FILTERS_TAB = 1;
-    private final int FILTERS_CHECK_TAB = 2;
-    private final int EVE_FILTERS_TAB = 3;
-    private final int ALICE_AFTER_EVE_FILTERS_TAB = 4;
-    private final int EVE_FILTERS_CHECK_TAB = 5;
-
-    private boolean isFiltersCheckClosed = false;
-    private boolean isEveFiltersClosed = false;
-    private boolean isAliceAfterEveFiltersClosed = false;
-    private boolean isEveFiltersCheckClosed = false;
-    private boolean isMeasurementClosed = false;
+    private final int EXPLANATION_TAB = 1;
+    private final int INTRODUCTION_TAB = 2;
 
     // TODO: 19.11.2019  check if they are all correct
     // TODO: 22.11.2019 add the rest of circles
@@ -148,13 +128,9 @@ public class IntroductionScene {
     private final double TABS_FIRST_X = 53;     // TODO: 20.11.2019 use circle in another scenes
     private final double TABS_SECOND_X = 206;
     private final double TABS_THIRD_X = 385;
-    private final double TABS_FOURTH_X = 560;
-    private final double TABS_FIFTH_X = 800;
-    private final double TABS_SIXTH_X = 1000;
 
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
-    // TODO: 01.11.2019 message sent by quantum cable could be yellow
 
     private ArrayList<CommentedAnimation> sceneCAnimations;
     private ArrayList<JFXDialog> sceneDialogs;
@@ -162,26 +138,25 @@ public class IntroductionScene {
     private int dialogCounter;
     private boolean nextIsDialog = false;
     private boolean animationsShowed = false;
-    private boolean isUserInput;
-    private boolean isAfterEavesdropping = false;       // TODO: 21.11.2019 if I create ALICE_AFTER_EVE tab in right time I probably wont even need this flag
 
-    // TODO: 22.11.2019 special flag for every tab telling when showButton can be enabled
-    private QBitState[] bobQBitsStates;
-    private QBitState[] eveQBitsStates;
-    private int[] aliceFiltersValues;
-    private int[] eveFiltersValues;
-    private int[] aliceQBitsValuesAfterEve;
-
+    // TODO: 26.11.2019 some flags(?) to recognize what tab has been closed
+    
     private Circle secondHighlightCircle;
     private Circle thirdHighlightCircle;
-    private Circle fourthHighlightCircle;
-    private Circle fifthHighlightCircle;
-    private Circle sixthHighlightCircle;
     private DropShadow borderGlow;
 
-    private JFXDialog enterCombinationDialog;
+    // TODO: 25.11.2019 refactor
+    private ChangeListener<? super Number> listener;
 
+    public ChangeListener<? super Number> getListener() {
+        return listener;
+    }
 
+    public StackPane getRootPane() {
+        return rootPane;
+    }
+
+    // TODO: 26.11.2019 refactor
     @FXML
     private void initialize() {
         initEvents();
@@ -193,9 +168,6 @@ public class IntroductionScene {
 
         secondHighlightCircle = getHighlightCircle(TABS_SECOND_X, TABS_Y);
         thirdHighlightCircle = getHighlightCircle(TABS_THIRD_X, TABS_Y);
-        fourthHighlightCircle = getHighlightCircle(TABS_FOURTH_X, TABS_Y);
-        fifthHighlightCircle = getHighlightCircle(TABS_FIFTH_X, TABS_Y);
-        sixthHighlightCircle = getHighlightCircle(TABS_SIXTH_X, TABS_Y);
 
         returnDialog("Nowadays to send information safely, we use asynchronous algorithms like RSA. \n" +
                 "Alice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \n" +
@@ -208,43 +180,12 @@ public class IntroductionScene {
         //  charts scene
         //  eavesdropper and why he cannot read qubits in quantum cable
 
-// TODO: 12.11.2019 TBR
 
-//         filters
-//        isUserInput = true;
-//        enterCombinationDialog = returnEnterCombinationDialog();
-//        enterCombinationDialog.show();
-//        Tab filterTab1 = new Tab("Test tab");
-//        tabPane.getTabs().add(filterTab1);
-//        Tab filterTab2 = new Tab("Test tab");
-//        tabPane.getTabs().add(filterTab2);
-    }
+        Tab explanationTab = new Tab("Qubit explanation");
+        tabPane.getTabs().add(explanationTab);
 
-    public StackPane getRootPane() {
-        return rootPane;
-    }
-
-    public void setUserCombination(QBitState[] userCombination, boolean isRandom) {
-        isUserInput = isRandom;
-        bobQBitsStates = userCombination;
-        // its kinda workaround to prepare filters with qbits values here
-        aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
-        eveFiltersValues = getRandomFilterValues(bobQBitsStates.length);
-        enterCombinationDialog.close();
-    }
-
-    public void setUserCombination(boolean isRandom) {
-        isUserInput = isRandom;
-        enterCombinationDialog.close();
-    }
-
-    public void setEavesdroppedQBits(QBitState[] eavesDroppedValues) {
-        this.eveQBitsStates = eavesDroppedValues;
-        this.isAfterEavesdropping = true;             // TODO: 21.11.2019 circle on filters scene
-    }
-
-    public void setAliceQBitsValuesAfterEve(int[] aliceQBitsValuesAfterEve) {
-        this.aliceQBitsValuesAfterEve = aliceQBitsValuesAfterEve;
+        Tab quantumTab = new Tab("BB84");
+        tabPane.getTabs().add(quantumTab);
     }
 
     private void initEvents() {
@@ -295,76 +236,39 @@ public class IntroductionScene {
     }
 
     private void initMainTabPane() {
-        tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
-            try {
-                if (oldVal.intValue() != 0) {
-                    hideMess(aliceMess);
-                    hideMess(bobMess);
-                    hideMess(eveMess);
-                } else if (oldVal.intValue() == EVE_FILTERS_TAB) {
-                    hideMess(bobMess);
-                } else if (oldVal.intValue() == EVE_FILTERS_CHECK_TAB && tabPane.getTabs().size() == 6) {
-                    Tab filterTab = new Tab("Photons Measurement");
-                    tabPane.getTabs().add(filterTab);
-                }
+        listener = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldVal, Number newVal) {
+                try {
+                    if (oldVal.intValue() != 0) {
+                        hideMess(aliceMess);
+                        hideMess(bobMess);
+                    }
 
-                if (newVal.intValue() == FILTERS_TAB) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../filters/filtersScene.fxml"));
-                    StackPane body = loader.load();
-                    tabPane.getTabs().get(FILTERS_TAB).setContent(body);
-                    FiltersScene filtersController = loader.getController();
-                    filtersController.startDefaultScenario(this, bobQBitsStates, aliceFiltersValues, isAfterEavesdropping);
-                    hideMess(bobMess);
-                    showButton.setDisable(false);
-                } else if (newVal.intValue() == FILTERS_CHECK_TAB) {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../filtersCheck/filtersCheckScene.fxml"));
-                        BorderPane body = loader.load();
-                        tabPane.getTabs().get(FILTERS_CHECK_TAB).setContent(body);
-                        FiltersCheckScene filtersCheckScene = loader.getController();
-                        filtersCheckScene.start(aliceFiltersValues, bobQBitsStates);
+                    // TODO: 25.11.2019 separate method
+                    if (newVal.intValue() == EXPLANATION_TAB) {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../explanations/qBitExplanationScene.fxml"));
+                        AnchorPane body = loader.load();
+                        tabPane.getTabs().get(EXPLANATION_TAB).setContent(body);
+                        QBitExplanationScene qBitExplanationScene = loader.getController();
+                        qBitExplanationScene.start();
+                        hideMess(bobMess);
                         showButton.setDisable(false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else if (newVal.intValue() == EVE_FILTERS_TAB) {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../filters/filtersScene.fxml"));
+                    } else if (newVal.intValue() == INTRODUCTION_TAB) {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../quantumScene/quantumScene.fxml"));
                         StackPane body = loader.load();
-                        tabPane.getTabs().get(EVE_FILTERS_TAB).setContent(body);
-                        FiltersScene filtersController = loader.getController();
-                        filtersController.startEveScenario(this, bobQBitsStates, eveFiltersValues);
+                        tabPane.getTabs().get(INTRODUCTION_TAB).setContent(body);
+                        QuantumScene quantumScene = loader.getController();
+                        quantumScene.start(IntroductionScene.this, tabPane);
+                        hideMess(bobMess);
                         showButton.setDisable(false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
-                } else if (newVal.intValue() == ALICE_AFTER_EVE_FILTERS_TAB) {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../filters/filtersScene.fxml"));
-                        StackPane body = loader.load();
-                        tabPane.getTabs().get(ALICE_AFTER_EVE_FILTERS_TAB).setContent(body);
-                        FiltersScene filtersController = loader.getController();
-                        filtersController.startDefaultScenario(this, eveQBitsStates, aliceFiltersValues, isAfterEavesdropping);
-                        showButton.setDisable(false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else if (newVal.intValue() == EVE_FILTERS_CHECK_TAB) {
-                    try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../eveFiltersCheck/EveFiltersCheckScene.fxml"));
-                        BorderPane body = loader.load();
-                        tabPane.getTabs().get(EVE_FILTERS_CHECK_TAB).setContent(body);
-                        EveFiltersCheckScene filtersCheckScene = loader.getController();
-                        filtersCheckScene.start(aliceFiltersValues, bobQBitsStates, aliceQBitsValuesAfterEve);
-                        showButton.setDisable(false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-        });
+        };
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
     }
 
     private void reloadIntroductionScene() {
@@ -461,7 +365,7 @@ public class IntroductionScene {
     }
 
     private void showNextAnimation() {
-        if (animCounter == 0) {
+        if (animCounter == 0 && dialogCounter == 0) {
             prepareAllAnimations();
             prepareSceneDialogs();
         }
@@ -481,11 +385,6 @@ public class IntroductionScene {
         playShowButtonTransition();
         preparePublicKeyAnimation();
         preparePrivateKeyAnimation();
-        prepareQuantumAnimation();
-        prepareAliceSendFiltersAnimation();
-        prepareBobToEveAnimation();
-        prepareEveToAliceAnimation();
-        prepareAliceSendFiltersAfterEveAnimation();
     }
 
     private void playShowButtonTransition() {
@@ -570,7 +469,7 @@ public class IntroductionScene {
         double toMessageX = lastTrans.getToX() + publicKey.getFitWidth() + aliceMess.getFitWidth() / 2.0;
         double toMessageY = -aliceMess.getFitHeight() / 2.0;
 
-        SequentialTransition showMessTrans = showMess(aliceMess);
+        SequentialTransition showMessTrans = getShowMessTransition(aliceMess);
         TranslateTransition toMessageTrans = getTranslateTransition(publicKey, lastTrans.getToX(), lastTrans.getToY(), toMessageX, toMessageY);
         SequentialTransition bumpUpAnimation = returnChangingEnvelopeAnimation(LOCKED_ENVELOPE_PATH);
         TranslateTransition keyGoBackTrans = getTranslateTransition(publicKey, toMessageX, toMessageY, lastTrans.getToX(), lastTrans.getToY());
@@ -614,138 +513,15 @@ public class IntroductionScene {
         return getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
     }
 
-    private void prepareQuantumAnimation() {
-        double moveX = aliceMess.getLayoutX() - bobMess.getLayoutX();
-        double moveY = photonCable.getLayoutY() - bobMess.getLayoutY() + bobMess.getFitHeight() / 2.0;
-
-        SequentialTransition sendKeyTrans = getSendingTransition(bobMess, moveX, moveY);
-        sendKeyTrans.setOnFinished(e -> {
-            secondHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Photons Measurement");
-            tabPane.getTabs().add(filterTab);
-        });
-        FadeTransition highlightTransition = getHighlightCircleAnimation(secondHighlightCircle);
-
-        SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
-        sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans, "Bob send random qubits by quantum cable");
-        sceneCAnimations.add(sendKeyCAnimation);
-    }
-
-    private void prepareAliceSendFiltersAnimation() {
-        ScaleTransition showMessTrans = getScaleTransition(aliceMess, 0.0, 1.0, 0.25);
-        SequentialTransition sendingTrans = getAliceReturnTransition();
-        sendingTrans.setOnFinished(e -> {
-            thirdHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Filters Comparison");
-            tabPane.getTabs().add(filterTab);
-            nextIsDialog = true;
-            hideMess(aliceMess);
-            showButton.setDisable(true);
-        });
-        FadeTransition highlightTransition = getHighlightCircleAnimation(thirdHighlightCircle);
-
-        SequentialTransition aliceSendFiltersTrans = new SequentialTransition(showMessTrans, sendingTrans, highlightTransition);
-        aliceSendFiltersTrans.setOnFinished(e -> showButton.setDisable(true));
-        CommentedAnimation aliceSendFiltersCAnimation = new CommentedAnimation(aliceSendFiltersTrans, "Alice send filters that she chose");
-        sceneCAnimations.add(aliceSendFiltersCAnimation);
-    }
-
-    private void prepareBobToEveAnimation() {
-        double moveX = eveMess.getLayoutX() - bobMess.getLayoutX();
-        double moveY = photonCable.getLayoutY() - bobMess.getLayoutY() + bobMess.getFitHeight() / 2.0;
-
-        SequentialTransition sendKeyTrans = getSendingTransition(bobMess, moveX, moveY);
-        sendKeyTrans.setOnFinished(e -> {
-            fourthHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Eavesdropping");
-            tabPane.getTabs().add(filterTab);
-            nextIsDialog = true;
-        });
-        FadeTransition highlightTransition = getHighlightCircleAnimation(fourthHighlightCircle);
-
-        SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
-        sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans, "Bob send random qubits by quantum cable, but now Eve is capturing the message");
-        sceneCAnimations.add(sendKeyCAnimation);
-    }
-
-    private void prepareEveToAliceAnimation() {
-        double moveX = aliceMess.getLayoutX() - eveMess.getLayoutX();
-        double moveY = photonCable.getLayoutY() - eveMess.getLayoutY() + eveMess.getFitHeight() / 2.0;
-
-        SequentialTransition sendKeyTrans = getSendingTransition(eveMess, moveX, moveY);
-        sendKeyTrans.setOnFinished(e -> {
-            fifthHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Alice measure photons");
-            tabPane.getTabs().add(filterTab);
-        });
-        FadeTransition highlightTransition = getHighlightCircleAnimation(fifthHighlightCircle);
-
-        SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
-        sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans, "Eve send eavesdropped qubits to Alice");
-        sceneCAnimations.add(sendKeyCAnimation);
-    }
-
-    private void prepareAliceSendFiltersAfterEveAnimation() {       // TODO: 22.11.2019 same as  "prepareAliceSendFiltersAnimation" just need proper circle as parameter
-        ScaleTransition showMessTrans = getScaleTransition(aliceMess, 0.0, 1.0, 0.25);
-        SequentialTransition sendingTrans = getAliceReturnTransition();
-        sendingTrans.setOnFinished(e -> {
-            sixthHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Filters Comparison after eavesdropping");
-            tabPane.getTabs().add(filterTab);
-            nextIsDialog = true;
-            hideMess(aliceMess);
-        });
-        FadeTransition highlightTransition = getHighlightCircleAnimation(sixthHighlightCircle);
-
-        SequentialTransition aliceSendFiltersTrans = new SequentialTransition(showMessTrans, sendingTrans, highlightTransition);
-        CommentedAnimation aliceSendFiltersCAnimation = new CommentedAnimation(aliceSendFiltersTrans, "Alice send filters that she chose");
-        sceneCAnimations.add(aliceSendFiltersCAnimation);
-    }
-
     private void prepareSceneDialogs() {
         sceneDialogs.add(getRSADialogs());
-        sceneDialogs.add(returnExplanationDialog());
-        enterCombinationDialog = returnEnterCombinationDialog();
-        sceneDialogs.add(enterCombinationDialog);
-        sceneDialogs.add(returnBobDialog());
-        sceneDialogs.add(returnEveEavesdroppingDialog());
-        sceneDialogs.add(returnEveForwardingDialog());
-    }
-
-    private JFXDialog returnEveEavesdroppingDialog() {
-        JFXDialog dialog = returnDialog("But assume world is not perfect and someone can be eavesdropping \n" +
-                "Let's repeat sending scenario* but with Eve in scene and see how BB84 is dealing with situation like this");
-        EventHandler<? super JFXDialogEvent> currentCloseEvent = dialog.getOnDialogClosed();
-        dialog.setOnDialogClosed(e -> {
-            bobMess.setTranslateX(0);
-            showMess(bobMess).play();
-            nextIsDialog = false;
-            makeEveShowUpTransition();
-            currentCloseEvent.handle(e);
-        });
-        return dialog;
-    }
-
-    private JFXDialog returnEveForwardingDialog() {
-        JFXDialog dialog = returnDialog("Eve is forwarding qubits she has eavesdropped to Alice");
-        EventHandler<? super JFXDialogEvent> currentCloseEvent = dialog.getOnDialogClosed();
-        dialog.setOnDialogClosed(e -> {
-            hideMess(eveMess);
-            showMess(eveMess).play();
-            nextIsDialog = false;
-            currentCloseEvent.handle(e);
-        });
-        return dialog;
     }
 
     private JFXDialog getRSADialogs() {
         JFXDialog d1 = returnDialog("For ordinary computer this algorithm is nearly impossible to break in reasonable time");
         JFXDialog d2 = returnDialog("This can be quite easy for quantum computers", "BUT!");
         JFXDialog d3 = returnDialog("Thankfully there are quantum cryptography algorithms that can stop them thanks to the laws of physics. \n\n" +
-                "One of them is algorithm called BB84, which now we will discuss");
+                "One of them is algorithm called BB84.");
 
         EventHandler<? super JFXDialogEvent> d1CurrentEvent = d1.getOnDialogOpened();
         d1.setOnDialogOpened(ev -> {
@@ -763,117 +539,6 @@ public class IntroductionScene {
         return d1;
     }
 
-    private JFXDialog returnExplanationDialog() {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        Text text = new Text("What is qubit?");
-        text.setFont(Font.font(null, FontWeight.BOLD, 24));
-        dialogLayout.setHeading(text);
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../explanations/qBitExplanationScene.fxml"));
-            AnchorPane body = loader.load();
-            QBitExplanationScene qBitExplanationController = loader.getController();
-
-            dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-            dialog.setOnDialogOpened(e -> {
-                addSceneBlurEffect();
-                removeCommentDialog();
-                qBitExplanationController.start();
-            });
-            dialog.setOnDialogClosed(e -> removeSceneEffects());
-            return dialog;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JFXDialog();
-        }
-    }
-
-    private JFXDialog returnEnterCombinationDialog() {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setHeading(new Text("Bob is preparing the sequence of qubits to send"));
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../enterQBitCombination/enterQBitCombination.fxml"));
-            AnchorPane body = loader.load();
-            EnterQBitCombination enterQBitCombination = loader.getController();
-
-            dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-            dialog.setOverlayClose(false);
-            dialog.setOnDialogOpened(e -> {
-                addSceneBlurEffect();
-                removeCommentDialog();
-                enterQBitCombination.start(this);
-            });
-            dialog.setOnDialogClosed(e -> {
-                removeSceneEffects();
-                showMess(bobMess).play();
-                nextIsDialog = true;
-            });
-            return dialog;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JFXDialog();
-        }
-    }
-
-    private JFXDialog returnBobDialog() {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setHeading(new Text("Bob is choosing the sequence of qubits to send"));
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../choosingQBits/choosingQBitsScene.fxml"));
-            AnchorPane body = loader.load();
-            ChoosingQBitsScene choosingQBitsController = loader.getController();
-
-            dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-            dialog.setOnDialogOpened(e -> {
-                addSceneBlurEffect();
-                removeCommentDialog();
-                if (isUserInput) {
-                    choosingQBitsController.startWithUserInput(bobQBitsStates);
-                } else {
-                    bobQBitsStates = choosingQBitsController.startRandom();
-                    aliceFiltersValues = getRandomFilterValues(bobQBitsStates.length);
-                    eveFiltersValues = getRandomFilterValues(bobQBitsStates.length);
-                }
-            });
-            dialog.setOnDialogClosed(e -> {
-                removeSceneEffects();
-                nextIsDialog = false;
-            });
-            return dialog;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new JFXDialog();
-        }
-    }
-
-    private void makeEveShowUpTransition() {
-        double fromY = rootAnchorPane.getHeight() + 500.0;
-        evePC.setTranslateY(fromY);
-        evePC.setVisible(true);
-        TranslateTransition eveTrans = getTranslateTransition(evePC, 0, fromY, 0, 0);
-        eveTrans.setDuration(Duration.seconds(2.0));
-        eveTrans.play();
-    }
-
-    private int[] getRandomFilterValues(int length) {
-        Random random = new Random();
-        int[] values = new int[length];
-        int bound = 2;
-
-        for (int i = 0; i < length; i++) {
-            values[i] = random.nextInt(bound);
-        }
-        return values;
-    }
-
     // general methods
     private void hideMess(ImageView imgView) {
         ScaleTransition hideTrans = getScaleTransition(imgView, 1.0, 0.0, 0.25);
@@ -884,7 +549,7 @@ public class IntroductionScene {
         hideTrans.play();
     }
 
-    private SequentialTransition showMess(ImageView imgView) {
+    private SequentialTransition getShowMessTransition(ImageView imgView) {
         ScaleTransition hideTransition = getScaleTransition(imgView, 0.0, 0.0, 0.01);
         hideTransition.setOnFinished(e -> imgView.setVisible(true));
         ScaleTransition showTransition = getScaleTransition(imgView, 0.0, 1.0, 0.25);

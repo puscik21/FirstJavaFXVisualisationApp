@@ -13,6 +13,13 @@ import javafx.stage.Stage;
 //  right click everything
 public class Main extends Application {
 
+    // TODO: 25.11.2019 separate IntroductionScene
+    //  + QBit explanation
+    //  + Quantum piece
+
+    // TODO: 25.11.2019 swap Alice with Bob
+    // TODO: 25.11.2019 3 rows in filters comparison
+
     // TODO: 13.11.2019
     //  fix transited objects
     //  class with animations, class with dialogs

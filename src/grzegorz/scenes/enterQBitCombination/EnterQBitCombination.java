@@ -4,7 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import grzegorz.QBitState;
-import grzegorz.scenes.introduction.IntroductionScene;
+import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -33,7 +33,7 @@ public class EnterQBitCombination {
     @FXML
     private JFXButton sendButton;
 
-    private IntroductionScene parentController;
+    private QuantumScene parentController;
     private String binaryRepresentation;
     private Random generator;
 
@@ -64,7 +64,7 @@ public class EnterQBitCombination {
         return bigInt.compareTo(new BigInteger(maxVal)) <= 0;
     }
 
-    public void start(IntroductionScene parentController) {
+    public void start(QuantumScene parentController) {
         this.parentController = parentController;
         generator = new Random();
         binaryRepresentation = "";

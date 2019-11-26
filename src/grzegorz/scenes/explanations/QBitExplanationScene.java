@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
+// TODO: 26.11.2019 fix for darkTheme
 public class QBitExplanationScene {
 
     @FXML

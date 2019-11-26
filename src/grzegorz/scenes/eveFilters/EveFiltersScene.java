@@ -1,8 +1,9 @@
-package grzegorz.scenes.filters;
+package grzegorz.scenes.eveFilters;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import grzegorz.QBitState;
+import grzegorz.scenes.introduction.IntroductionScene;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
 import javafx.fxml.FXML;
@@ -18,7 +19,7 @@ import javafx.util.Duration;
 
 import java.util.*;
 
-public class FiltersScene {
+public class EveFiltersScene {
     @FXML
     public StackPane rootStackPane;
 
