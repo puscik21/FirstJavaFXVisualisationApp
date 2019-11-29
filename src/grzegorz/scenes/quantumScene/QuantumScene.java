@@ -11,7 +11,9 @@ import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
 import grzegorz.scenes.enterQBitCombination.EnterQBitCombination;
 import grzegorz.scenes.eveFilters.EveFiltersScene;
 import grzegorz.scenes.eveFiltersCheck.EveFiltersCheckScene;
+import grzegorz.scenes.explanations.QBitExplanationScene;
 import grzegorz.scenes.filters.FiltersScene;
+import grzegorz.scenes.filtersCheck.FiltersCheckScene;
 import grzegorz.scenes.introduction.IntroductionScene;
 import javafx.animation.*;
 import javafx.event.ActionEvent;
@@ -22,7 +24,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
@@ -37,7 +38,6 @@ import java.util.stream.Collectors;
 
 // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
 // TODO: 26.10.2019 look at transited objects positions
-// TODO: 24.11.2019 before user go to third tab showButton goes available
 public class QuantumScene {
 
     // TODO przerozne roznosci
@@ -97,12 +97,6 @@ public class QuantumScene {
     private ImageView eveMess;
 
     @FXML
-    private ImageView publicKey;
-
-    @FXML
-    private ImageView privateKey;
-
-    @FXML
     private ImageView electricalCable;
 
     @FXML
@@ -120,13 +114,17 @@ public class QuantumScene {
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
 
+    private final int EXPLANATION_TAB = 1;
     private final int FILTERS_TAB = 3;
-    private final int EVE_FILTERS_TAB = 4;
-    private final int ALICE_AFTER_EVE_FILTERS_TAB = 5;
-    private final int EVE_FILTERS_CHECK_TAB = 6;
+    private final int FILTERS_CHECK_TAB = 4;
+    private final int EVE_FILTERS_TAB = 5;
+    private final int ALICE_AFTER_EVE_FILTERS_TAB = 6;
+    private final int EVE_FILTERS_CHECK_TAB = 7;
 
     // TODO: 19.11.2019  check if they are all correct
     // TODO: 22.11.2019 add the rest of circles
+    // TODO: 29.11.2019 (LAST) circles on other scenes?
+    // TODO: 29.11.2019 probably need to be changed to something like arrows
     private final double TABS_Y = 50;
     private final double TABS_FOURTH_X = 560;
     private final double TABS_FIFTH_X = 700;
@@ -141,7 +139,6 @@ public class QuantumScene {
     private boolean nextIsDialog = false;
     private boolean animationsShowed = false;
     private boolean isUserInput;
-    private boolean isAfterEavesdropping = false;       // TODO: 21.11.2019 if I create ALICE_AFTER_EVE tab in right time I probably wont even need this flag
 
     // TODO: 22.11.2019 special flag for every tab telling when showButton can be enabled
     private QBitState[] bobQBitsStates;
@@ -178,16 +175,11 @@ public class QuantumScene {
         seventhHighlightCircle = getHighlightCircle(TABS_SEVEN_X, TABS_Y);
         eighthHighlightCircle = getHighlightCircle(TABS_EIGHT_X, TABS_Y);
 
-
-
-
-
         // TODO: 13.10.2019
         //  send back part of the current key to make sure that no one is eavesdropping
-        //  charts scene
-        //  eavesdropper and why he cannot read qubits in quantum cable
+        //  eavesdropper and why he cannot read qubits in quantum cable (?)
 
-// TODO: 12.11.2019 TBR
+// TODO: 12.11.2019 (tests) TBR
 
 //         filters
 //        isUserInput = true;
@@ -236,7 +228,6 @@ public class QuantumScene {
 
     public void setEavesdroppedQBits(QBitState[] eavesDroppedValues) {
         this.eveQBitsStates = eavesDroppedValues;
-        this.isAfterEavesdropping = true;             // TODO: 21.11.2019 circle on filters scene
     }
 
     public void setAliceQBitsValuesAfterEve(int[] aliceQBitsValuesAfterEve) {
@@ -290,57 +281,64 @@ public class QuantumScene {
     }
 
     private void initMainTabPane() {
-//        tabPane.getSelectionModel().selectedIndexProperty().removeListener(listener);
         tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
-            try {
-                if (oldVal.intValue() != 0) {
-                    hideMess(aliceMess);
-                    hideMess(bobMess);
-                    hideMess(eveMess);
-                } else if (oldVal.intValue() == EVE_FILTERS_TAB) {
-                    hideMess(bobMess);
-                }
+            // TODO: 28.11.2019 maybe remove this? maybe make flag for each tab
+            if (oldVal.intValue() != 0) {
+                hideMess(aliceMess);
+                hideMess(bobMess);
+                hideMess(eveMess);
+            } else if (oldVal.intValue() == EVE_FILTERS_TAB) {
+                hideMess(bobMess);
+            }
 
-                if (newVal.intValue() == FILTERS_TAB) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../filters/filtersScene.fxml"));
-                    StackPane body = loader.load();
-                    tabPane.getTabs().get(FILTERS_TAB).setContent(body);
-                    FiltersScene filtersController = loader.getController();
-                    filtersController.startDefaultScenario(this, bobQBitsStates, aliceFiltersValues, isAfterEavesdropping);
-                    hideMess(bobMess);
-                    showButton.setDisable(false);
-                } else if (newVal.intValue() == EVE_FILTERS_TAB) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../eveFilters/eveFiltersScene.fxml"));
-                    StackPane body = loader.load();
-                    tabPane.getTabs().get(EVE_FILTERS_TAB).setContent(body);
-                    EveFiltersScene eveFiltersController = loader.getController();
-                    eveFiltersController.startEveScenario(this, bobQBitsStates, eveFiltersValues);
-                    showButton.setDisable(false);
-                } else if (newVal.intValue() == ALICE_AFTER_EVE_FILTERS_TAB) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../eveFilters/eveFiltersScene.fxml"));
-                    StackPane body = loader.load();
-                    tabPane.getTabs().get(ALICE_AFTER_EVE_FILTERS_TAB).setContent(body);
-                    EveFiltersScene eveFiltersController = loader.getController();
-                    eveFiltersController.startDefaultScenario(this, eveQBitsStates, aliceFiltersValues, isAfterEavesdropping);
-                    showButton.setDisable(false);
-                } else if (newVal.intValue() == EVE_FILTERS_CHECK_TAB) {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../eveFiltersCheck/EveFiltersCheckScene.fxml"));
-                    BorderPane body = loader.load();
-                    tabPane.getTabs().get(EVE_FILTERS_CHECK_TAB).setContent(body);
-                    EveFiltersCheckScene filtersCheckScene = loader.getController();
-                    filtersCheckScene.start(aliceFiltersValues, bobQBitsStates, aliceQBitsValuesAfterEve);
-                    showButton.setDisable(false);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (newVal.intValue() == EXPLANATION_TAB) {
+                FXMLLoader loader = loadToTab(EXPLANATION_TAB, "../explanations/qBitExplanationScene.fxml");
+                QBitExplanationScene qBitExplanationScene = loader.getController();
+                qBitExplanationScene.start();
+            }
+            else if (newVal.intValue() == FILTERS_TAB) {
+                FXMLLoader loader = loadToTab(FILTERS_TAB, "../filters/filtersScene.fxml");
+                FiltersScene filtersController = loader.getController();
+                filtersController.start(bobQBitsStates, aliceFiltersValues);
+            }
+            else if (newVal.intValue() == FILTERS_CHECK_TAB) {
+                FXMLLoader loader = loadToTab(FILTERS_CHECK_TAB, "../filtersCheck/filtersCheckScene.fxml");
+                FiltersCheckScene filtersCheckController = loader.getController();
+                filtersCheckController.start(aliceFiltersValues, bobQBitsStates);
+            }
+            else if (newVal.intValue() == EVE_FILTERS_TAB) {
+                FXMLLoader loader = loadToTab(EVE_FILTERS_TAB, "../eveFilters/eveFiltersScene.fxml");
+                EveFiltersScene eveFiltersController = loader.getController();
+                eveFiltersController.startEveScenario(this, bobQBitsStates, eveFiltersValues);
+            }
+            else if (newVal.intValue() == ALICE_AFTER_EVE_FILTERS_TAB) {
+                FXMLLoader loader = loadToTab(ALICE_AFTER_EVE_FILTERS_TAB, "../eveFilters/eveFiltersScene.fxml");
+                EveFiltersScene eveFiltersController = loader.getController();
+                eveFiltersController.startAliceScenario(this, bobQBitsStates, eveQBitsStates, aliceFiltersValues);
+            }
+            else if (newVal.intValue() == EVE_FILTERS_CHECK_TAB) {
+                FXMLLoader loader = loadToTab(EVE_FILTERS_CHECK_TAB, "../eveFiltersCheck/EveFiltersCheckScene.fxml");
+                EveFiltersCheckScene filtersCheckScene = loader.getController();
+                filtersCheckScene.start(aliceFiltersValues, bobQBitsStates, aliceQBitsValuesAfterEve);
             }
         });
     }
 
-    // TODO: 26.11.2019 try to make it for every tab
+    private FXMLLoader loadToTab(int tabPosition, String path) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+            Pane body = loader.load();
+            tabPane.getTabs().get(tabPosition).setContent(body);
+            showButton.setDisable(false);
+            return loader;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void reloadScene() {
         try {
-//            Parent root = FXMLLoader.load(getClass().getResource("quantumScene.fxml"));
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../quantumScene/quantumScene.fxml"));
             StackPane body = loader.load();
             tabPane.getTabs().get(2).setContent(body);
@@ -363,60 +361,27 @@ public class QuantumScene {
                 }
             }
         });
-
-        menuItemRefresh.setOnAction(e -> reloadScene());
         initCommentDialogs();
     }
 
     // TODO: 24.11.2019 rest of comments
     private void initCommentDialogs() {
-        alicePC.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Alice's PC").show();
-            }
-        });
+        initCommentDialogForNode(alicePC, "Alice's PC");
+        initCommentDialogForNode(bobPC, "Bob's PC");
+        initCommentDialogForNode(aliceMess, "This is encrypted message");
+        initCommentDialogForNode(bobMess, "Bob's qubits for key distribution");
+        initCommentDialogForNode(electricalCable, "Electrical Cable - used for communication in unsecure channel");
+        initCommentDialogForNode(photonCable, "Quantum cable - used for the key establishment");
+    }
 
-        bobPC.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's PC").show();
-            }
-        });
+    private void initCommentDialogForNode(Node node, String comment) {
+        node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e.getButton(), comment));
+    }
 
-        aliceMess.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("This is encrypted message").show();
-            }
-        });
-
-        bobMess.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's qubits for key distribution").show();
-            }
-        });
-
-        electricalCable.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Electrical Cable - used for communication in unsecure channel").show();
-            }
-        });
-
-        photonCable.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Quantum cable - used for the key establishment").show();
-            }
-        });
-
-        publicKey.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's public key").show();
-            }
-        });
-
-        privateKey.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's private key").show();
-            }
-        });
+    private void setCommentOnSecondaryButton(MouseButton button, String comment) {
+        if (button == MouseButton.SECONDARY) {
+            returnDialog(comment).show();
+        }
     }
 
     private void initBorderGlowEffectInstance() {
@@ -504,25 +469,10 @@ public class QuantumScene {
         });
         dialog.show();
         dialogCounter++;
-
-        if (noMoreAnimationsOrDialogs()) {
-            disableButtonForLastDialog(dialog);
-        }
     }
 
     private boolean noMoreAnimationsOrDialogs() {
         return animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size();
-    }
-
-    // TODO: 20.11.2019 (LAST) at the end check if its really used
-    private void disableButtonForLastDialog(JFXDialog dialog) {
-        EventHandler<? super JFXDialogEvent> currentCloseEvent = dialog.getOnDialogClosed();
-        dialog.setOnDialogClosed(e -> {
-            if (currentCloseEvent != null) {
-                currentCloseEvent.handle(e);
-            }
-            showButton.setDisable(true);
-        });
     }
 
     private void prepareQuantumAnimation() {
@@ -538,7 +488,6 @@ public class QuantumScene {
             fourthHighlightCircle.setVisible(true);
             Tab filterTab = new Tab("Photons Measurement");
             tabPane.getTabs().add(filterTab);
-            System.out.println("koniec animacji");
         });
         FadeTransition highlightTransition = getHighlightCircleAnimation(fourthHighlightCircle);
 
@@ -549,7 +498,6 @@ public class QuantumScene {
     }
 
     private void prepareAliceSendFiltersAnimation() {
-//        ScaleTransition showMessTrans = getScaleTransition(aliceMess, 0.0, 1.0, 0.25);
         SequentialTransition showMessTrans = getShowMessTransition(aliceMess);
         SequentialTransition sendingTrans = getAliceReturnTransition();
         sendingTrans.setOnFinished(e -> {
@@ -681,7 +629,6 @@ public class QuantumScene {
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
-                getShowMessTransition(bobMess).play();
                 nextIsDialog = true;
             });
             return dialog;
@@ -824,7 +771,7 @@ public class QuantumScene {
         FadeTransition fadeTransition = getFadeTransition(node);
         fadeTransition.setDuration(Duration.seconds(0.25));
         fadeTransition.setAutoReverse(true);
-        fadeTransition.setCycleCount(5);
+        fadeTransition.setCycleCount(3);
         fadeTransition.setOnFinished(e -> borderPane.getChildren().remove(node));
 
         return fadeTransition;

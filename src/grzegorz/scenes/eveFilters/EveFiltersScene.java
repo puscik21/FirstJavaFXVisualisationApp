@@ -3,7 +3,6 @@ package grzegorz.scenes.eveFilters;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import grzegorz.QBitState;
-import grzegorz.scenes.introduction.IntroductionScene;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
 import javafx.fxml.FXML;
@@ -30,6 +29,9 @@ public class EveFiltersScene {
     private VBox imagesContainer;
 
     @FXML
+    private HBox originalQBitHBox;
+
+    @FXML
     private HBox qBitHBox;
 
     @FXML
@@ -52,9 +54,8 @@ public class EveFiltersScene {
     private ArrayList<Image> photonImages;
     private ArrayList<Image> valuesImages;
 
-    private ArrayList<Integer> chosenFilters;       // TODO: 21.11.2019  bobQbits and Alice filters?
-    private ArrayList<QBitState> chosenPhotons;
     private QBitState[] sentQBitsStates;
+    private QBitState[] originalQBits;
     private QBitState[] eveQBits;
     private int[] filtersValues;
 
@@ -69,63 +70,15 @@ public class EveFiltersScene {
         initListeners();
     }
 
-    public void startDefaultScenario(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues, boolean isAfterEavesdropping) {
+    public void startAliceScenario(QuantumScene parentController, QBitState[] originalQBits, QBitState[] sentQBitsStates, int[] filtersValues) {
         this.parentController = parentController;
+        this.originalQBits = originalQBits;
         isEveScenario = false;
-        if (isAfterEavesdropping) {
-            timeScale *= 0.75;
-        }
-
-        prepare(sentQBitsStates, filtersValues);
-        prepareEavesDroppedQBits();
-
-        if (isAfterEavesdropping) {
-            sendAliceQBitsValuesAfterEve();
-        }
-    }
-
-    private void sendAliceQBitsValuesAfterEve() {
-        int size = eveQBits.length;
-        int[] aliceQBitsValuesAfterEve = new int[size];
-        for (int i = 0; i < size; i++) {
-            aliceQBitsValuesAfterEve[i] = eveQBits[i].getValue();
-        }
-        parentController.setAliceQBitsValuesAfterEve(aliceQBitsValuesAfterEve);
-    }
-
-    public void startEveScenario(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues) {
-        this.parentController = parentController;
-        isEveScenario = true;
         timeScale *= 0.75;
 
         prepare(sentQBitsStates, filtersValues);
-        prepareEavesDroppedQBits();
-        sendEavesdroppedStates();
+        scheduleAnimationStart();
     }
-
-    private void prepareEavesDroppedQBits() {
-        int size = sentQBitsStates.length;
-        eveQBits = new QBitState[size];
-        for (int i = 0; i < size; i++) {
-            eveQBits[i] = QBitState.getNewQBit(sentQBitsStates[i].getState());
-        }
-
-        for (int i = 0; i < size; i++) {
-            if (sentQBitsStates[i].isFilterWrong(filtersValues[i])) {
-                int direction = getRandomNumber(2) == 0 ? -1 : 1;
-                changeEveQBitState(i, direction);
-            }
-        }
-    }
-
-    private void changeEveQBitState(int compNumber, int direction) {
-        eveQBits[compNumber].turnQBit(direction);
-    }
-
-    private void sendEavesdroppedStates() {
-        parentController.setEavesdroppedQBits(eveQBits);
-    }
-
 
     private void prepare(QBitState[] sentQBitsStates, int[] filtersValues) {
         this.sentQBitsStates = sentQBitsStates;
@@ -133,22 +86,14 @@ public class EveFiltersScene {
         comparisonStarted = false;
         generator = new Random();
         prepareScene();
-        prepareQBitsAndFilters();
-        scheduleAnimationStart();
+        prepareEavesDroppedQBits();
+        sendAliceQBitsValuesAfterEve();
     }
 
-    private void scheduleAnimationStart() {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                if (!comparisonStarted) {
-                    compare(0);
-                }
-            }
-        };
-        Timer timer = new Timer();
-        long delay = 4000L;
-        timer.schedule(task, delay);
+    private void prepareScene() {
+        addImageViews();
+        scaleContainer();
+        prepareQBitsAndFilters();
     }
 
     private void setAllImages() {
@@ -169,15 +114,67 @@ public class EveFiltersScene {
         valuesImages.addAll(Arrays.asList(zeroValue, oneValue));
     }
 
-    private void prepareScene() {
-        addImageViews();
-        scaleContainer();
-        prepareQBitsAndFilters();
+    private void prepareEavesDroppedQBits() {
+        int size = sentQBitsStates.length;
+        eveQBits = new QBitState[size];
+        for (int i = 0; i < size; i++) {
+            eveQBits[i] = QBitState.getNewQBit(sentQBitsStates[i].getState());
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (sentQBitsStates[i].isFilterWrong(filtersValues[i])) {
+                int direction = getRandomNumber(2) == 0 ? -1 : 1;
+                changeEveQBitState(i, direction);
+            }
+        }
+    }
+
+    private void sendAliceQBitsValuesAfterEve() {
+        int size = eveQBits.length;
+        int[] aliceQBitsValuesAfterEve = new int[size];
+        for (int i = 0; i < size; i++) {
+            aliceQBitsValuesAfterEve[i] = eveQBits[i].getValue();
+        }
+        parentController.setAliceQBitsValuesAfterEve(aliceQBitsValuesAfterEve);
+    }
+
+    public void startEveScenario(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues) {
+        this.parentController = parentController;
+        originalQBits = sentQBitsStates;
+        isEveScenario = true;
+        timeScale *= 0.75;
+
+        prepare(sentQBitsStates, filtersValues);
+        prepareEavesDroppedQBits();
+        sendEavesdroppedStates();
+    }
+
+    private void changeEveQBitState(int compNumber, int direction) {
+        eveQBits[compNumber].turnQBit(direction);
+    }
+
+    private void sendEavesdroppedStates() {
+        parentController.setEavesdroppedQBits(eveQBits);
+    }
+
+    private void scheduleAnimationStart() {
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (!comparisonStarted) {
+                    compare(0);
+                }
+            }
+        };
+        Timer timer = new Timer();
+        long delay = 4000L;
+        timer.schedule(task, delay);
     }
 
     private void addImageViews() {
         int quantity = sentQBitsStates.length;
         for (int i = 0; i < quantity; i++) {
+            originalQBitHBox.getChildren().add(new ImageView(photonImages.get(0)));
             filterHBox.getChildren().add(new ImageView(filterImages.get(0)));
             qBitHBox.getChildren().add(new ImageView(photonImages.get(0)));
             ImageView valueView = new ImageView(valuesImages.get(0));
@@ -188,7 +185,7 @@ public class EveFiltersScene {
 
     private void scaleContainer() {
         setTimeScale();
-        double sizeScale = 1.0;
+        double sizeScale = 0.9;
         imagesContainer.setScaleX(sizeScale);
         imagesContainer.setScaleY(sizeScale);
     }
@@ -206,28 +203,37 @@ public class EveFiltersScene {
     }
 
     private void prepareQBitsAndFilters() {
-        chosenPhotons = new ArrayList<>(filterHBox.getChildren().size());
-        chosenFilters = new ArrayList<>(qBitHBox.getChildren().size());
-
-        prepareQBitsHBox();
+        prepareOriginalQBitsHBox();
+        prepareSentQBitsHBox();
         prepareFiltersHBox();
     }
 
-    private void prepareQBitsHBox() {
-        for (int i = 0; i < qBitHBox.getChildren().size(); i++) {
-            int imageNumber = sentQBitsStates[i].getState();
-            ImageView imageView = (ImageView) qBitHBox.getChildren().get(i);
-            imageView.setImage(photonImages.get(imageNumber));
-            chosenPhotons.add(QBitState.getNewQBit(imageNumber));
+    private void prepareOriginalQBitsHBox() {
+        prepareQBitHBox(originalQBitHBox, originalQBits, photonImages);
+    }
+
+    private void prepareSentQBitsHBox() {
+        prepareQBitHBox(qBitHBox, sentQBitsStates, photonImages);
+    }
+
+    private void prepareQBitHBox(HBox hBox, QBitState[] qBitStates, ArrayList<Image> images) {
+        int size = qBitStates.length;
+        int[] states = new int[size];
+        for (int i = 0; i < size; i++) {
+            states[i] = qBitStates[i].getState();
         }
+        prepareImagesHBox(hBox, states, images);
     }
 
     private void prepareFiltersHBox() {
-        for (int i = 0; i < filterHBox.getChildren().size(); i++) {
-            int imageNumber = filtersValues[i];
-            ImageView imageView = (ImageView) filterHBox.getChildren().get(i);
-            imageView.setImage(filterImages.get(imageNumber));
-            chosenFilters.add(imageNumber);
+        prepareImagesHBox(filterHBox, filtersValues, filterImages);
+    }
+
+    private void prepareImagesHBox(HBox hBox, int[] imageNumbers, ArrayList<Image> images) {
+        for (int i = 0; i < hBox.getChildren().size(); i++) {
+            int imageNumber = imageNumbers[i];
+            ImageView imageView = (ImageView) hBox.getChildren().get(i);
+            imageView.setImage(images.get(imageNumber));
         }
     }
 
@@ -328,7 +334,7 @@ public class EveFiltersScene {
     }
 
     private void checkQBitState(int compNumber) {
-        if (chosenPhotons.get(compNumber).isFilterWrong(chosenFilters.get(compNumber))) {
+        if (sentQBitsStates[compNumber].isFilterWrong(filtersValues[compNumber])) {
             Glow highlightEffect = new Glow(0.5);
             qBitImage.setEffect(highlightEffect);
             int direction = rotateQBit(compNumber);
@@ -342,7 +348,7 @@ public class EveFiltersScene {
     }
 
     private int rotateQBit(int compNumber) {
-        QBitState bobQBit = chosenPhotons.get(compNumber);
+        QBitState bobQBit = sentQBitsStates[compNumber];
         QBitState eveQBit = eveQBits[compNumber];
         int direction = bobQBit.getDirectionToState(eveQBit);
 
@@ -440,10 +446,11 @@ public class EveFiltersScene {
         scaleTransition.setToY(scale);
         scaleTransition.setDuration(Duration.seconds(1.0));
         scaleTransition.play();
+
     }
 
     private double getScaleForResultTransition() {
-        double scaleFactor = 17;
+        double scaleFactor = 18.5;
         int nodesQuantity = valuesHBox.getChildren().size();
 
         double result = scaleFactor / nodesQuantity;
@@ -453,7 +460,6 @@ public class EveFiltersScene {
         return result;
     }
 
-    // TODO: 05.10.2019 1 class with many general methods like this one
     private void showDialog(String message) {
         BoxBlur blurEffect = new BoxBlur(3, 3, 3);
 

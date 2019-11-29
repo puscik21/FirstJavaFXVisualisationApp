@@ -6,6 +6,7 @@ import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.CommentedAnimation;
+import grzegorz.scenes.eveFiltersCheck.EveFiltersCheckScene;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
 import javafx.animation.*;
@@ -38,7 +39,6 @@ import java.util.stream.Collectors;
 
 // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
 // TODO: 26.10.2019 look at transited objects positions
-// TODO: 24.11.2019 before user go to third tab showButton goes available
 public class IntroductionScene {
 
     // TODO przerozne roznosci
@@ -123,7 +123,6 @@ public class IntroductionScene {
     private final int INTRODUCTION_TAB = 2;
 
     // TODO: 19.11.2019  check if they are all correct
-    // TODO: 22.11.2019 add the rest of circles
     private final double TABS_Y = 50;
     private final double TABS_FIRST_X = 53;     // TODO: 20.11.2019 use circle in another scenes
     private final double TABS_SECOND_X = 206;
@@ -144,27 +143,16 @@ public class IntroductionScene {
     private Circle secondHighlightCircle;
     private Circle thirdHighlightCircle;
     private DropShadow borderGlow;
-
-    // TODO: 25.11.2019 refactor
     private ChangeListener<? super Number> listener;
 
     public ChangeListener<? super Number> getListener() {
         return listener;
     }
 
-    public StackPane getRootPane() {
-        return rootPane;
-    }
-
     // TODO: 26.11.2019 refactor
     @FXML
     private void initialize() {
         initEvents();
-
-        sceneCAnimations = new ArrayList<>(10);
-        animCounter = 0;
-        sceneDialogs = new ArrayList<>(10);
-        dialogCounter = 0;
 
         secondHighlightCircle = getHighlightCircle(TABS_SECOND_X, TABS_Y);
         thirdHighlightCircle = getHighlightCircle(TABS_THIRD_X, TABS_Y);
@@ -180,11 +168,9 @@ public class IntroductionScene {
         //  charts scene
         //  eavesdropper and why he cannot read qubits in quantum cable
 
-
         Tab explanationTab = new Tab("Qubit explanation");
-        tabPane.getTabs().add(explanationTab);
-
         Tab quantumTab = new Tab("BB84");
+        tabPane.getTabs().add(explanationTab);
         tabPane.getTabs().add(quantumTab);
     }
 
@@ -236,39 +222,37 @@ public class IntroductionScene {
     }
 
     private void initMainTabPane() {
-        listener = new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldVal, Number newVal) {
-                try {
-                    if (oldVal.intValue() != 0) {
-                        hideMess(aliceMess);
-                        hideMess(bobMess);
-                    }
+        listener = (ChangeListener<Number>) (observable, oldVal, newVal) -> {
+            if (oldVal.intValue() != 0) {
+                hideMess(aliceMess);
+                hideMess(bobMess);
+            }
 
-                    // TODO: 25.11.2019 separate method
-                    if (newVal.intValue() == EXPLANATION_TAB) {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../explanations/qBitExplanationScene.fxml"));
-                        AnchorPane body = loader.load();
-                        tabPane.getTabs().get(EXPLANATION_TAB).setContent(body);
-                        QBitExplanationScene qBitExplanationScene = loader.getController();
-                        qBitExplanationScene.start();
-                        hideMess(bobMess);
-                        showButton.setDisable(false);
-                    } else if (newVal.intValue() == INTRODUCTION_TAB) {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../quantumScene/quantumScene.fxml"));
-                        StackPane body = loader.load();
-                        tabPane.getTabs().get(INTRODUCTION_TAB).setContent(body);
-                        QuantumScene quantumScene = loader.getController();
-                        quantumScene.start(IntroductionScene.this, tabPane);
-                        hideMess(bobMess);
-                        showButton.setDisable(false);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if (newVal.intValue() == EXPLANATION_TAB) {
+                FXMLLoader loader = loadToTab(EXPLANATION_TAB, "../explanations/qBitExplanationScene.fxml");
+                QBitExplanationScene qBitExplanationScene = loader.getController();
+                qBitExplanationScene.start();
+            }
+            else if (newVal.intValue() == INTRODUCTION_TAB) {
+                FXMLLoader loader = loadToTab(INTRODUCTION_TAB, "../quantumScene/quantumScene.fxml");
+                QuantumScene quantumScene = loader.getController();
+                quantumScene.start(IntroductionScene.this, tabPane);
             }
         };
         tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
+    }
+
+    private FXMLLoader loadToTab(int tabPosition, String path) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+            Pane body = loader.load();
+            tabPane.getTabs().get(tabPosition).setContent(body);
+            showButton.setDisable(false);
+            return loader;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void reloadIntroductionScene() {
@@ -295,59 +279,29 @@ public class IntroductionScene {
 
         menuItemRefresh.setOnAction(e -> reloadIntroductionScene());
         menuItemHelp.setOnAction(e -> returnDialog("Here are many valuable things about this applications", "About").show());
-
         initCommentDialogs();
     }
 
     // TODO: 24.11.2019 rest of comments
     private void initCommentDialogs() {
-        alicePC.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Alice's PC").show();
-            }
-        });
+        initCommentDialogForNode(alicePC, "Alice's PC");
+        initCommentDialogForNode(bobPC, "Bob's PC");
+        initCommentDialogForNode(aliceMess, "This is encrypted message");
+        initCommentDialogForNode(bobMess, "Bob's qubits for key distribution");
+        initCommentDialogForNode(electricalCable, "Electrical Cable - used for communication in unsecure channel");
+        initCommentDialogForNode(photonCable, "Quantum cable - used for the key establishment");
+        initCommentDialogForNode(publicKey, "Bob's public key");
+        initCommentDialogForNode(privateKey, "Bob's private key");
+    }
 
-        bobPC.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's PC").show();
-            }
-        });
+    private void initCommentDialogForNode(Node node, String comment) {
+        node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e.getButton(), comment));
+    }
 
-        aliceMess.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("This is encrypted message").show();
-            }
-        });
-
-        bobMess.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's qubits for key distribution").show();
-            }
-        });
-
-        electricalCable.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Electrical Cable - used for communication in unsecure channel").show();
-            }
-        });
-
-        photonCable.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Quantum cable - used for the key establishment").show();
-            }
-        });
-
-        publicKey.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's public key").show();
-            }
-        });
-
-        privateKey.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.SECONDARY) {
-                returnDialog("Bob's private key").show();
-            }
-        });
+    private void setCommentOnSecondaryButton(MouseButton button, String comment) {
+        if (button == MouseButton.SECONDARY) {
+            returnDialog(comment).show();
+        }
     }
 
     private void initBorderGlowEffectInstance() {
@@ -382,6 +336,7 @@ public class IntroductionScene {
     }
 
     private void prepareAllAnimations() {
+        sceneCAnimations = new ArrayList<>(10);
         playShowButtonTransition();
         preparePublicKeyAnimation();
         preparePrivateKeyAnimation();
@@ -408,11 +363,7 @@ public class IntroductionScene {
         Transition trans = (Transition) cAnimation.getAnimation();
         EventHandler<ActionEvent> currentEvent = trans.getOnFinished();
         trans.setOnFinished(e -> {
-            if (noMoreAnimationsOrDialogs()) {
-                showButton.setDisable(true);
-            } else {
-                showButton.setDisable(false);
-            }
+            showButton.setDisable(false);
             if (currentEvent != null) {
                 currentEvent.handle(e);
             }
@@ -431,25 +382,10 @@ public class IntroductionScene {
 
         dialog.show();
         dialogCounter++;
-
-        if (noMoreAnimationsOrDialogs()) {
-            disableButtonForLastDialog(dialog);
-        }
     }
 
     private boolean noMoreAnimationsOrDialogs() {
         return animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size();
-    }
-
-    // TODO: 20.11.2019 (LAST) at the end check if its really used
-    private void disableButtonForLastDialog(JFXDialog dialog) {
-        EventHandler<? super JFXDialogEvent> currentCloseEvent = dialog.getOnDialogClosed();
-        dialog.setOnDialogClosed(e -> {
-            if (currentCloseEvent != null) {
-                currentCloseEvent.handle(e);
-            }
-            showButton.setDisable(true);
-        });
     }
 
     private void preparePublicKeyAnimation() {
@@ -505,7 +441,6 @@ public class IntroductionScene {
         sceneCAnimations.add(privateKeyCAnimation);
     }
 
-
     private TranslateTransition getBobUseKeyTransition() {
         double toMessageX = bobPC.getLayoutX() - privateKey.getLayoutX() + privateKey.getFitWidth();
         double toMessageY = bobPC.getLayoutY() - privateKey.getLayoutY();
@@ -514,6 +449,7 @@ public class IntroductionScene {
     }
 
     private void prepareSceneDialogs() {
+        sceneDialogs = new ArrayList<>(10);
         sceneDialogs.add(getRSADialogs());
     }
 
@@ -626,7 +562,7 @@ public class IntroductionScene {
         FadeTransition fadeTransition = getFadeTransition(node);
         fadeTransition.setDuration(Duration.seconds(0.25));
         fadeTransition.setAutoReverse(true);
-        fadeTransition.setCycleCount(5);
+        fadeTransition.setCycleCount(3);
         fadeTransition.setOnFinished(e -> borderPane.getChildren().remove(node));
 
         return fadeTransition;

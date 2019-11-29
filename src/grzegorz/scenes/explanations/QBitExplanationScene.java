@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-// TODO: 26.11.2019 fix for darkTheme
 public class QBitExplanationScene {
 
     @FXML
@@ -36,7 +35,7 @@ public class QBitExplanationScene {
 
     private ArrayList<Image> rectPhotonsImages;
     private ArrayList<Image> diagPhotonsImages;
-    private final int[] qbitsStatesValues = new int[]{1, 1, 0, 0};
+    private final int[] qBitsStatesValues = new int[]{1, 1, 0, 0};
     private int rectImgCounter = 0;
     private int diagImgCounter = 0;
     private int stateCounter = 2;
@@ -188,7 +187,7 @@ public class QBitExplanationScene {
     }
 
     private void changeQbitVal() {
-        String val = String.valueOf(qbitsStatesValues[stateCounter]);
+        String val = String.valueOf(qBitsStatesValues[stateCounter]);
         valField.setText(val);
 
         stateCounter++;

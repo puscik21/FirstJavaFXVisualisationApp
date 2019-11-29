@@ -39,20 +39,15 @@ public class FiltersScene {
 
     @FXML
     private ImageView qBitImage;
-    
+
     @FXML
     private ImageView filterImage;
 
     @FXML
     private AnchorPane comparisonPane;
-
-    private QuantumScene parentController;
     private ArrayList<Image> filterImages;
     private ArrayList<Image> photonImages;
     private ArrayList<Image> valuesImages;
-
-    private ArrayList<Integer> chosenFilters;       // TODO: 21.11.2019  bobQbits and Alice filters?
-    private ArrayList<QBitState> chosenPhotons;
     private QBitState[] sentQBitsStates;
     private QBitState[] eveQBits;
     private int[] filtersValues;
@@ -68,38 +63,10 @@ public class FiltersScene {
         initListeners();
     }
 
-    public void startDefaultScenario(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues, boolean isAfterEavesdropping) {
-        this.parentController = parentController;
+    public void start(QBitState[] sentQBitsStates, int[] filtersValues) {
         isEveScenario = false;
-        if (isAfterEavesdropping) {
-            timeScale *= 0.75;
-        }
-
         prepare(sentQBitsStates, filtersValues);
-        prepareEavesDroppedQBits();
-
-        if (isAfterEavesdropping) {
-            sendAliceQBitsValuesAfterEve();
-        }
-    }
-
-    private void sendAliceQBitsValuesAfterEve() {
-        int size = eveQBits.length;
-        int[] aliceQBitsValuesAfterEve = new int[size];
-        for (int i = 0; i < size; i++) {
-            aliceQBitsValuesAfterEve[i] = eveQBits[i].getValue();
-        }
-        parentController.setAliceQBitsValuesAfterEve(aliceQBitsValuesAfterEve);
-    }
-
-    public void startEveScenario(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues) {
-        this.parentController = parentController;
-        isEveScenario = true;
-        timeScale *= 0.75;
-
-        prepare(sentQBitsStates, filtersValues);
-        prepareEavesDroppedQBits();
-        sendEavesdroppedStates();
+        scheduleAnimationStart();
     }
 
     private void prepareEavesDroppedQBits() {
@@ -121,19 +88,14 @@ public class FiltersScene {
         eveQBits[compNumber].turnQBit(direction);
     }
 
-    private void sendEavesdroppedStates() {
-        parentController.setEavesdroppedQBits(eveQBits);
-    }
-
-
     private void prepare(QBitState[] sentQBitsStates, int[] filtersValues) {
         this.sentQBitsStates = sentQBitsStates;
         this.filtersValues = filtersValues;
         comparisonStarted = false;
         generator = new Random();
         prepareScene();
+        prepareEavesDroppedQBits();
         prepareQBitsAndFilters();
-        scheduleAnimationStart();
     }
 
     private void scheduleAnimationStart() {
@@ -205,9 +167,6 @@ public class FiltersScene {
     }
 
     private void prepareQBitsAndFilters() {
-        chosenPhotons = new ArrayList<>(filterHBox.getChildren().size());
-        chosenFilters = new ArrayList<>(qBitHBox.getChildren().size());
-
         prepareQBitsHBox();
         prepareFiltersHBox();
     }
@@ -217,7 +176,6 @@ public class FiltersScene {
             int imageNumber = sentQBitsStates[i].getState();
             ImageView imageView = (ImageView) qBitHBox.getChildren().get(i);
             imageView.setImage(photonImages.get(imageNumber));
-            chosenPhotons.add(QBitState.getNewQBit(imageNumber));
         }
     }
 
@@ -226,7 +184,6 @@ public class FiltersScene {
             int imageNumber = filtersValues[i];
             ImageView imageView = (ImageView) filterHBox.getChildren().get(i);
             imageView.setImage(filterImages.get(imageNumber));
-            chosenFilters.add(imageNumber);
         }
     }
 
@@ -327,7 +284,7 @@ public class FiltersScene {
     }
 
     private void checkQBitState(int compNumber) {
-        if (chosenPhotons.get(compNumber).isFilterWrong(chosenFilters.get(compNumber))) {
+        if (sentQBitsStates[compNumber].isFilterWrong(filtersValues[compNumber])) {
             Glow highlightEffect = new Glow(0.5);
             qBitImage.setEffect(highlightEffect);
             int direction = rotateQBit(compNumber);
@@ -341,7 +298,7 @@ public class FiltersScene {
     }
 
     private int rotateQBit(int compNumber) {
-        QBitState bobQBit = chosenPhotons.get(compNumber);
+        QBitState bobQBit = sentQBitsStates[compNumber];
         QBitState eveQBit = eveQBits[compNumber];
         int direction = bobQBit.getDirectionToState(eveQBit);
 

@@ -27,6 +27,10 @@ public class Main extends Application {
     //  different languages comments
     //  \/
     //  refresh for every scene
+
+    // TODO: 29.11.2019 think about something like preparation of every qbits/filters values on quantum scene start and then only get them by getters
+
+    // TODO: 26.11.2019 try to make reloadScene for every tab by pressing MenuItem (or by replay button (showButton))
     public static void main(String[] args){
         launch(args);
     }
