@@ -10,7 +10,7 @@
    <top>
       <AnchorPane minHeight="50.0" prefHeight="50.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="sceneTitle" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="600.0" text="Title of scene*" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Label fx:id="sceneTitle" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="600.0" text="Alice check which filters were correct" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
@@ -22,7 +22,7 @@
       <AnchorPane fx:id="comparePane" maxHeight="600.0" minHeight="350.0" minWidth="600.0" prefHeight="350.0" prefWidth="600.0" BorderPane.alignment="BOTTOM_CENTER">
          <children>
             <VBox fx:id="filtersVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="0.0" />
-            <VBox fx:id="ticksVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0" />
+            <VBox fx:id="ticksVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="0.0" />
             <VBox fx:id="qBitsVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>

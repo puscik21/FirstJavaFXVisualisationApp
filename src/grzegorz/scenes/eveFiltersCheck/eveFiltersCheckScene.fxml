@@ -10,7 +10,7 @@
    <top>
       <AnchorPane minHeight="50.0" prefHeight="50.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="sceneTitle" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="600.0" text="Title of scene*" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Label fx:id="sceneTitle" alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="600.0" text="Alice check which filters were correct" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>

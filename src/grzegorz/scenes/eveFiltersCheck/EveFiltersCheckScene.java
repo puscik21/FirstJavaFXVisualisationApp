@@ -3,6 +3,7 @@ package grzegorz.scenes.eveFiltersCheck;
 import com.jfoenix.controls.JFXTabPane;
 import grzegorz.QBitState;
 import grzegorz.scenes.introduction.IntroductionScene;
+import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.SequentialTransition;
@@ -10,10 +11,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -50,17 +54,17 @@ public class EveFiltersCheckScene {
     private int[] aliceFilters;
     private QBitState[] bobQBitStates;
 
+    private QuantumScene parentController;
+    private DropShadow borderGlow;
+
     private double sizeScale = 1.0;
     private double timeScale = 4.0;
 
-
-    // TODO: 16.11.2019 comments on right click
-    // TODO: 17.11.2019 scene title
-    // TODO: 20.11.2019 glow effect
     // TODO: 20.11.2019 what to do when there is no key in result - "X" icon meaning wrong filter, then disappear when changing to 1 or 0
     // TODO: 22.11.2019 check incorrect, but when everyone matches write some info
 
-    public void start(int[] aliceFilters, QBitState[] bobQBitStates, int[] aliceQBitsValuesAfterEve) {
+    public void start(QuantumScene parentController, int[] aliceFilters, QBitState[] bobQBitStates, int[] aliceQBitsValuesAfterEve) {
+        this.parentController = parentController;
         this.aliceFilters = aliceFilters;
         this.bobQBitStates = bobQBitStates;
         this.aliceQBitsValuesAfterEve = aliceQBitsValuesAfterEve;
@@ -75,6 +79,7 @@ public class EveFiltersCheckScene {
         scaleComparePane();
         prepareQBitsHBox();
         prepareFiltersHBox();
+        initCommentDialogs();
     }
 
     private void prepareImages() {
@@ -161,6 +166,40 @@ public class EveFiltersCheckScene {
             ImageView imageView = (ImageView) filtersVBox.getChildren().get(i);
             imageView.setImage(filterImages.get(imageNumber));
         }
+    }
+
+    private void initCommentDialogs() {
+        initBorderGlowEffectInstance();
+        initCommentForNode(aliceValuesVBox, "Comment");
+        initCommentForNode(filtersVBox, "Comment");
+        initCommentForNode(ticksVBox, "Comment");
+        initCommentForNode(qBitsVBox, "Comment");
+        initCommentForNode(bobValuesVBox, "Comment");
+    }
+
+    private void initBorderGlowEffectInstance() {
+        borderGlow = new DropShadow();
+        borderGlow.setColor(Color.WHITESMOKE);
+        borderGlow.setOffsetX(0f);
+        borderGlow.setOffsetY(0f);
+        borderGlow.setHeight(50);
+        borderGlow.setWidth(50);
+    }
+
+    private void initCommentForNode(Node node, String comment) {
+        node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e.getButton(), comment));
+        setBorderGlowEffect(node);
+    }
+
+    private void setCommentOnSecondaryButton(MouseButton button, String comment) {
+        if (button == MouseButton.SECONDARY) {
+            parentController.returnDialog(comment).show();
+        }
+    }
+
+    private void setBorderGlowEffect(Node node) {
+        node.setOnMouseEntered(e -> node.setEffect(borderGlow));
+        node.setOnMouseExited(e -> node.setEffect(null));
     }
 
     private void scheduleAnimationStart() {

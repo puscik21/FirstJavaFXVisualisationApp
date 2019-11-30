@@ -7,61 +7,57 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="rootPane" stylesheets="@../../style/darkTheme.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.quantumScene.QuantumScene">
+<AnchorPane fx:id="rootAnchorPane" stylesheets="@../../style/darkTheme.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.quantumScene.QuantumScene">
    <children>
-      <AnchorPane fx:id="rootAnchorPane">
-         <children>
-            <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <center>
-                  <AnchorPane fx:id="envPane" minHeight="0.0" minWidth="0.0" BorderPane.alignment="CENTER">
-                     <children>
-                        <ImageView fx:id="electricalCable" fitHeight="25.0" fitWidth="450.0" layoutX="306.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../images/electricalCable.png" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="photonCable" fitHeight="25.0" fitWidth="450.0" layoutX="306.0" layoutY="386.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../images/photonCable.png" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="alicePC" fitHeight="150.0" fitWidth="200.0" layoutX="123.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../images/PCWhite.png" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="bobPC" fitHeight="150.0" fitWidth="200.0" layoutX="772.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../images/PCWhite.png" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="evePC" fitHeight="150.0" fitWidth="200.0" layoutX="463.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                           <image>
-                              <Image url="@../../images/PCRed.png" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="aliceMess" fitHeight="90.0" fitWidth="160.0" layoutX="130.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
-                           <image>
-                              <Image url="@../../images/envelope.jpg" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="bobMess" fitHeight="90.0" fitWidth="160.0" layoutX="779.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
-                           <image>
-                              <Image url="@../../images/envelope.jpg" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="eveMess" fitHeight="90.0" fitWidth="160.0" layoutX="470.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
-                           <image>
-                              <Image url="@../../images/envelope.jpg" />
-                           </image>
-                        </ImageView>
-                        <StackPane fx:id="commentPane" layoutX="26.0" layoutY="512.0" prefHeight="150.0" prefWidth="560.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="20.0" />
-                        <JFXButton fx:id="showButton" layoutX="452.0" layoutY="560.0" prefHeight="54.0" prefWidth="181.0" text="Show me!" textAlignment="CENTER" />
-                     </children>
-                  </AnchorPane>
-               </center>
-            </BorderPane>
-         </children>
-      </AnchorPane>
+      <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <AnchorPane fx:id="envPane" minHeight="0.0" minWidth="0.0" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fx:id="electricalCable" fitHeight="25.0" fitWidth="450.0" layoutX="306.0" layoutY="140.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/electricalCable.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="photonCable" fitHeight="25.0" fitWidth="450.0" layoutX="306.0" layoutY="386.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/photonCable.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="alicePC" fitHeight="150.0" fitWidth="200.0" layoutX="123.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/PCWhite.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="bobPC" fitHeight="150.0" fitWidth="200.0" layoutX="772.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/PCWhite.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="evePC" fitHeight="150.0" fitWidth="200.0" layoutX="463.0" layoutY="198.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@../../images/PCRed.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="aliceMess" fitHeight="90.0" fitWidth="160.0" layoutX="130.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
+                     <image>
+                        <Image url="@../../images/envelope.jpg" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="bobMess" fitHeight="90.0" fitWidth="160.0" layoutX="779.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
+                     <image>
+                        <Image url="@../../images/envelope.jpg" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="eveMess" fitHeight="90.0" fitWidth="160.0" layoutX="470.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true" styleClass="image" visible="false">
+                     <image>
+                        <Image url="@../../images/envelope.jpg" />
+                     </image>
+                  </ImageView>
+                  <StackPane fx:id="commentPane" layoutX="26.0" layoutY="512.0" prefHeight="150.0" prefWidth="560.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="20.0" />
+                  <JFXButton fx:id="showButton" layoutX="452.0" layoutY="560.0" prefHeight="54.0" prefWidth="181.0" text="Show me!" textAlignment="CENTER" />
+               </children>
+            </AnchorPane>
+         </center>
+      </BorderPane>
    </children>
-</StackPane>
+</AnchorPane>

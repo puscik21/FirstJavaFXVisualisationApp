@@ -11,6 +11,7 @@ import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -49,7 +50,6 @@ public class EveFiltersScene {
     @FXML
     private AnchorPane comparisonPane;
 
-    private QuantumScene parentController;
     private ArrayList<Image> filterImages;
     private ArrayList<Image> photonImages;
     private ArrayList<Image> valuesImages;
@@ -58,6 +58,9 @@ public class EveFiltersScene {
     private QBitState[] originalQBits;
     private QBitState[] eveQBits;
     private int[] filtersValues;
+
+    private QuantumScene parentController;
+    private DropShadow borderGlow;
 
     private Random generator;
     private double timeScale = 4.0;
@@ -88,6 +91,7 @@ public class EveFiltersScene {
         prepareScene();
         prepareEavesDroppedQBits();
         sendAliceQBitsValuesAfterEve();
+        initCommentDialogs();
     }
 
     private void prepareScene() {
@@ -155,6 +159,40 @@ public class EveFiltersScene {
 
     private void sendEavesdroppedStates() {
         parentController.setEavesdroppedQBits(eveQBits);
+    }
+
+    private void initCommentDialogs() {
+        initBorderGlowEffectInstance();
+        initCommentForNode(originalQBitHBox, "Comment");
+        initCommentForNode(qBitHBox, "Comment");
+        initCommentForNode(filterHBox, "Comment");
+        initCommentForNode(valuesHBox, "Comment");
+    }
+
+    private void initBorderGlowEffectInstance() {
+        borderGlow = new DropShadow();
+        borderGlow.setColor(Color.WHITESMOKE);
+        borderGlow.setOffsetX(0f);
+        borderGlow.setOffsetY(0f);
+        borderGlow.setHeight(50);
+        borderGlow.setWidth(50);
+    }
+
+    private void initCommentForNode(Node node, String comment) {
+        node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e, comment));
+        setBorderGlowEffect(node);
+    }
+
+    private void setCommentOnSecondaryButton(MouseEvent event, String comment) {
+        if (event.getButton() == MouseButton.SECONDARY) {
+            event.consume();
+            parentController.returnDialog(comment).show();
+        }
+    }
+
+    private void setBorderGlowEffect(Node node) {
+        node.setOnMouseEntered(e -> node.setEffect(borderGlow));
+        node.setOnMouseExited(e -> node.setEffect(null));
     }
 
     private void scheduleAnimationStart() {

@@ -35,13 +35,14 @@ public class Main extends Application {
     // TODO: 26.10.2019 look at transited objects positions
 
     // TODO: 30.11.2019 circles (probably arrows) on every scene
+
+    // TODO: 30.11.2019 check every comment
     public static void main(String[] args){
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-//        Parent root = FXMLLoader.load(getClass().getResource("scenes/introduction/introductionScene.fxml"));
         Parent root = FXMLLoader.load(getClass().getResource("scenes/menu/menuScene.fxml"));
         primaryStage.setTitle("Quantum key distribution");
 
@@ -55,3 +56,4 @@ public class Main extends Application {
 
 
 // TODO: (LAST) 06.10.2019 .properties file for all comments
+// TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob

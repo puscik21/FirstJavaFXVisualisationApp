@@ -142,6 +142,14 @@ public class IntroductionScene {
     private DropShadow borderGlow;
     private ChangeListener<? super Number> listener;
 
+    public StackPane getRootPane() {
+        return rootPane;
+    }
+
+    public AnchorPane getRootAnchorPane() {
+        return rootAnchorPane;
+    }
+
     public ChangeListener<? super Number> getListener() {
         return listener;
     }
@@ -166,6 +174,7 @@ public class IntroductionScene {
     }
 
     private void initEvents() {
+        initMainTabPane();
         initResizeEvents();
         initMouseEvents();
     }
@@ -203,13 +212,19 @@ public class IntroductionScene {
     }
 
     private void initMouseEvents() {
-        initMainTabPane();
-        initOnMouseClickedEvents();
+        showButton.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) {
+                if (animationsShowed) {
+                    reloadIntroductionScene();
+                } else {
+                    showNextAnimation();
+                }
+            }
+        });
+        initCommentDialogs();
 
-        initBorderGlowEffectInstance();
-        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())) {
-            setBorderGlowEffect(node);
-        }
+        menuItemRefresh.setOnAction(e -> reloadIntroductionScene());
+        menuItemHelp.setOnAction(e -> returnDialog("Here are many valuable things about this applications", "About").show());
     }
 
     private void initMainTabPane() {
@@ -257,24 +272,8 @@ public class IntroductionScene {
         }
     }
 
-    private void initOnMouseClickedEvents() {
-        showButton.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.PRIMARY) {
-                if (animationsShowed) {
-                    reloadIntroductionScene();
-                } else {
-                    showNextAnimation();
-                }
-            }
-        });
-
-        menuItemRefresh.setOnAction(e -> reloadIntroductionScene());
-        menuItemHelp.setOnAction(e -> returnDialog("Here are many valuable things about this applications", "About").show());
-        initCommentDialogs();
-    }
-
-    // TODO: 24.11.2019 rest of comments
     private void initCommentDialogs() {
+        initBorderGlowEffectInstance();
         initCommentDialogForNode(alicePC, "Alice's PC");
         initCommentDialogForNode(bobPC, "Bob's PC");
         initCommentDialogForNode(aliceMess, "This is encrypted message");
@@ -287,6 +286,7 @@ public class IntroductionScene {
 
     private void initCommentDialogForNode(Node node, String comment) {
         node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e.getButton(), comment));
+        setBorderGlowEffect(node);
     }
 
     private void setCommentOnSecondaryButton(MouseButton button, String comment) {
@@ -604,12 +604,12 @@ public class IntroductionScene {
         }
     }
 
-    private void addSceneBlurEffect() {
+    public void addSceneBlurEffect() {
         BoxBlur blurEffect = new BoxBlur(3, 3, 3);
         rootAnchorPane.setEffect(blurEffect);
     }
 
-    private void removeSceneEffects() {
+    public void removeSceneEffects() {
         rootAnchorPane.setEffect(null);
     }
 }

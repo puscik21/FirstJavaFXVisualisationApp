@@ -116,7 +116,7 @@ public class EnterQBitCombination {
         Text text = new Text(message);
         dialogLayout.setBody(text);
 
-        JFXDialog dialog = new JFXDialog(parentController.getRootPane(), dialogLayout, JFXDialog.DialogTransition.TOP);
+        JFXDialog dialog = new JFXDialog(parentController.getMainPane(), dialogLayout, JFXDialog.DialogTransition.TOP);
         dialog.show();
     }
 

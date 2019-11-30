@@ -11,6 +11,7 @@ import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -52,6 +53,9 @@ public class FiltersScene {
     private QBitState[] eveQBits;
     private int[] filtersValues;
 
+    private QuantumScene parentController;
+    private DropShadow borderGlow;
+
     private Random generator;
     private double timeScale = 4.0;
     private boolean comparisonStarted = false;
@@ -63,10 +67,22 @@ public class FiltersScene {
         initListeners();
     }
 
-    public void start(QBitState[] sentQBitsStates, int[] filtersValues) {
+    public void start(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues) {
+        this.parentController = parentController;
         isEveScenario = false;
         prepare(sentQBitsStates, filtersValues);
         scheduleAnimationStart();
+    }
+
+    private void prepare(QBitState[] sentQBitsStates, int[] filtersValues) {
+        this.sentQBitsStates = sentQBitsStates;
+        this.filtersValues = filtersValues;
+        comparisonStarted = false;
+        generator = new Random();
+        prepareScene();
+        prepareEavesDroppedQBits();
+        prepareQBitsAndFilters();
+        initCommentDialogs();
     }
 
     private void prepareEavesDroppedQBits() {
@@ -88,14 +104,37 @@ public class FiltersScene {
         eveQBits[compNumber].turnQBit(direction);
     }
 
-    private void prepare(QBitState[] sentQBitsStates, int[] filtersValues) {
-        this.sentQBitsStates = sentQBitsStates;
-        this.filtersValues = filtersValues;
-        comparisonStarted = false;
-        generator = new Random();
-        prepareScene();
-        prepareEavesDroppedQBits();
-        prepareQBitsAndFilters();
+    private void initCommentDialogs() {
+        initBorderGlowEffectInstance();
+        initCommentForNode(qBitHBox, "Comment");
+        initCommentForNode(filterHBox, "Comment");
+        initCommentForNode(valuesHBox, "Comment");
+    }
+
+    private void initBorderGlowEffectInstance() {
+        borderGlow = new DropShadow();
+        borderGlow.setColor(Color.WHITESMOKE);
+        borderGlow.setOffsetX(0f);
+        borderGlow.setOffsetY(0f);
+        borderGlow.setHeight(50);
+        borderGlow.setWidth(50);
+    }
+
+    private void initCommentForNode(Node node, String comment) {
+        node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e, comment));
+        setBorderGlowEffect(node);
+    }
+
+    private void setCommentOnSecondaryButton(MouseEvent event, String comment) {
+        if (event.getButton() == MouseButton.SECONDARY) {
+            event.consume();
+            parentController.returnDialog(comment).show();
+        }
+    }
+
+    private void setBorderGlowEffect(Node node) {
+        node.setOnMouseEntered(e -> node.setEffect(borderGlow));
+        node.setOnMouseExited(e -> node.setEffect(null));
     }
 
     private void scheduleAnimationStart() {

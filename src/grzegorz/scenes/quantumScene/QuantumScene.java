@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-// TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
 public class QuantumScene {
 
     // TODO przerozne roznosci
@@ -56,8 +55,6 @@ public class QuantumScene {
     // ###############################
 
 
-    @FXML
-    private StackPane rootPane;
 
     @FXML
     private AnchorPane rootAnchorPane;
@@ -107,6 +104,7 @@ public class QuantumScene {
     @FXML
     private StackPane commentPane;
 
+    private StackPane mainPane;
     // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
     //  primaryStage.setOnShowing(event -> {});     - try it
     //  after initialize call method start I guess and take good value
@@ -187,6 +185,7 @@ public class QuantumScene {
     }
 
     public void start(IntroductionScene introductionController, JFXTabPane tabPane) {
+        this.mainPane = introductionController.getRootPane();
         this.introductionController = introductionController;
         this.tabPane = tabPane;
         tabPane.getSelectionModel().selectedIndexProperty().removeListener(introductionController.getListener());
@@ -203,8 +202,8 @@ public class QuantumScene {
         nextIsDialog = true;
     }
 
-    public StackPane getRootPane() {
-        return rootPane;
+    public StackPane getMainPane() {
+        return mainPane;
     }
 
     public void setUserCombination(QBitState[] userCombination, boolean isRandom) {
@@ -267,12 +266,16 @@ public class QuantumScene {
     }
 
     private void initMouseEvents() {
-        initOnMouseClickedEvents();
-
-        initBorderGlowEffectInstance();
-        for (Node node : envPane.getChildren().stream().filter(e -> e instanceof ImageView).collect(Collectors.toList())) {
-            setBorderGlowEffect(node);
-        }
+        showButton.setOnMouseClicked(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) {
+                if (animationsShowed) {
+                    reloadScene();
+                } else {
+                    showNextAnimation();
+                }
+            }
+        });
+        initCommentDialogs();
     }
 
     private void initMainTabPane() {
@@ -294,12 +297,12 @@ public class QuantumScene {
             else if (newVal.intValue() == FILTERS_TAB) {
                 FXMLLoader loader = loadToTab(FILTERS_TAB, "../filters/filtersScene.fxml");
                 FiltersScene filtersController = loader.getController();
-                filtersController.start(bobQBitsStates, aliceFiltersValues);
+                filtersController.start(this, bobQBitsStates, aliceFiltersValues);
             }
             else if (newVal.intValue() == FILTERS_CHECK_TAB) {
                 FXMLLoader loader = loadToTab(FILTERS_CHECK_TAB, "../filtersCheck/filtersCheckScene.fxml");
                 FiltersCheckScene filtersCheckController = loader.getController();
-                filtersCheckController.start(aliceFiltersValues, bobQBitsStates);
+                filtersCheckController.start(this, aliceFiltersValues, bobQBitsStates);
             }
             else if (newVal.intValue() == EVE_FILTERS_TAB) {
                 FXMLLoader loader = loadToTab(EVE_FILTERS_TAB, "../eveFilters/eveFiltersScene.fxml");
@@ -314,7 +317,7 @@ public class QuantumScene {
             else if (newVal.intValue() == EVE_FILTERS_CHECK_TAB) {
                 FXMLLoader loader = loadToTab(EVE_FILTERS_CHECK_TAB, "../eveFiltersCheck/EveFiltersCheckScene.fxml");
                 EveFiltersCheckScene filtersCheckScene = loader.getController();
-                filtersCheckScene.start(aliceFiltersValues, bobQBitsStates, aliceQBitsValuesAfterEve);
+                filtersCheckScene.start(this, aliceFiltersValues, bobQBitsStates, aliceQBitsValuesAfterEve);
             }
         });
     }
@@ -335,7 +338,7 @@ public class QuantumScene {
     private void reloadScene() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../quantumScene/quantumScene.fxml"));
-            StackPane body = loader.load();
+            AnchorPane body = loader.load();
             tabPane.getTabs().get(2).setContent(body);
             QuantumScene quantumScene = loader.getController();
             quantumScene.start(introductionController, tabPane);
@@ -346,37 +349,16 @@ public class QuantumScene {
         }
     }
 
-    private void initOnMouseClickedEvents() {
-        showButton.setOnMouseClicked(e -> {
-            if (e.getButton() == MouseButton.PRIMARY) {
-                if (animationsShowed) {
-                    reloadScene();
-                } else {
-                    showNextAnimation();
-                }
-            }
-        });
-        initCommentDialogs();
-    }
-
-    // TODO: 24.11.2019 rest of comments
     private void initCommentDialogs() {
-        initCommentDialogForNode(alicePC, "Alice's PC");
-        initCommentDialogForNode(bobPC, "Bob's PC");
-        initCommentDialogForNode(aliceMess, "This is encrypted message");
-        initCommentDialogForNode(bobMess, "Bob's qubits for key distribution");
-        initCommentDialogForNode(electricalCable, "Electrical Cable - used for communication in unsecure channel");
-        initCommentDialogForNode(photonCable, "Quantum cable - used for the key establishment");
-    }
-
-    private void initCommentDialogForNode(Node node, String comment) {
-        node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e.getButton(), comment));
-    }
-
-    private void setCommentOnSecondaryButton(MouseButton button, String comment) {
-        if (button == MouseButton.SECONDARY) {
-            returnDialog(comment).show();
-        }
+        initBorderGlowEffectInstance();
+        initCommentForNode(alicePC, "Alice's PC");
+        initCommentForNode(evePC, "comment*");
+        initCommentForNode(bobPC, "Bob's PC");
+        initCommentForNode(aliceMess, "This is encrypted message");
+        initCommentForNode(eveMess, "comment*");
+        initCommentForNode(bobMess, "Bob's qubits for key distribution");
+        initCommentForNode(electricalCable, "Electrical Cable - used for communication in unsecure channel");
+        initCommentForNode(photonCable, "Quantum cable - used for the key establishment");
     }
 
     private void initBorderGlowEffectInstance() {
@@ -386,6 +368,17 @@ public class QuantumScene {
         borderGlow.setOffsetY(0f);
         borderGlow.setHeight(50);
         borderGlow.setWidth(50);
+    }
+
+    private void initCommentForNode(Node node, String comment) {
+        node.setOnMouseClicked(e -> setCommentOnSecondaryButton(e.getButton(), comment));
+        setBorderGlowEffect(node);
+    }
+
+    private void setCommentOnSecondaryButton(MouseButton button, String comment) {
+        if (button == MouseButton.SECONDARY) {
+            returnDialog(comment).show();
+        }
     }
 
     private void setBorderGlowEffect(Node node) {
@@ -615,7 +608,7 @@ public class QuantumScene {
             EnterQBitCombination enterQBitCombination = loader.getController();
 
             dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.TOP);
             dialog.setOverlayClose(false);
             dialog.setOnDialogOpened(e -> {
                 addSceneBlurEffect();
@@ -644,7 +637,7 @@ public class QuantumScene {
             ChoosingQBitsScene choosingQBitsController = loader.getController();
 
             dialogLayout.setBody(body);
-            JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+            JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.TOP);
             dialog.setOnDialogOpened(e -> {
                 addSceneBlurEffect();
                 removeCommentDialog();
@@ -772,11 +765,11 @@ public class QuantumScene {
         return fadeTransition;
     }
 
-    private JFXDialog returnDialog(String message) {
+    public JFXDialog returnDialog(String message) {
         return returnDialog(message, "");
     }
 
-    private JFXDialog returnDialog(String message, String title) {
+    public JFXDialog returnDialog(String message, String title) {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         if (!title.isEmpty()) {
             dialogLayout.setHeading(new Text(title));
@@ -785,7 +778,7 @@ public class QuantumScene {
 //        text.setWrappingWidth(START_PANE_WIDTH / 1.5);
         dialogLayout.setBody(text);
 
-        JFXDialog dialog = new JFXDialog(rootPane, dialogLayout, JFXDialog.DialogTransition.TOP);
+        JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.TOP);
         dialog.setOnDialogOpened(e -> addSceneBlurEffect());
         dialog.setOnDialogClosed(e -> removeSceneEffects());
         return dialog;
@@ -818,11 +811,10 @@ public class QuantumScene {
     }
 
     private void addSceneBlurEffect() {
-        BoxBlur blurEffect = new BoxBlur(3, 3, 3);
-        rootAnchorPane.setEffect(blurEffect);
+        introductionController.addSceneBlurEffect();
     }
 
     private void removeSceneEffects() {
-        rootAnchorPane.setEffect(null);
+        introductionController.removeSceneEffects();
     }
 }

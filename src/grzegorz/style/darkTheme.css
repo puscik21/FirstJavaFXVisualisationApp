@@ -1,17 +1,8 @@
 * {
-    /*-fx-base-color : #2A2E37;*/
-    /*-fx-base-color : #26231C;*/
     -fx-base-color : #1F1F1F;
     -fx-second-color : #3AEA00;
     -fx-detail-color : #EAE8DC;
-
-    /*--fx-big-font : 40px;*/
-    /*-fx-medium-font : 25px;*/
 }
-
-/*
-    todo 10.11.2019 check what is necessary here
-*/
 
 .root {
     -fx-background-color: -fx-base-color;
@@ -24,7 +15,7 @@
     -fx-background-color: derive(-fx-base-color, 15%);
     -fx-font-size: 25px;
     -fx-text-fill: -fx-second-color;
-    -fx-background-radius: 10px;
+    -fx-background-radius: 15px;
 }
 
 .jfx-button:hover {
@@ -33,16 +24,11 @@
 }
 
 .menu-bar {
-    -fx-base : -fx-base-color;
-    /*-fx-background-color: -fx-base-color; /*to make flat color*/
-}
-
-.tab {
-    -fx-background-color: -fx-base-color;
+    -fx-background-color: derive(-fx-base-color, -20%); /*to make flat color*/
 }
 
 .tab-header-background {
-    -fx-background-color: -fx-base-color;
+    -fx-background-color: derive(-fx-base-color, -12%);
 }
 
 .context-menu {
@@ -58,8 +44,4 @@
     -fx-background-color: -fx-base-color;
     -fx-font-size: 40px;
     -fx-alignment: center;
-}
-
-#close {
-    -fx-background-color: #ff0000;
 }
