@@ -80,13 +80,14 @@ public class FiltersCheckScene {
         Image zeroIcon = new Image("grzegorz\\images\\zeroIcon.png");
         Image oneIcon = new Image("grzegorz\\images\\oneIcon.png");
         Image tickIcon = new Image("grzegorz\\images\\tickIcon.png");
+        Image xIcon = new Image("grzegorz\\images\\xIcon.png");
 
         photonImages = new ArrayList<>(4);
         filterImages = new ArrayList<>(2);
         valuesImages = new ArrayList<>(3);
         photonImages.addAll(Arrays.asList(verPhoton, rightDiagPhoton, horPhoton, leftDiagPhoton));
         filterImages.addAll(Arrays.asList(whiteFilter, greenFilter));
-        valuesImages.addAll(Arrays.asList(zeroIcon, oneIcon, tickIcon));
+        valuesImages.addAll(Arrays.asList(zeroIcon, oneIcon, tickIcon, xIcon));
     }
 
     private void addImageViews() {
@@ -94,10 +95,19 @@ public class FiltersCheckScene {
         for (int i = 0; i < quantity; i++) {
             filtersVBox.getChildren().add(new ImageView(filterImages.get(0)));
             qBitsVBox.getChildren().add(new ImageView(photonImages.get(0)));
-            ImageView invisibleTick = new ImageView(valuesImages.get(2));
-            invisibleTick.setVisible(false);
-            ticksVBox.getChildren().add(invisibleTick);
+            addValueImageView(i);
         }
+    }
+
+    private void addValueImageView(int i) {
+        ImageView valView;
+        if (bobQBitStates[i].isFilterWrong(aliceFilters[i])) {
+            valView = new ImageView(valuesImages.get(3));
+        } else {
+            valView = new ImageView(valuesImages.get(2));
+        }
+        valView.setVisible(false);
+        ticksVBox.getChildren().add(valView);
     }
 
     private void scaleComparePane() {
@@ -195,18 +205,16 @@ public class FiltersCheckScene {
     }
 
     private SequentialTransition prepareWholeAnimation() {
-        int size = ticksVBox.getChildren().size();
+        int size = qBitsVBox.getChildren().size();
         ArrayList<Animation> transitions = new ArrayList<>();
         ArrayList<Integer> indexesOfCorrect = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
-            if (bobQBitStates[i].isFilterWrong(aliceFilters[i])) {
-                continue;
+            if (!bobQBitStates[i].isFilterWrong(aliceFilters[i])) {
+                indexesOfCorrect.add(i);
             }
-            indexesOfCorrect.add(i);
             Node node = ticksVBox.getChildren().get(i);
-            node.setVisible(true);
-            transitions.add(getFadeTransition(node, 0.0, 1.0, 2 * timeScale));
+            transitions.add(getShowInvisibleIconTransition(node));
         }
         Animation[] transArray = new Animation[transitions.size()];
         transArray = transitions.toArray(transArray);
@@ -214,6 +222,13 @@ public class FiltersCheckScene {
         SequentialTransition showNumbersTransition = getTicksToNumbersTransition(indexesOfCorrect);
 
         return new SequentialTransition(showTicksTransition, showNumbersTransition);
+    }
+
+    private SequentialTransition getShowInvisibleIconTransition(Node node) {
+        FadeTransition hideTrans = getFadeTransition(node, 1.0, 0.0, 0.001);
+        hideTrans.setOnFinished(e -> node.setVisible(true));
+        FadeTransition showTrans = getFadeTransition(node, 0.0, 1.0, 2 * timeScale);
+        return new SequentialTransition(hideTrans, showTrans);
     }
 
     private SequentialTransition getTicksToNumbersTransition(ArrayList<Integer> indexes) {
