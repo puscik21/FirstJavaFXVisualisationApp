@@ -61,7 +61,11 @@ public class EnterQBitCombination {
 
         String maxVal = "65535";
         BigInteger bigInt = new BigInteger(value);
-        return bigInt.compareTo(new BigInteger(maxVal)) <= 0;
+        if (bigInt.compareTo(new BigInteger(maxVal)) > 0) {
+            bitsText.setText("Value is too big!");
+            return false;
+        }
+        return true;
     }
 
     public void start(QuantumScene parentController) {

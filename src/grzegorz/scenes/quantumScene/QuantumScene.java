@@ -37,7 +37,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
-// TODO: 26.10.2019 look at transited objects positions
 public class QuantumScene {
 
     // TODO przerozne roznosci
@@ -121,10 +120,6 @@ public class QuantumScene {
     private final int ALICE_AFTER_EVE_FILTERS_TAB = 6;
     private final int EVE_FILTERS_CHECK_TAB = 7;
 
-    // TODO: 19.11.2019  check if they are all correct
-    // TODO: 22.11.2019 add the rest of circles
-    // TODO: 29.11.2019 (LAST) circles on other scenes?
-    // TODO: 29.11.2019 probably need to be changed to something like arrows
     private final double TABS_Y = 50;
     private final double TABS_FOURTH_X = 560;
     private final double TABS_FIFTH_X = 700;

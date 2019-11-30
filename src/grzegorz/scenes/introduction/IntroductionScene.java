@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
-// TODO: 26.10.2019 look at transited objects positions
 public class IntroductionScene {
 
     // TODO przerozne roznosci
@@ -118,13 +117,11 @@ public class IntroductionScene {
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
 
-    // TODO: 22.11.2019 remove additional tabs
     private final int EXPLANATION_TAB = 1;
     private final int INTRODUCTION_TAB = 2;
 
-    // TODO: 19.11.2019  check if they are all correct
     private final double TABS_Y = 50;
-    private final double TABS_FIRST_X = 53;     // TODO: 20.11.2019 use circle in another scenes
+    private final double TABS_FIRST_X = 53;
     private final double TABS_SECOND_X = 206;
     private final double TABS_THIRD_X = 385;
 
@@ -161,12 +158,6 @@ public class IntroductionScene {
                 "Alice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \n" +
                 "Message can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm")
                 .show();
-
-
-        // TODO: 13.10.2019
-        //  send back part of the current key to make sure that no one is eavesdropping
-        //  charts scene
-        //  eavesdropper and why he cannot read qubits in quantum cable
 
         Tab explanationTab = new Tab("Qubit explanation");
         Tab quantumTab = new Tab("BB84");

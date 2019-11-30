@@ -31,6 +31,10 @@ public class Main extends Application {
     // TODO: 29.11.2019 think about something like preparation of every qbits/filters values on quantum scene start and then only get them by getters
 
     // TODO: 26.11.2019 try to make reloadScene for every tab by pressing MenuItem (or by replay button (showButton))
+
+    // TODO: 26.10.2019 look at transited objects positions
+
+    // TODO: 30.11.2019 circles (probably arrows) on every scene
     public static void main(String[] args){
         launch(args);
     }
