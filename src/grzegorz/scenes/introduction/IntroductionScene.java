@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-// TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
 public class IntroductionScene {
 
     // TODO przerozne roznosci

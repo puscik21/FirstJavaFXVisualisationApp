@@ -10,15 +10,8 @@ import javafx.stage.Stage;
 //  eavesdropper scene "But assume world is not perfect and someone can be eavesdropping - Let's repeat sending scenario* but with Eve in scene and see how BB84 is dealing with situation like this"
 //  something why it works
 //  chart scene - checking if some1 was eavesdropping
-//  right click everything
 public class Main extends Application {
-
-    // TODO: 25.11.2019 separate IntroductionScene
-    //  + QBit explanation
-    //  + Quantum piece
-
     // TODO: 25.11.2019 swap Alice with Bob
-    // TODO: 25.11.2019 3 rows in filters comparison
 
     // TODO: 13.11.2019
     //  fix transited objects

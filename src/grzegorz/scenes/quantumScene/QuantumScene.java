@@ -37,25 +37,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class QuantumScene {
-
-    // TODO przerozne roznosci
-    // ###############################
-    // tooltip
-//        Tooltip envelopeToolTip = new Tooltip("This is encrypted message");
-//        Tooltip.install(image, envelopeToolTip);
-
-    // fitProperty
-//        image1.fitWidthProperty().bind(imagePane2.widthProperty());
-//        image1.fitHeightProperty().bind(imagePane2.heightProperty());
-
-    // dialog button
-//        JFXButton button = new JFXButton("Click me!");
-//        button.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> dialog.close());
-//        dialogLayout.setActions(button);
-    // ###############################
-
-
-
     @FXML
     private AnchorPane rootAnchorPane;
 

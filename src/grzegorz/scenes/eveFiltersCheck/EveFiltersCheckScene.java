@@ -60,10 +60,8 @@ public class EveFiltersCheckScene {
     private double sizeScale = 1.0;
     private double timeScale = 4.0;
 
-    // TODO: 20.11.2019 what to do when there is no key in result - "X" icon meaning wrong filter, then disappear when changing to 1 or 0
     // TODO: 22.11.2019 check incorrect, but when everyone matches write some info
-
-    // TODO: 01.12.2019 highlight rows that are incorrect (some1 was eavesdropping) 
+    // TODO: 01.12.2019 highlight rows that are incorrect (some1 was eavesdropping)
     public void start(QuantumScene parentController, int[] aliceFilters, QBitState[] bobQBitStates, int[] aliceQBitsValuesAfterEve) {
         this.parentController = parentController;
         this.aliceFilters = aliceFilters;
