@@ -746,6 +746,7 @@ public class QuantumScene {
         return fadeTransition;
     }
 
+    // TODO: 03.12.2019 use it from introduction scene
     public JFXDialog returnDialog(String message) {
         return returnDialog(message, "");
     }
