@@ -6,12 +6,11 @@ import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.CommentedAnimation;
-import grzegorz.scenes.eveFiltersCheck.EveFiltersCheckScene;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
+import grzegorz.scenes.qber.QBERScene;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -170,6 +169,9 @@ public class IntroductionScene {
         Tab quantumTab = new Tab("BB84");
         tabPane.getTabs().add(explanationTab);
         tabPane.getTabs().add(quantumTab);
+
+        Tab testTab = new Tab("test");
+        tabPane.getTabs().add(testTab);
     }
 
     private void initEvents() {
@@ -242,6 +244,11 @@ public class IntroductionScene {
                 FXMLLoader loader = loadToTab(INTRODUCTION_TAB, "../quantumScene/quantumScene.fxml");
                 QuantumScene quantumScene = loader.getController();
                 quantumScene.start(IntroductionScene.this, tabPane);
+            }
+            else if (newVal.intValue() == 3) {
+                FXMLLoader loader = loadToTab(3, "../qber/qBERScene.fxml");
+                QBERScene QBERController = loader.getController();
+                QBERController.start(this);
             }
         };
         tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
@@ -558,11 +565,11 @@ public class IntroductionScene {
         return fadeTransition;
     }
 
-    private JFXDialog returnDialog(String message) {
+    public JFXDialog returnDialog(String message) {
         return returnDialog(message, "");
     }
 
-    private JFXDialog returnDialog(String message, String title) {
+    public JFXDialog returnDialog(String message, String title) {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         if (!title.isEmpty()) {
             dialogLayout.setHeading(new Text(title));
