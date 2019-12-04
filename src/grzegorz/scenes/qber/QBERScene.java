@@ -2,23 +2,24 @@ package grzegorz.scenes.qber;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.events.JFXDialogEvent;
-import grzegorz.CommentedAnimation;
 import grzegorz.SceneDisplay;
 import grzegorz.scenes.introduction.IntroductionScene;
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.ParallelTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class QBERScene {
     @FXML
@@ -30,21 +31,33 @@ public class QBERScene {
     @FXML
     private HBox receivedKeyHBox;
 
+    @FXML
+    private Label qberLabel;
+
+    @FXML
+    private Label operationLabel;
+
+    @FXML
+    private Label resultLabel;
+
     private IntroductionScene introductionController;
     private List<SceneDisplay> sceneDisplays;
+    private List<Image> valuesImages;
+    private List<Image> valuesImagesRed;
+    private Random generator;
 
     private int displayCounter = 0;
-    private int hBoxOffset = 2000;
+    private int outsideOffset = 2000;
+    private int errorBitIndex;
     private boolean isDisplayToShow = true;
 
 
-    // TODO: 04.12.2019 load random values of bits, but make sure only one in each 16 part is wrong
-    // TODO: 04.12.2019 then add some effect (red glow?)
-    // TODO: 04.12.2019 QBER animation (transition for "qber =" and value in %) - new scene - init as dialog
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
-        receivedKeyHBox.setTranslateX(-hBoxOffset);
+        generator = new Random();
+        receivedKeyHBox.setTranslateX(-outsideOffset);
+        prepareKeys();
     }
 
     public void start(IntroductionScene introductionController) {
@@ -53,11 +66,56 @@ public class QBERScene {
         initMouseEvents();
     }
 
+    private void prepareKeys() {
+        prepareImages();
+        fillKeys();
+        spoilOneBit();
+    }
+
+    private void prepareImages() {
+        Image zeroIcon = new Image("grzegorz\\images\\zeroIcon.png");
+        Image oneIcon = new Image("grzegorz\\images\\oneIcon.png");
+        Image zeroIconRed = new Image("grzegorz\\images\\zeroIconRed.png");
+        Image oneIconRed = new Image("grzegorz\\images\\oneIconRed.png");
+        valuesImages = new ArrayList<>(2);
+        valuesImagesRed = new ArrayList<>(2);
+        valuesImages.addAll(Arrays.asList(zeroIcon, oneIcon));
+        valuesImagesRed.addAll(Arrays.asList(zeroIconRed, oneIconRed));
+    }
+
+    private void fillKeys() {
+        for (int i = 0; i < 32; i++) {
+            int bitValue = getRandomBitValue(2);
+            keyHBox.getChildren().add(new ImageView(valuesImages.get(bitValue)));
+            if (i < 16) {
+                receivedKeyHBox.getChildren().add(new ImageView(valuesImages.get(bitValue)));
+            }
+        }
+    }
+
+    private void spoilOneBit() {
+        errorBitIndex = getRandomBitValue(16);
+        ImageView errorBitView = (ImageView) receivedKeyHBox.getChildren().get(errorBitIndex);
+        changeBitImage(errorBitView);
+    }
+
+    private int getRandomBitValue(int bound) {
+        return generator.nextInt(bound);
+    }
+
+    private void changeBitImage(ImageView imgView) {
+        if (imgView.getImage() == valuesImages.get(0)) {
+            imgView.setImage(valuesImages.get(1));
+        } else {
+            imgView.setImage(valuesImages.get(0));
+        }
+    }
+
     private void prepareSceneDisplays() {
         addIntroductionDialog();
-        addSeparatorTransition();
-        addTakeHalfOfKeyTransition();
-        addReceiveKeyTransition();
+        addCompareKeysTransition();
+        addQBERDialog();
+        addResultTransition();
     }
 
     private void addIntroductionDialog() {
@@ -65,27 +123,40 @@ public class QBERScene {
         sceneDisplays.add(new SceneDisplay(dialog));
     }
 
-    private void addSeparatorTransition() {
+    private Animation addSeparatorTransition() {
         Separator separator = getVerticalSeparator();
+        separator.setTranslateY(-outsideOffset);
         keyHBox.getChildren().add(keyHBox.getChildren().size() / 2, separator);
+        TranslateTransition separatorTransition = getTranslateTransition(separator, 0, -outsideOffset, 0, 0);
+        separatorTransition.setInterpolator(Interpolator.EASE_OUT);
+        separatorTransition.setDuration(Duration.seconds(1.0));
+        return separatorTransition;
     }
 
     private Separator getVerticalSeparator() {
         Separator separator = new Separator(Orientation.VERTICAL);
-        separator.setMinHeight(100);
-        separator.setStyle("-fx-background-color: red; -fx-padding: 0 -2 0 -2;");
+        separator.setMinHeight(200);
+        separator.setStyle("-fx-background-color: red;");
         return separator;
     }
 
-    private void addTakeHalfOfKeyTransition() {
+    private void addCompareKeysTransition() {
+        Animation separatorTransition = addSeparatorTransition();
+        Animation takeHalfOfKeyTransition = addTakeHalfOfKeyTransition();
+        Animation alignKeysTransition = addAlignKeysTransition();
+        SequentialTransition compareKeysTransition = new SequentialTransition(separatorTransition, takeHalfOfKeyTransition, alignKeysTransition);
+        sceneDisplays.add(new SceneDisplay(compareKeysTransition));
+    }
+
+    private Animation addTakeHalfOfKeyTransition() {
         int firstHalfQuantity = keyHBox.getChildren().size() / 2;
         int secondHalfQuantity = keyHBox.getChildren().size() - keyHBox.getChildren().size() / 2;
         Animation moveNodesDownTransition = moveNodesDown(keyHBox, firstHalfQuantity);
         Animation moveRestOfKeyAwayTransition = moveRestOfKeyAway(keyHBox, secondHalfQuantity);
 
-        ParallelTransition takeHalfOfKeyTransition = new ParallelTransition(moveNodesDownTransition, moveRestOfKeyAwayTransition);
-        CommentedAnimation cAnimation = new CommentedAnimation(takeHalfOfKeyTransition, null);
-        sceneDisplays.add(new SceneDisplay(cAnimation));
+        Animation takeHalfOfKeyTransition = new ParallelTransition(moveNodesDownTransition, moveRestOfKeyAwayTransition);
+        takeHalfOfKeyTransition.setDelay(Duration.seconds(0.75));
+        return takeHalfOfKeyTransition;
     }
 
     private ParallelTransition moveNodesDown(HBox hbox, int quantity) {
@@ -102,7 +173,7 @@ public class QBERScene {
         Animation[] animations = new Animation[quantity];
         for (int i = 0; i < quantity; i++) {
             Node node = hbox.getChildren().get(last - i);
-            TranslateTransition moveTransition = getTranslateTransition(node, 0, 0, hBoxOffset, 0);
+            TranslateTransition moveTransition = getTranslateTransition(node, 0, 0, outsideOffset, 0);
             moveTransition.setDuration(Duration.seconds(1));
             moveTransition.setInterpolator(Interpolator.EASE_IN);
             animations[i] = moveTransition;
@@ -110,18 +181,64 @@ public class QBERScene {
         return new ParallelTransition(animations);
     }
 
-    private void addReceiveKeyTransition() {
-        double rootAndVBoxDifference = (introductionController.getRootPane().getWidth() - 0.5625 * keyHBox.getBoundsInLocal().getWidth());
-        double resultOffset = (introductionController.getRootPane().getWidth() - rootAndVBoxDifference) / 2.0;
+    private Animation addAlignKeysTransition() {
+        double keyHBoxWidth = keyHBox.getChildren().size() * ((ImageView)keyHBox.getChildren().get(0)).getImage().getWidth();
+        double offset = 0.25 * keyHBoxWidth;
 
-        TranslateTransition firstKeyTrans = getTranslateTransition(keyHBox, 0, 0, resultOffset, 0);
-        TranslateTransition receiveKeyTrans = getTranslateTransition(receivedKeyHBox, -hBoxOffset, 0, resultOffset, 0);
+        TranslateTransition firstKeyTrans = getTranslateTransition(keyHBox, 0, 0, offset, 0);
+        TranslateTransition receiveKeyTrans = getTranslateTransition(receivedKeyHBox, -outsideOffset, 0, offset, 0);
         firstKeyTrans.setDuration(Duration.seconds(1.0));
         receiveKeyTrans.setDuration(Duration.seconds(1.0));
 
-        ParallelTransition moveKeysTransition = new ParallelTransition(firstKeyTrans, receiveKeyTrans);
-        CommentedAnimation cAnimation = new CommentedAnimation(moveKeysTransition, null);
-        sceneDisplays.add(new SceneDisplay(cAnimation));
+        return new ParallelTransition(firstKeyTrans, receiveKeyTrans);
+    }
+
+    private void addQBERDialog() {
+        JFXDialog dialog = introductionController.returnDialog("Search for errors and measure Quantum Bit Error Rate");
+        EventHandler<? super JFXDialogEvent> currentEvent = dialog.getOnDialogClosed();
+        dialog.setOnDialogClosed(e -> {
+            currentEvent.handle(e);
+            highlightErrorBits();
+        });
+        sceneDisplays.add(new SceneDisplay(dialog));
+    }
+
+    private void highlightErrorBits() {
+        highlightBitInKey(keyHBox);
+        highlightBitInKey(receivedKeyHBox);
+    }
+
+    private void highlightBitInKey(HBox keyHBox) {
+        ImageView bit = (ImageView) keyHBox.getChildren().get(errorBitIndex);
+        changeToRedImage(bit);
+    }
+
+    private void changeToRedImage(ImageView imgView) {
+        if (imgView.getImage() == valuesImages.get(0)) {
+            imgView.setImage(valuesImagesRed.get(0));
+        } else {
+            imgView.setImage(valuesImagesRed.get(1));
+        }
+    }
+
+    private void addResultTransition() {
+        Label[] resultLabels = new Label[] {qberLabel, operationLabel, resultLabel};
+        Animation[] transitions = new Animation[resultLabels.length];
+        for (int i = 0; i < resultLabels.length; i++) {
+            Label label = resultLabels[i];
+            transitions[i] = getDelayedShowLabelTransition(label, i);
+        }
+        ParallelTransition resultTransition = new ParallelTransition(transitions);
+        sceneDisplays.add(new SceneDisplay(resultTransition));
+    }
+
+    private SequentialTransition getDelayedShowLabelTransition(Label label, double delay) {
+        FadeTransition hideTransition = getShowTransition(label);
+        hideTransition.setDelay(Duration.seconds(delay));
+        hideTransition.setDuration(Duration.seconds(0.001));
+        hideTransition.setOnFinished(e -> label.setVisible(true));
+        FadeTransition showTransition = getShowTransition(label);
+        return new SequentialTransition(hideTransition, showTransition);
     }
 
     private void initMouseEvents() {
@@ -141,7 +258,11 @@ public class QBERScene {
 
     private void useSceneDisplay(SceneDisplay sceneDisplay) {
         if (sceneDisplay.getState().equals("animation")) {
-            Animation animation = sceneDisplay.getcAnimation().getAnimation();
+            Animation animation = sceneDisplay.getAnimation();
+            animation.setOnFinished(e -> isDisplayToShow = true);
+            animation.play();
+        } else if (sceneDisplay.getState().equals("cAnimation")) {
+            Animation animation = sceneDisplay.getCAnimation().getAnimation();
             animation.setOnFinished(e -> isDisplayToShow = true);
             animation.play();
         } else {
@@ -167,24 +288,13 @@ public class QBERScene {
         return transition;
     }
 
+    private FadeTransition getShowTransition(Node node) {
+        FadeTransition fadeTransition = new FadeTransition();
+        fadeTransition.setNode(node);
+        fadeTransition.setDuration(Duration.seconds(0.5));
+        fadeTransition.setFromValue(0.0);
+        fadeTransition.setToValue(1.0);
 
-
-
-
-
-
-
-
-    private void rectThings() {
-        double scale = 0.5625;
-        Region rect1 = new Region();
-//        rect1.setStyle("-fx-background-color: transparent; -fx-border-style: solid; -fx-border-width: 5; -fx-border-color: red; -fx-min-width: 200; -fx-min-height:100; -fx-max-width:200; -fx-max-height: 100;");
-        rect1.setStyle("-fx-background-color: transparent; -fx-border-style: solid; -fx-border-width: 5; -fx-border-color: red;");
-        rect1.setPrefSize(60, 60);
-//        rect1.setLayoutX(280);
-//        rect1.setLayoutX(360);
-//        rect1.setLayoutY(50 / scale);
-        scenePane.getChildren().add(rect1);
-        rect1.toFront();
+        return fadeTransition;
     }
 }
