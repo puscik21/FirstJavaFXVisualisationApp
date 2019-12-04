@@ -1,4 +1,4 @@
-package grzegorz;
+package grzegorz.general;
 
 public class QBitState {
 

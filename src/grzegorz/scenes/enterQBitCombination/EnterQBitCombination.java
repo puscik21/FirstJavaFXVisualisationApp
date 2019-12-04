@@ -3,7 +3,7 @@ package grzegorz.scenes.enterQBitCombination;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import grzegorz.QBitState;
+import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

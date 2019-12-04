@@ -1,6 +1,6 @@
 package grzegorz.scenes.choosingQBits;
 
-import grzegorz.QBitState;
+import grzegorz.general.QBitState;
 import javafx.animation.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

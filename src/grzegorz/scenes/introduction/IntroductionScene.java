@@ -5,7 +5,7 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
-import grzegorz.CommentedAnimation;
+import grzegorz.general.CommentedAnimation;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
 import grzegorz.scenes.qber.QBERScene;

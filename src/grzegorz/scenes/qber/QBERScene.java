@@ -2,7 +2,7 @@ package grzegorz.scenes.qber;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.events.JFXDialogEvent;
-import grzegorz.SceneDisplay;
+import grzegorz.general.SceneDisplay;
 import grzegorz.scenes.introduction.IntroductionScene;
 import javafx.animation.*;
 import javafx.event.EventHandler;

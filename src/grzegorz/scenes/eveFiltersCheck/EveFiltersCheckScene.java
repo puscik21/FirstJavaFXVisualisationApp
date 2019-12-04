@@ -1,8 +1,6 @@
 package grzegorz.scenes.eveFiltersCheck;
 
-import com.jfoenix.controls.JFXTabPane;
-import grzegorz.QBitState;
-import grzegorz.scenes.introduction.IntroductionScene;
+import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -10,7 +8,6 @@ import javafx.animation.SequentialTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

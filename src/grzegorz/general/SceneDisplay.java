@@ -1,4 +1,4 @@
-package grzegorz;
+package grzegorz.general;
 
 import com.jfoenix.controls.JFXDialog;
 import javafx.animation.Animation;

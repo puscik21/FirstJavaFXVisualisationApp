@@ -1,6 +1,6 @@
 package grzegorz.scenes.filtersCheck;
 
-import grzegorz.QBitState;
+import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
 import javafx.fxml.FXML;
