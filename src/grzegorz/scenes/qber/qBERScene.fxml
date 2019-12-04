@@ -5,174 +5,264 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
 <AnchorPane fx:id="scenePane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grzegorz.scenes.qber.QBERScene">
    <children>
-      <HBox fx:id="keyHBox" alignment="CENTER" scaleX="0.5625" scaleY="0.5625" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <padding>
-            <Insets top="50.0" />
-         </padding>
+      <VBox scaleX="0.5625" scaleY="0.5625" spacing="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="10.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="70.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="130.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="190.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="250.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="310.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="370.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="430.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="490.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="550.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="610.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="670.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="730.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="790.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="850.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="910.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="970.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1030.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1090.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1150.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1210.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1270.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1330.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1390.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1450.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1510.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1570.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1630.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1690.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1750.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-            <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="310.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../images/oneIcon.png" />
-               </image>
-            </ImageView>
-         </children></HBox>
+            <HBox fx:id="keyHBox" alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="10.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="70.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="130.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="190.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="250.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="310.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="370.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="430.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="490.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="550.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="610.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="670.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="730.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="790.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="850.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="910.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="970.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1030.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1090.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1150.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1210.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1270.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1330.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1390.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1450.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1510.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1570.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1630.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1690.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="1750.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="310.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </HBox>
+            <HBox fx:id="receivedKeyHBox" alignment="CENTER_LEFT">
+               <padding>
+                  <Insets top="50.0" />
+               </padding>
+               <children>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="10.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="70.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="130.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="190.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="250.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="310.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="370.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="430.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="490.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="550.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="610.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="670.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="730.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="790.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="850.0" layoutY="60.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/oneIcon.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

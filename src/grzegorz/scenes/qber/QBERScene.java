@@ -6,6 +6,7 @@ import grzegorz.CommentedAnimation;
 import grzegorz.SceneDisplay;
 import grzegorz.scenes.introduction.IntroductionScene;
 import javafx.animation.Animation;
+import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.event.EventHandler;
@@ -26,15 +27,24 @@ public class QBERScene {
     @FXML
     private HBox keyHBox;
 
+    @FXML
+    private HBox receivedKeyHBox;
+
     private IntroductionScene introductionController;
     private List<SceneDisplay> sceneDisplays;
 
     private int displayCounter = 0;
+    private int hBoxOffset = 2000;
     private boolean isDisplayToShow = true;
 
+
+    // TODO: 04.12.2019 load random values of bits, but make sure only one in each 16 part is wrong
+    // TODO: 04.12.2019 then add some effect (red glow?)
+    // TODO: 04.12.2019 QBER animation (transition for "qber =" and value in %) - new scene - init as dialog
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
+        receivedKeyHBox.setTranslateX(-hBoxOffset);
     }
 
     public void start(IntroductionScene introductionController) {
@@ -46,7 +56,8 @@ public class QBERScene {
     private void prepareSceneDisplays() {
         addIntroductionDialog();
         addSeparatorTransition();
-        addMoveHalfDownTransition();
+        addTakeHalfOfKeyTransition();
+        addReceiveKeyTransition();
     }
 
     private void addIntroductionDialog() {
@@ -66,21 +77,51 @@ public class QBERScene {
         return separator;
     }
 
-    private void addMoveHalfDownTransition() {
-        Animation animation = moveNodes(keyHBox, keyHBox.getChildren().size() / 2);
-        CommentedAnimation cAnimation = new CommentedAnimation(animation, null);
+    private void addTakeHalfOfKeyTransition() {
+        int firstHalfQuantity = keyHBox.getChildren().size() / 2;
+        int secondHalfQuantity = keyHBox.getChildren().size() - keyHBox.getChildren().size() / 2;
+        Animation moveNodesDownTransition = moveNodesDown(keyHBox, firstHalfQuantity);
+        Animation moveRestOfKeyAwayTransition = moveRestOfKeyAway(keyHBox, secondHalfQuantity);
+
+        ParallelTransition takeHalfOfKeyTransition = new ParallelTransition(moveNodesDownTransition, moveRestOfKeyAwayTransition);
+        CommentedAnimation cAnimation = new CommentedAnimation(takeHalfOfKeyTransition, null);
         sceneDisplays.add(new SceneDisplay(cAnimation));
     }
 
-    private ParallelTransition moveNodes(HBox hbox, int quantity) {
+    private ParallelTransition moveNodesDown(HBox hbox, int quantity) {
         Animation[] animations = new Animation[quantity];
         for (int i = 0; i < quantity; i++) {
             Node node = hbox.getChildren().get(i);
             animations[i] = getTranslateTransition(node, 0, 0, 0, 200);
         }
+        return new ParallelTransition(animations);
+    }
 
-        ParallelTransition moveDownTransition = new ParallelTransition(animations);
-        return moveDownTransition;
+    private ParallelTransition moveRestOfKeyAway(HBox hbox, int quantity){
+        int last = hbox.getChildren().size() - 1;
+        Animation[] animations = new Animation[quantity];
+        for (int i = 0; i < quantity; i++) {
+            Node node = hbox.getChildren().get(last - i);
+            TranslateTransition moveTransition = getTranslateTransition(node, 0, 0, hBoxOffset, 0);
+            moveTransition.setDuration(Duration.seconds(1));
+            moveTransition.setInterpolator(Interpolator.EASE_IN);
+            animations[i] = moveTransition;
+        }
+        return new ParallelTransition(animations);
+    }
+
+    private void addReceiveKeyTransition() {
+        double rootAndVBoxDifference = (introductionController.getRootPane().getWidth() - 0.5625 * keyHBox.getBoundsInLocal().getWidth());
+        double resultOffset = (introductionController.getRootPane().getWidth() - rootAndVBoxDifference) / 2.0;
+
+        TranslateTransition firstKeyTrans = getTranslateTransition(keyHBox, 0, 0, resultOffset, 0);
+        TranslateTransition receiveKeyTrans = getTranslateTransition(receivedKeyHBox, -hBoxOffset, 0, resultOffset, 0);
+        firstKeyTrans.setDuration(Duration.seconds(1.0));
+        receiveKeyTrans.setDuration(Duration.seconds(1.0));
+
+        ParallelTransition moveKeysTransition = new ParallelTransition(firstKeyTrans, receiveKeyTrans);
+        CommentedAnimation cAnimation = new CommentedAnimation(moveKeysTransition, null);
+        sceneDisplays.add(new SceneDisplay(cAnimation));
     }
 
     private void initMouseEvents() {
