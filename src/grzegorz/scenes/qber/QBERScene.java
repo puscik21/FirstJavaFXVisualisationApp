@@ -1,21 +1,27 @@
 package grzegorz.scenes.qber;
 
 import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.general.SceneDisplay;
 import grzegorz.scenes.introduction.IntroductionScene;
+import grzegorz.scenes.parity.ParityScene;
 import javafx.animation.*;
+import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,10 +46,16 @@ public class QBERScene {
     @FXML
     private Label resultLabel;
 
+    private final int PARITY_TAB = 4;
+    private final int AMPLIFICATION_TAB = 5;
+
     private IntroductionScene introductionController;
+    private JFXTabPane tabPane;
+    private ChangeListener<? super Number> listener;
     private List<SceneDisplay> sceneDisplays;
     private List<Image> valuesImages;
     private List<Image> valuesImagesRed;
+    private int[] keyValues;
     private Random generator;
 
     private int displayCounter = 0;
@@ -55,15 +67,61 @@ public class QBERScene {
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
+        keyValues = new int[16];
         generator = new Random();
         receivedKeyHBox.setTranslateX(-outsideOffset);
         prepareKeys();
     }
 
+    // TODO: 04.12.2019 later Quenatum scene and remove listener from Quantum scene
     public void start(IntroductionScene introductionController) {
         this.introductionController = introductionController;
+        this.tabPane = introductionController.getTabPane();
+        initMainTabPane();
         prepareSceneDisplays();
         initMouseEvents();
+    }
+
+    public int[] getKeyValues() {
+        return keyValues;
+    }
+
+    private void initMainTabPane() {
+        addTabs();
+
+        FXMLLoader explanationLoader = loadToTab(PARITY_TAB, "../parity/parityScene.fxml");
+        ParityScene parityController = explanationLoader.getController();
+
+        listener = getTabPaneListener(parityController);
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
+    }
+
+    private void addTabs() {
+        // TODO: 05.12.2019 change value later
+        if (tabPane.getTabs().size() < 5) {
+            Tab parityTab = new Tab("Parity");
+            tabPane.getTabs().add(parityTab);
+        }
+    }
+
+    private ChangeListener<? super Number> getTabPaneListener(ParityScene parityController) {
+        return (ChangeListener<Number>) (observable, oldVal, newVal) -> {
+            if (newVal.intValue() == PARITY_TAB) {
+                parityController.start(this, introductionController);
+            }
+        };
+    }
+
+    private FXMLLoader loadToTab(int tabPosition, String path) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+            Pane body = loader.load();
+            tabPane.getTabs().get(tabPosition).setContent(body);
+            return loader;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void prepareKeys() {
@@ -89,6 +147,8 @@ public class QBERScene {
             keyHBox.getChildren().add(new ImageView(valuesImages.get(bitValue)));
             if (i < 16) {
                 receivedKeyHBox.getChildren().add(new ImageView(valuesImages.get(bitValue)));
+            } else {
+                keyValues[i - 16] = bitValue;
             }
         }
     }
@@ -96,18 +156,19 @@ public class QBERScene {
     private void spoilOneBit() {
         errorBitIndex = getRandomBitValue(16);
         ImageView errorBitView = (ImageView) receivedKeyHBox.getChildren().get(errorBitIndex);
-        changeBitImage(errorBitView);
+        int bitValue = keyValues[errorBitIndex];
+        changeBitImage(errorBitView, bitValue);
     }
 
     private int getRandomBitValue(int bound) {
         return generator.nextInt(bound);
     }
 
-    private void changeBitImage(ImageView imgView) {
-        if (imgView.getImage() == valuesImages.get(0)) {
-            imgView.setImage(valuesImages.get(1));
-        } else {
+    private void changeBitImage(ImageView imgView, int bitValue) {
+        if (bitValue == 0) {
             imgView.setImage(valuesImages.get(0));
+        } else {
+            imgView.setImage(valuesImages.get(1));
         }
     }
 

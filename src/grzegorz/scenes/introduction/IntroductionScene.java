@@ -148,8 +148,12 @@ public class IntroductionScene {
         return rootAnchorPane;
     }
 
-    public ChangeListener<? super Number> getListener() {
-        return listener;
+    public JFXTabPane getTabPane() {
+        return tabPane;
+    }
+
+    public void removeTabPaneListener() {
+        tabPane.getSelectionModel().selectedIndexProperty().removeListener(listener);
     }
 
     // TODO: 26.11.2019 refactor
@@ -165,13 +169,13 @@ public class IntroductionScene {
                 "Message can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm")
                 .show();
 
-        Tab explanationTab = new Tab("Qubit explanation");
-        Tab quantumTab = new Tab("BB84");
-        tabPane.getTabs().add(explanationTab);
-        tabPane.getTabs().add(quantumTab);
-
-        Tab testTab = new Tab("test");
-        tabPane.getTabs().add(testTab);
+//        Tab explanationTab = new Tab("Qubit explanation");
+//        Tab quantumTab = new Tab("BB84");
+//        tabPane.getTabs().add(explanationTab);
+//        tabPane.getTabs().add(quantumTab);
+//
+//        Tab testTab = new Tab("test");
+//        tabPane.getTabs().add(testTab);
     }
 
     private void initEvents() {
@@ -229,29 +233,43 @@ public class IntroductionScene {
     }
 
     private void initMainTabPane() {
-        listener = (ChangeListener<Number>) (observable, oldVal, newVal) -> {
+        addTabs();
+
+        FXMLLoader explanationLoader = loadToTab(EXPLANATION_TAB, "../explanations/qBitExplanationScene.fxml");
+        FXMLLoader quantumLoader = loadToTab(INTRODUCTION_TAB, "../quantumScene/quantumScene.fxml");
+        FXMLLoader qberLoader = loadToTab(3, "../qber/qberScene.fxml"); // TODO: 04.12.2019 tests only
+        QBitExplanationScene qBitExplanationScene = explanationLoader.getController();
+        QuantumScene quantumScene = quantumLoader.getController();
+        QBERScene qberController = qberLoader.getController();
+
+        listener = getTabPaneListener(qBitExplanationScene, quantumScene, qberController);
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
+    }
+
+    private void addTabs() {
+        Tab explanationTab = new Tab("Qubit explanation");
+        Tab quantumTab = new Tab("BB84");
+        Tab testTab = new Tab("QBER");
+        tabPane.getTabs().add(explanationTab);
+        tabPane.getTabs().add(quantumTab);
+        tabPane.getTabs().add(testTab);
+    }
+
+    private ChangeListener<? super Number> getTabPaneListener(QBitExplanationScene qBitExplanationScene,QuantumScene quantumScene, QBERScene qberController) {
+        return (ChangeListener<Number>) (observable, oldVal, newVal) -> {
             if (oldVal.intValue() != 0) {
                 hideMess(aliceMess);
                 hideMess(bobMess);
             }
 
             if (newVal.intValue() == EXPLANATION_TAB) {
-                FXMLLoader loader = loadToTab(EXPLANATION_TAB, "../explanations/qBitExplanationScene.fxml");
-                QBitExplanationScene qBitExplanationScene = loader.getController();
                 qBitExplanationScene.start();
-            }
-            else if (newVal.intValue() == INTRODUCTION_TAB) {
-                FXMLLoader loader = loadToTab(INTRODUCTION_TAB, "../quantumScene/quantumScene.fxml");
-                QuantumScene quantumScene = loader.getController();
+            } else if (newVal.intValue() == INTRODUCTION_TAB) {
                 quantumScene.start(IntroductionScene.this, tabPane);
-            }
-            else if (newVal.intValue() == 3) {
-                FXMLLoader loader = loadToTab(3, "../qber/qBERScene.fxml");
-                QBERScene QBERController = loader.getController();
-                QBERController.start(this);
+            } else if (newVal.intValue() == 3) {
+                qberController.start(this);
             }
         };
-        tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
     }
 
     private FXMLLoader loadToTab(int tabPosition, String path) {

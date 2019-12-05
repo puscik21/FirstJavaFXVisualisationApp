@@ -15,7 +15,9 @@ import grzegorz.scenes.explanations.QBitExplanationScene;
 import grzegorz.scenes.filters.FiltersScene;
 import grzegorz.scenes.filtersCheck.FiltersCheckScene;
 import grzegorz.scenes.introduction.IntroductionScene;
+import grzegorz.scenes.qber.QBERScene;
 import javafx.animation.*;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -131,6 +133,7 @@ public class QuantumScene {
 
     private IntroductionScene introductionController;
     private JFXTabPane tabPane;
+    private ChangeListener<? super Number> listener;
 
 
     @FXML
@@ -168,7 +171,7 @@ public class QuantumScene {
         this.mainPane = introductionController.getRootPane();
         this.introductionController = introductionController;
         this.tabPane = tabPane;
-        tabPane.getSelectionModel().selectedIndexProperty().removeListener(introductionController.getListener());
+        introductionController.removeTabPaneListener();
         JFXDialog bb84Dialog = returnDialog("This is very popular and quite simple algorithm, so we will take it as an example.", "BB84 algorithm");
         EventHandler<? super JFXDialogEvent> currentOnCloseEvent = bb84Dialog.getOnDialogClosed();
         bb84Dialog.setOnDialogClosed(e -> {
@@ -206,6 +209,10 @@ public class QuantumScene {
 
     public void setAliceQBitsValuesAfterEve(int[] aliceQBitsValuesAfterEve) {
         this.aliceQBitsValuesAfterEve = aliceQBitsValuesAfterEve;
+    }
+
+    public void removeTabPaneListener() {
+        tabPane.getSelectionModel().selectedIndexProperty().removeListener(listener);
     }
 
     private void initEvents() {
@@ -259,7 +266,7 @@ public class QuantumScene {
     }
 
     private void initMainTabPane() {
-        tabPane.getSelectionModel().selectedIndexProperty().addListener((observableVal, oldVal, newVal) -> {
+        listener = (ChangeListener<Number>) (observable, oldVal, newVal) -> {
             // TODO: 28.11.2019 maybe remove this? maybe make flag for each tab
             if (oldVal.intValue() != 0) {
                 hideMess(aliceMess);
@@ -269,11 +276,6 @@ public class QuantumScene {
                 hideMess(bobMess);
             }
 
-            if (newVal.intValue() == EXPLANATION_TAB) {
-                FXMLLoader loader = loadToTab(EXPLANATION_TAB, "../explanations/qBitExplanationScene.fxml");
-                QBitExplanationScene qBitExplanationScene = loader.getController();
-                qBitExplanationScene.start();
-            }
             else if (newVal.intValue() == FILTERS_TAB) {
                 FXMLLoader loader = loadToTab(FILTERS_TAB, "../filters/filtersScene.fxml");
                 FiltersScene filtersController = loader.getController();
@@ -299,7 +301,13 @@ public class QuantumScene {
                 EveFiltersCheckScene filtersCheckScene = loader.getController();
                 filtersCheckScene.start(this, aliceFiltersValues, bobQBitsStates, aliceQBitsValuesAfterEve);
             }
-        });
+//            // TODO: 04.12.2019 later with good tab value
+//            else if (newVal.intValue() == 3) {
+//                FXMLLoader loader = loadToTab(3, "../qber/qberScene.fxml");
+//                QBERScene QBERController = loader.getController();
+//                QBERController.start(this);
+//            }
+        };
     }
 
     private FXMLLoader loadToTab(int tabPosition, String path) {
