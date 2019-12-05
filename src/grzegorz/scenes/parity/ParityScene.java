@@ -93,6 +93,7 @@ public class ParityScene {
 
     private void prepareSceneDisplays() {
         addReceiveKeyTransition();
+        addSearchParityTransition(1, 17, 0, 0); // +1 to indexes because of separator
     }
 
     private void addReceiveKeyTransition(){
@@ -118,6 +119,51 @@ public class ParityScene {
         moveTransition.setInterpolator(Interpolator.EASE_IN);
         moveTransition.setOnFinished(e -> keyHBox.getChildren().remove(separator));
         return moveTransition;
+    }
+
+    private void addSearchParityTransition(int from, int to, int cycle, double xOffset) {
+        if (to - from <= 2) {
+            return;
+        }
+
+        int mid = from +  (to - from) / 2;
+        ParallelTransition takeLeftTransition = moveLeftSideDown(keyHBox, from, mid, -1, cycle, xOffset);
+        ParallelTransition takeRightTransition = moveRightSideDown(keyHBox, mid, to, 1, cycle, xOffset);
+        ParallelTransition divideTransition = new ParallelTransition(takeLeftTransition, takeRightTransition);
+        sceneDisplays.add(new SceneDisplay(divideTransition));
+
+        double nextXOffset = 200 / (1 + cycle);
+        cycle++;
+        addSearchParityTransition(from, mid, cycle, xOffset - nextXOffset);
+        addSearchParityTransition(mid, to, cycle, xOffset + nextXOffset);
+    }
+
+    private ParallelTransition moveLeftSideDown(HBox hbox, int from, int to, int direction, int cycle, double xOffset) {
+        double xpath = 200 / (1 + cycle);
+        double yOffset = cycle * 100;
+
+        Animation[] animations = new Animation[to - from];
+        for (int i = from; i < to; i++) {
+            Node node = hbox.getChildren().get(i);
+            TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, xOffset + direction * xpath, yOffset + 100);
+            trans.setDuration(Duration.seconds(1.5));
+            animations[i - from] = trans;
+        }
+        return new ParallelTransition(animations);
+    }
+
+    private ParallelTransition moveRightSideDown(HBox hbox, int from, int to, int direction, int cycle, double xOffset) {
+        double xpath = 200 / (1 + cycle);
+        double yOffset = cycle * 100;
+
+        Animation[] animations = new Animation[to - from];
+        for (int i = from; i < to; i++) {
+            Node node = hbox.getChildren().get(i);
+            TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, xOffset + direction * xpath, yOffset + 100);
+            trans.setDuration(Duration.seconds(1.5));
+            animations[i - from] = trans;
+        }
+        return new ParallelTransition(animations);
     }
 
     private void initMouseEvents() {
