@@ -50,3 +50,5 @@ public class Main extends Application {
 
 // TODO: (LAST) 06.10.2019 .properties file for all comments
 // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
+
+// TODO: (LAST) 05.12.2019 Do I want it to look in ParityScene like the whole half is checked for errors

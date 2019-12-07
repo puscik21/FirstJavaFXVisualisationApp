@@ -11,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +32,12 @@ public class ParityScene {
     @FXML
     private AnchorPane scenePane;
 
+    @FXML
+    private Label leftLabel;
+
+    @FXML
+    private Label rightLabel;
+
     private IntroductionScene introductionController;
     private JFXTabPane tabPane;
     private List<SceneDisplay> sceneDisplays;
@@ -46,6 +53,8 @@ public class ParityScene {
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
+        prepareImages();
+        initiallyFillKey();
     }
 
     public void start(QBERScene qberController, IntroductionScene introductionController) {
@@ -59,12 +68,6 @@ public class ParityScene {
         showDisplay();
     }
 
-    private void prepareKey() {
-        prepareImages();
-        fillKey();
-        keyHBox.setTranslateX(-outsideOffset);
-    }
-
     private void prepareImages() {
         Image zeroIcon = new Image("grzegorz\\images\\zeroIcon.png");
         Image oneIcon = new Image("grzegorz\\images\\oneIcon.png");
@@ -76,11 +79,32 @@ public class ParityScene {
         valuesImagesRed.addAll(Arrays.asList(zeroIconRed, oneIconRed));
     }
 
-    private void fillKey() {
+    private void initiallyFillKey() {
         keyHBox.getChildren().add(getVerticalSeparator());
         for (int i = 0; i < 16; i++) {
-            int bitValue = keyValues[i];
+            int bitValue = 0;
             keyHBox.getChildren().add(new ImageView(valuesImages.get(bitValue)));
+        }
+    }
+
+    private void prepareKey() {
+        fillKey();
+        keyHBox.setTranslateX(-outsideOffset);
+    }
+
+    // TODO: 08.12.2019 move to qberscene then here and again (look if everything is ok (separator))
+    private void fillKey() {
+        for (int i = 1; i < keyHBox.getChildren().size(); i++) {
+            int bitValue = keyValues[i - 1];
+            setBitView(i, bitValue);
+        }
+    }
+
+    private void setBitView(int i, int value) {
+        Node node = keyHBox.getChildren().get(i);
+        if (node instanceof ImageView) {
+            ImageView bitView = (ImageView) keyHBox.getChildren().get(i);
+            bitView.setImage(valuesImages.get(value));
         }
     }
 
@@ -126,43 +150,40 @@ public class ParityScene {
             return;
         }
 
-        int mid = from +  (to - from) / 2;
-        ParallelTransition takeLeftTransition = moveLeftSideDown(keyHBox, from, mid, -1, cycle, xOffset);
-        ParallelTransition takeRightTransition = moveRightSideDown(keyHBox, mid, to, 1, cycle, xOffset);
-        ParallelTransition divideTransition = new ParallelTransition(takeLeftTransition, takeRightTransition);
-        sceneDisplays.add(new SceneDisplay(divideTransition));
-
+        int mid = from + (to - from) / 2;
         double nextXOffset = 200 / (1 + cycle);
+        prepareDivideTransition(from, to, cycle, xOffset);
         cycle++;
         addSearchParityTransition(from, mid, cycle, xOffset - nextXOffset);
         addSearchParityTransition(mid, to, cycle, xOffset + nextXOffset);
     }
 
-    private ParallelTransition moveLeftSideDown(HBox hbox, int from, int to, int direction, int cycle, double xOffset) {
-        double xpath = 200 / (1 + cycle);
-        double yOffset = cycle * 100;
-
-        Animation[] animations = new Animation[to - from];
-        for (int i = from; i < to; i++) {
-            Node node = hbox.getChildren().get(i);
-            TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, xOffset + direction * xpath, yOffset + 100);
-            trans.setDuration(Duration.seconds(1.5));
-            animations[i - from] = trans;
-        }
-        return new ParallelTransition(animations);
+    private void prepareDivideTransition(int from, int to, int cycle, double xOffset) {
+        int mid = from + (to - from) / 2;
+        ParallelTransition takeLeftTransition = moveBitsDown(keyHBox, leftLabel, from, mid, -1, cycle, xOffset);
+        ParallelTransition takeRightTransition = moveBitsDown(keyHBox, rightLabel, mid, to, 1, cycle, xOffset);
+        ParallelTransition divideTransition = new ParallelTransition(takeLeftTransition, takeRightTransition);
+        sceneDisplays.add(new SceneDisplay(divideTransition));
     }
 
-    private ParallelTransition moveRightSideDown(HBox hbox, int from, int to, int direction, int cycle, double xOffset) {
+    private ParallelTransition moveBitsDown(HBox hbox, Label label, int from, int to, int direction, int cycle, double xOffset) {
         double xpath = 200 / (1 + cycle);
         double yOffset = cycle * 100;
 
-        Animation[] animations = new Animation[to - from];
+        Animation[] animations = new Animation[to - from + 1];
         for (int i = from; i < to; i++) {
             Node node = hbox.getChildren().get(i);
             TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, xOffset + direction * xpath, yOffset + 100);
-            trans.setDuration(Duration.seconds(1.5));
+            trans.setDuration(Duration.seconds(1.0));
             animations[i - from] = trans;
         }
+
+        double scale = 0.5625;
+        double xInParent = hbox.getChildren().get(from + (to - from) / 2).getBoundsInParent().getMaxX();
+        double labelXOffset = (xOffset + xInParent + direction * xpath) * scale;
+        double labelYOffset = scale * (yOffset + 100);
+
+        animations[to - from] = getTranslateTransition(label, scale * xOffset,scale *  yOffset, labelXOffset, labelYOffset);
         return new ParallelTransition(animations);
     }
 

@@ -99,7 +99,7 @@ public class QBERScene {
     private void addTabs() {
         // TODO: 05.12.2019 change value later
         if (tabPane.getTabs().size() < 5) {
-            Tab parityTab = new Tab("Parity");
+            Tab parityTab = new Tab("Key reconciliation");
             tabPane.getTabs().add(parityTab);
         }
     }
