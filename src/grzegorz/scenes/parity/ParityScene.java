@@ -92,8 +92,10 @@ public class ParityScene {
         keyHBox.setTranslateX(-outsideOffset);
     }
 
-    // TODO: 08.12.2019 move to qberscene then here and again (look if everything is ok (separator))
     private void fillKey() {
+        if (keyHBox.getChildren().size() == 16) {
+            keyHBox.getChildren().add(0, getVerticalSeparator());
+        }
         for (int i = 1; i < keyHBox.getChildren().size(); i++) {
             int bitValue = keyValues[i - 1];
             setBitView(i, bitValue);
@@ -160,31 +162,54 @@ public class ParityScene {
 
     private void prepareDivideTransition(int from, int to, int cycle, double xOffset) {
         int mid = from + (to - from) / 2;
-        ParallelTransition takeLeftTransition = moveBitsDown(keyHBox, leftLabel, from, mid, -1, cycle, xOffset);
-        ParallelTransition takeRightTransition = moveBitsDown(keyHBox, rightLabel, mid, to, 1, cycle, xOffset);
+        ParallelTransition takeLeftTransition = moveBitsDown(leftLabel, from, mid, -1, cycle, xOffset);
+        ParallelTransition takeRightTransition = moveBitsDown(rightLabel, mid, to, 1, cycle, xOffset);
         ParallelTransition divideTransition = new ParallelTransition(takeLeftTransition, takeRightTransition);
         sceneDisplays.add(new SceneDisplay(divideTransition));
     }
 
-    private ParallelTransition moveBitsDown(HBox hbox, Label label, int from, int to, int direction, int cycle, double xOffset) {
+    // TODO: 08.12.2019 check if parity is correct, if yes - skip transitions, if not - change image to red in some transition, then kick that bit out
+    // TODO: 08.12.2019 then set every translation to 0?
+    // TODO: 08.12.2019 then hash function on key (15 bits -> 12 (random 12?))
+    private ParallelTransition moveBitsDown(Label label, int from, int to, int direction, int cycle, double xOffset) {
         double xpath = 200 / (1 + cycle);
         double yOffset = cycle * 100;
-
         Animation[] animations = new Animation[to - from + 1];
+
         for (int i = from; i < to; i++) {
-            Node node = hbox.getChildren().get(i);
+            Node node = keyHBox.getChildren().get(i);
             TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, xOffset + direction * xpath, yOffset + 100);
             trans.setDuration(Duration.seconds(1.0));
             animations[i - from] = trans;
         }
+        animations[to - from] = getLabelTransition(label, from, to, direction, xOffset, yOffset, xpath);
+        return new ParallelTransition(animations);
+    }
 
+    private Animation getLabelTransition(Label label, int from, int to, int direction, double xOffset, double yOffset, double nodesXPath) {
         double scale = 0.5625;
-        double xInParent = hbox.getChildren().get(from + (to - from) / 2).getBoundsInParent().getMaxX();
-        double labelXOffset = (xOffset + xInParent + direction * xpath) * scale;
+        double xInParent = keyHBox.getChildren().get(from + (to - from) / 2).getBoundsInParent().getMaxX();
+        double labelXOffset = (xOffset + xInParent + direction * nodesXPath) * scale;
         double labelYOffset = scale * (yOffset + 100);
 
-        animations[to - from] = getTranslateTransition(label, scale * xOffset,scale *  yOffset, labelXOffset, labelYOffset);
-        return new ParallelTransition(animations);
+        FadeTransition hideTransition = getHideTransition(label);
+        hideTransition.setOnFinished(e -> changeParityLabelText(label, from - 1, to - 1));
+        Animation translateTransition = getTranslateTransition(label, scale * xOffset,scale *  yOffset, labelXOffset, labelYOffset);
+        FadeTransition showTransition = getShowTransition(label);
+        return new SequentialTransition(hideTransition, translateTransition, showTransition);
+    }
+
+    private void changeParityLabelText(Label label, int from, int to) {
+        int sum = 0;
+        for (int i = from; i < to; i++) {
+            sum += keyValues[i];
+        }
+
+        if (sum % 2 == 0) {
+            label.setText("0");
+        } else {
+            label.setText("1");
+        }
     }
 
     private void initMouseEvents() {
@@ -232,6 +257,16 @@ public class ParityScene {
         transition.setToY(toY);
 
         return transition;
+    }
+
+    private FadeTransition getHideTransition(Node node) {
+        FadeTransition fadeTransition = new FadeTransition();
+        fadeTransition.setNode(node);
+        fadeTransition.setDuration(Duration.seconds(0.001));
+        fadeTransition.setFromValue(1.0);
+        fadeTransition.setToValue(0.0);
+
+        return fadeTransition;
     }
 
     private FadeTransition getShowTransition(Node node) {
