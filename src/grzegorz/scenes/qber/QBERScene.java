@@ -62,8 +62,9 @@ public class QBERScene {
     private int outsideOffset = 2000;
     private int errorBitIndex;
     private boolean isDisplayToShow = true;
+    private boolean isParitySceneLoaded = false;
 
-
+    // TODO: 08.12.2019 probably remove 2 bits
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
@@ -86,8 +87,15 @@ public class QBERScene {
         return keyValues;
     }
 
+    public int getRandomBitValue(int bound) {
+        return generator.nextInt(bound);
+    }
+
     private void initMainTabPane() {
-        addTabs();
+        if (isParitySceneLoaded) {
+            return;
+        }
+        addParityTab();
 
         FXMLLoader explanationLoader = loadToTab(PARITY_TAB, "../parity/parityScene.fxml");
         ParityScene parityController = explanationLoader.getController();
@@ -96,7 +104,7 @@ public class QBERScene {
         tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
     }
 
-    private void addTabs() {
+    private void addParityTab() {
         // TODO: 05.12.2019 change value later
         if (tabPane.getTabs().size() < 5) {
             Tab parityTab = new Tab("Key reconciliation");
@@ -158,10 +166,6 @@ public class QBERScene {
         ImageView errorBitView = (ImageView) receivedKeyHBox.getChildren().get(errorBitIndex);
         int bitValue = keyValues[errorBitIndex];
         changeBitImage(errorBitView, bitValue);
-    }
-
-    private int getRandomBitValue(int bound) {
-        return generator.nextInt(bound);
     }
 
     private void changeBitImage(ImageView imgView, int bitValue) {
