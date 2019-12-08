@@ -18,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -38,6 +39,9 @@ public class ParityScene {
     @FXML
     private Label rightLabel;
 
+    @FXML
+    private Label hashLabel;
+
     private IntroductionScene introductionController;
     private QBERScene qberController;
     private List<SceneDisplay> sceneDisplays;
@@ -53,7 +57,7 @@ public class ParityScene {
     private boolean isDisplayToShow = true;
     private boolean isErrorBitFound = false;
 
-
+    // TODO: 08.12.2019  showDisplay only in right moment (actually like one transition, not on mouse click, I guess)
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
@@ -111,6 +115,7 @@ public class ParityScene {
     private void prepareKey() {
         fillKey();
         keyHBox.setTranslateX(-outsideOffset);
+        hashLabel.setTranslateY(scenePane.getHeight() * 0.4 * 0.5625);
     }
 
     private void fillKey() {
@@ -144,6 +149,7 @@ public class ParityScene {
         addErrorBitTransition();
         addMergeBitsTransition();
         addKickErrorBitTransition();
+        addHashDialog();
     }
 
     private void addReceiveKeyTransition() {
@@ -196,7 +202,6 @@ public class ParityScene {
         sceneDisplays.add(new SceneDisplay(divideTransition));
     }
 
-    // TODO: 08.12.2019 check if parity is correct, if yes - skip transitions, if not - change image to red in some transition, then kick that bit out
     // TODO: 08.12.2019 then hash function on key (15 bits -> 12 (random 12?))
     private ParallelTransition moveBitsDown(Label label, int from, int to, int direction, int cycle, double xOffset) {
         double xpath = 200 / (1 + cycle);
@@ -220,7 +225,7 @@ public class ParityScene {
         double labelYOffset = scale * (yOffset + 100);
         int paritySum = getSum(keyValues, from - 1, to - 1);
 
-        FadeTransition hideTransition = getHideTransition(label);
+        FadeTransition hideTransition = getHideTransition(label, 0.001);
         hideTransition.setOnFinished(e -> {
             changeParityLabelText(label, paritySum);
             leftLabel.setVisible(true);
@@ -261,7 +266,7 @@ public class ParityScene {
         ImageView bitView = (ImageView) keyHBox.getChildren().get(errorBitIndex + 1);
         Image redImage = valuesImagesRed.get(keyValuesWithError[errorBitIndex]);
 
-        FadeTransition hideTransition = getHideTransition(bitView);
+        FadeTransition hideTransition = getHideTransition(bitView, 0.001);
         hideTransition.setOnFinished(e -> bitView.setImage(redImage));
         FadeTransition showTransition = getShowTransition(bitView);
         SequentialTransition errorBitTransition = new SequentialTransition(hideTransition, showTransition);
@@ -283,7 +288,7 @@ public class ParityScene {
             Node node = keyHBox.getChildren().get(i);
             double xOffset = node.getTranslateX();
             double yOffset = node.getTranslateY();
-            TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, 0, 0);
+            TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, 0, scenePane.getHeight() * 0.4);
             trans.setDuration(Duration.seconds(1.0));
             animations[i] = trans;
         }
@@ -294,9 +299,78 @@ public class ParityScene {
 
     private void addKickErrorBitTransition() {
         Node errorBitView = keyHBox.getChildren().get(errorBitIndex + 1);
-        Animation kickErrorBitTransition = getTranslateTransition(errorBitView, 0, 0, 0, outsideOffset);
+        Animation kickErrorBitTransition = getTranslateTransition(errorBitView, 0, scenePane.getHeight() * 0.4, 0, outsideOffset);
         kickErrorBitTransition.setOnFinished(e -> keyHBox.getChildren().remove(errorBitView));
         sceneDisplays.add(new SceneDisplay(kickErrorBitTransition));
+    }
+
+    private void addHashDialog() {
+        JFXDialog hashDialog = introductionController.returnDialog("Some text about hash", "Title");
+        EventHandler<? super JFXDialogEvent> currentEvent = hashDialog.getOnDialogClosed();
+        hashDialog.setOnDialogClosed(e -> {
+            currentEvent.handle(e);
+            showHashFunctionTransition();
+        });
+        sceneDisplays.add(new SceneDisplay(hashDialog));
+    }
+
+    private void showHashFunctionTransition() {
+        hashLabel.setText("Size: " + keyHBox.getChildren().size());
+        Label leftLabel = createHashLabel("H( ", 0);
+        Label rightLabel = createHashLabel(" ) ", keyHBox.getChildren().size());
+
+        Animation showHashSizeLabelTransition = getShowInvisibleNodeTransition(hashLabel);
+        Animation showLeftLabelTransition = getShowInvisibleNodeTransition(leftLabel);
+        Animation showRightLabelTransition = getShowInvisibleNodeTransition(rightLabel);
+        ParallelTransition showHashSignTransition = new ParallelTransition(showLeftLabelTransition, showRightLabelTransition, showHashSizeLabelTransition);
+        Animation hashOperationTransition = getHashOperationTransition();
+
+        SequentialTransition hashFunctionTransition = new SequentialTransition(showHashSignTransition, hashOperationTransition);
+        sceneDisplays.add(new SceneDisplay(hashFunctionTransition));
+    }
+
+    private Label createHashLabel(String text, int index) {
+        Label leftLabel = new Label(text);
+        Font font = new Font("System Bold", 60.0);
+        leftLabel.setTranslateY(scenePane.getHeight() * 0.4);
+        leftLabel.setFont(font);
+        leftLabel.setVisible(false);
+        keyHBox.getChildren().add(index, leftLabel);
+        return leftLabel;
+    }
+
+    private Animation getHashOperationTransition() {
+        ParallelTransition hideTransition = getScaleWithFadeForNodesTransition(1.0, 0.0, 0.75, keyHBox, hashLabel);
+        hideTransition.setOnFinished(e -> removeBitsForHashOperation());
+        ParallelTransition showTransition = getScaleWithFadeForNodesTransition(0.0, 1.0, 0.75, keyHBox, hashLabel);
+        SequentialTransition hashOperationTransition = new SequentialTransition(hideTransition, showTransition);
+        hashOperationTransition.setDelay(Duration.seconds(0.5));
+        return hashOperationTransition;
+    }
+
+    private void removeBitsForHashOperation() {
+        for (int i = 0; i < 3; i++) {
+            int size = keyHBox.getChildren().size();
+            int index = qberController.getRandomBitValue(size) + 1;
+            if (--index == size - 1) {
+                index--;
+            }
+            keyHBox.getChildren().remove(index);
+        }
+        hashLabel.setText("Size: " + (keyHBox.getChildren().size() - 2));
+    }
+
+    private ParallelTransition getScaleWithFadeForNodesTransition(double from, double to, double time, Node... nodes) {
+        int size = nodes.length;
+        Animation[] animations = new Animation[2 * size];
+        for (int i = 0; i < size; i++) {
+            Node node = nodes[i];
+            ScaleTransition scaleTransition = getScaleTransition(node, from, to, time);
+            FadeTransition fadeTransition = getFadeTransition(node, from, to, time);
+            animations[2 * i] = scaleTransition;
+            animations[2 * i + 1] = fadeTransition;
+        }
+        return new ParallelTransition(animations);
     }
 
     private void initMouseEvents() {
@@ -351,27 +425,41 @@ public class ParityScene {
         transition.setFromY(fromY);
         transition.setToX(toX);
         transition.setToY(toY);
-
         return transition;
     }
 
-    private FadeTransition getHideTransition(Node node) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(0.001));
-        fadeTransition.setFromValue(1.0);
-        fadeTransition.setToValue(0.0);
+    private ScaleTransition getScaleTransition(Node node, double from, double to, double time) {
+        ScaleTransition scaleTransition = new ScaleTransition();
+        scaleTransition.setNode(node);
+        scaleTransition.setDuration(Duration.seconds(time));
+        scaleTransition.setFromX(from);
+        scaleTransition.setFromY(from);
+        scaleTransition.setToX(to);
+        scaleTransition.setToY(to);
+        return scaleTransition;
+    }
 
-        return fadeTransition;
+    private SequentialTransition getShowInvisibleNodeTransition(Node node) {
+        FadeTransition hideTransition = getHideTransition(node, 0.001);
+        hideTransition.setOnFinished(e -> node.setVisible(true));
+        FadeTransition showTransition = getShowTransition(node);
+        return new SequentialTransition(hideTransition, showTransition);
+    }
+
+    private FadeTransition getHideTransition(Node node, double time) {
+        return getFadeTransition(node, 1.0, 0.0, time);
     }
 
     private FadeTransition getShowTransition(Node node) {
+        return getFadeTransition(node, 0.0, 1.0, 0.5);
+    }
+
+    private FadeTransition getFadeTransition(Node node, double from, double to, double time) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(0.5));
-        fadeTransition.setFromValue(0.0);
-        fadeTransition.setToValue(1.0);
-
+        fadeTransition.setDuration(Duration.seconds(time));
+        fadeTransition.setFromValue(from);
+        fadeTransition.setToValue(to);
         return fadeTransition;
     }
 }

@@ -23,5 +23,10 @@
             <Font name="System Bold" size="30.0" />
          </font>
       </Label>
+      <Label fx:id="hashLabel" layoutX="550.0" layoutY="223.0" text="Label" textFill="WHITE" visible="false">
+         <font>
+            <Font name="System Bold" size="40.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
