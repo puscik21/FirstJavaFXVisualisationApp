@@ -13,12 +13,12 @@
             <HBox fx:id="keyHBox" alignment="CENTER" />
          </children>
       </VBox>
-      <Label fx:id="leftLabel" layoutX="220.0" layoutY="71.0" text="0" textFill="WHITE">
+      <Label fx:id="leftLabel" layoutX="220.0" layoutY="71.0" text="0" textFill="WHITE" visible="false">
          <font>
             <Font name="System Bold" size="30.0" />
          </font>
       </Label>
-      <Label fx:id="rightLabel" layoutX="220.0" layoutY="71.0" text="0" textFill="WHITE">
+      <Label fx:id="rightLabel" layoutX="220.0" layoutY="71.0" text="0" textFill="WHITE" visible="false">
          <font>
             <Font name="System Bold" size="30.0" />
          </font>

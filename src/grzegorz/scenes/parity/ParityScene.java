@@ -1,12 +1,12 @@
 package grzegorz.scenes.parity;
 
 import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.general.SceneDisplay;
 import grzegorz.scenes.introduction.IntroductionScene;
 import grzegorz.scenes.qber.QBERScene;
 import javafx.animation.*;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
@@ -39,15 +39,19 @@ public class ParityScene {
     private Label rightLabel;
 
     private IntroductionScene introductionController;
-    private JFXTabPane tabPane;
+    private QBERScene qberController;
     private List<SceneDisplay> sceneDisplays;
     private List<Image> valuesImages;
     private List<Image> valuesImagesRed;
     private int[] keyValues;
+    private int[] keyValuesWithError;
 
     private int displayCounter = 0;
     private int outsideOffset = 2000;
+    private int keySize = 16;
+    private int errorBitIndex;
     private boolean isDisplayToShow = true;
+    private boolean isErrorBitFound = false;
 
 
     @FXML
@@ -58,13 +62,13 @@ public class ParityScene {
     }
 
     public void start(QBERScene qberController, IntroductionScene introductionController) {
+        this.qberController = qberController;
         this.introductionController = introductionController;
-        this.tabPane = introductionController.getTabPane();
         keyValues = qberController.getKeyValues();
+        prepareKeyValuesWithError();
         prepareKey();
         prepareSceneDisplays();
         initMouseEvents();
-
         showDisplay();
     }
 
@@ -87,17 +91,34 @@ public class ParityScene {
         }
     }
 
+    private void prepareKeyValuesWithError() {
+        errorBitIndex = qberController.getRandomBitValue(keySize);
+        keyValuesWithError = new int[keySize];
+        for (int i = 0; i < keySize; i++) {
+            keyValuesWithError[i] = keyValues[i];
+        }
+        changeBit(keyValuesWithError, errorBitIndex);
+    }
+
+    private void changeBit(int[] bits, int index) {
+        if (bits[index] == 1) {
+            bits[index] = 0;
+        } else {
+            bits[index] = 1;
+        }
+    }
+
     private void prepareKey() {
         fillKey();
         keyHBox.setTranslateX(-outsideOffset);
     }
 
     private void fillKey() {
-        if (keyHBox.getChildren().size() == 16) {
+        if (keyHBox.getChildren().size() == keySize) {
             keyHBox.getChildren().add(0, getVerticalSeparator());
         }
         for (int i = 1; i < keyHBox.getChildren().size(); i++) {
-            int bitValue = keyValues[i - 1];
+            int bitValue = keyValuesWithError[i - 1];
             setBitView(i, bitValue);
         }
     }
@@ -119,10 +140,13 @@ public class ParityScene {
 
     private void prepareSceneDisplays() {
         addReceiveKeyTransition();
-        addSearchParityTransition(1, 17, 0, 0); // +1 to indexes because of separator
+        addSearchParityTransition(1, keySize + 1, 0, 0); // +1 to indexes because of separator
+        addErrorBitTransition();
+        addMergeBitsTransition();
+        addKickErrorBitTransition();
     }
 
-    private void addReceiveKeyTransition(){
+    private void addReceiveKeyTransition() {
         Animation comingKeyTransition = getComingKeyTransition();
         Animation throwOutSeparatorTransition = getThrowOutSeparatorTransition();
         SequentialTransition receiveKeyTransition = new SequentialTransition(comingKeyTransition, throwOutSeparatorTransition);
@@ -148,7 +172,7 @@ public class ParityScene {
     }
 
     private void addSearchParityTransition(int from, int to, int cycle, double xOffset) {
-        if (to - from <= 2) {
+        if (to - from <= 2 || isErrorBitFound) {
             return;
         }
 
@@ -156,7 +180,11 @@ public class ParityScene {
         double nextXOffset = 200 / (1 + cycle);
         prepareDivideTransition(from, to, cycle, xOffset);
         cycle++;
-        addSearchParityTransition(from, mid, cycle, xOffset - nextXOffset);
+        isErrorBitFound = checkIfErrorIsFound(from, mid, to);
+
+        if (checkIfParityIsWrong(from - 1, mid - 1)) {
+            addSearchParityTransition(from, mid, cycle, xOffset - nextXOffset);
+        }
         addSearchParityTransition(mid, to, cycle, xOffset + nextXOffset);
     }
 
@@ -169,7 +197,6 @@ public class ParityScene {
     }
 
     // TODO: 08.12.2019 check if parity is correct, if yes - skip transitions, if not - change image to red in some transition, then kick that bit out
-    // TODO: 08.12.2019 then set every translation to 0?
     // TODO: 08.12.2019 then hash function on key (15 bits -> 12 (random 12?))
     private ParallelTransition moveBitsDown(Label label, int from, int to, int direction, int cycle, double xOffset) {
         double xpath = 200 / (1 + cycle);
@@ -191,25 +218,85 @@ public class ParityScene {
         double xInParent = keyHBox.getChildren().get(from + (to - from) / 2).getBoundsInParent().getMaxX();
         double labelXOffset = (xOffset + xInParent + direction * nodesXPath) * scale;
         double labelYOffset = scale * (yOffset + 100);
+        int paritySum = getSum(keyValues, from - 1, to - 1);
 
         FadeTransition hideTransition = getHideTransition(label);
-        hideTransition.setOnFinished(e -> changeParityLabelText(label, from - 1, to - 1));
-        Animation translateTransition = getTranslateTransition(label, scale * xOffset,scale *  yOffset, labelXOffset, labelYOffset);
+        hideTransition.setOnFinished(e -> {
+            changeParityLabelText(label, paritySum);
+            leftLabel.setVisible(true);
+            rightLabel.setVisible(true);
+        });
+        Animation translateTransition = getTranslateTransition(label, scale * xOffset, scale * yOffset, labelXOffset, labelYOffset);
         FadeTransition showTransition = getShowTransition(label);
         return new SequentialTransition(hideTransition, translateTransition, showTransition);
     }
 
-    private void changeParityLabelText(Label label, int from, int to) {
+    private boolean checkIfErrorIsFound(int from, int mid, int to) {
+        return to - mid == 2 && (checkIfParityIsWrong(from - 1, mid - 1) || checkIfParityIsWrong(mid - 1, to - 1));
+    }
+
+    private boolean checkIfParityIsWrong(int from, int to) {
+        int correctSum = getSum(keyValues, from, to);
+        int sum = getSum(keyValuesWithError, from, to);
+        return correctSum != sum;
+    }
+
+    private int getSum(int[] values, int from, int to) {
         int sum = 0;
         for (int i = from; i < to; i++) {
-            sum += keyValues[i];
+            sum += values[i];
         }
+        return sum;
+    }
 
+    private void changeParityLabelText(Label label, int sum) {
         if (sum % 2 == 0) {
             label.setText("0");
         } else {
             label.setText("1");
         }
+    }
+
+    private void addErrorBitTransition() {
+        ImageView bitView = (ImageView) keyHBox.getChildren().get(errorBitIndex + 1);
+        Image redImage = valuesImagesRed.get(keyValuesWithError[errorBitIndex]);
+
+        FadeTransition hideTransition = getHideTransition(bitView);
+        hideTransition.setOnFinished(e -> bitView.setImage(redImage));
+        FadeTransition showTransition = getShowTransition(bitView);
+        SequentialTransition errorBitTransition = new SequentialTransition(hideTransition, showTransition);
+        sceneDisplays.add(new SceneDisplay(errorBitTransition));
+    }
+
+    private void addMergeBitsTransition() {
+        Animation lastAnimation = sceneDisplays.get(sceneDisplays.size() - 1).getAnimation();
+        lastAnimation.setOnFinished(e -> {
+            leftLabel.setVisible(false);
+            rightLabel.setVisible(false);
+            returnMergeBitsTransition().play();
+        });
+    }
+
+    private ParallelTransition returnMergeBitsTransition() {
+        Animation[] animations = new Animation[keySize];
+        for (int i = 0; i < keySize; i++) {
+            Node node = keyHBox.getChildren().get(i);
+            double xOffset = node.getTranslateX();
+            double yOffset = node.getTranslateY();
+            TranslateTransition trans = getTranslateTransition(node, xOffset, yOffset, 0, 0);
+            trans.setDuration(Duration.seconds(1.0));
+            animations[i] = trans;
+        }
+        ParallelTransition mergeBitsTransition = new ParallelTransition(animations);
+        mergeBitsTransition.setDelay(Duration.seconds(1.0));
+        return mergeBitsTransition;
+    }
+
+    private void addKickErrorBitTransition() {
+        Node errorBitView = keyHBox.getChildren().get(errorBitIndex + 1);
+        Animation kickErrorBitTransition = getTranslateTransition(errorBitView, 0, 0, 0, outsideOffset);
+        kickErrorBitTransition.setOnFinished(e -> keyHBox.getChildren().remove(errorBitView));
+        sceneDisplays.add(new SceneDisplay(kickErrorBitTransition));
     }
 
     private void initMouseEvents() {
@@ -230,12 +317,10 @@ public class ParityScene {
     private void useSceneDisplay(SceneDisplay sceneDisplay) {
         if (sceneDisplay.getState().equals("animation")) {
             Animation animation = sceneDisplay.getAnimation();
-            animation.setOnFinished(e -> isDisplayToShow = true);
-            animation.play();
+            playAnimation(animation);
         } else if (sceneDisplay.getState().equals("cAnimation")) {
             Animation animation = sceneDisplay.getCAnimation().getAnimation();
-            animation.setOnFinished(e -> isDisplayToShow = true);
-            animation.play();
+            playAnimation(animation);
         } else {
             JFXDialog dialog = sceneDisplay.getDialog();
             EventHandler<? super JFXDialogEvent> currentEvent = dialog.getOnDialogClosed();
@@ -245,6 +330,17 @@ public class ParityScene {
             });
             dialog.show();
         }
+    }
+
+    private void playAnimation(Animation animation) {
+        EventHandler<ActionEvent> currentEvent = animation.getOnFinished();
+        animation.setOnFinished(e -> {
+            if (currentEvent != null) {
+                currentEvent.handle(e);
+            }
+            isDisplayToShow = true;
+        });
+        animation.play();
     }
 
     private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
