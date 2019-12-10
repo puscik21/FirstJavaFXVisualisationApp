@@ -96,6 +96,7 @@ public class QuantumScene {
     private final int EVE_FILTERS_TAB = 5;
     private final int ALICE_AFTER_EVE_FILTERS_TAB = 6;
     private final int EVE_FILTERS_CHECK_TAB = 7;
+    private final int QBER_TAB = 8;
 
     private final double TABS_Y = 50;
     private final double TABS_FOURTH_X = 560;
@@ -148,10 +149,10 @@ public class QuantumScene {
         eighthHighlightCircle = getHighlightCircle(TABS_EIGHT_X, TABS_Y);
     }
 
-    public void start(IntroductionScene introductionController, JFXTabPane tabPane) {
-        this.mainPane = introductionController.getRootPane();
+    public void start(IntroductionScene introductionController) {
         this.introductionController = introductionController;
-        this.tabPane = tabPane;
+        this.mainPane = introductionController.getRootPane();
+        this.tabPane = introductionController.getTabPane();
         introductionController.removeTabPaneListener();
         JFXDialog bb84Dialog = returnDialog("This is very popular and quite simple algorithm, so we will take it as an example.", "BB84 algorithm");
         EventHandler<? super JFXDialogEvent> currentOnCloseEvent = bb84Dialog.getOnDialogClosed();
@@ -194,6 +195,10 @@ public class QuantumScene {
 
     public void removeTabPaneListener() {
         tabPane.getSelectionModel().selectedIndexProperty().removeListener(listener);
+    }
+
+    public JFXTabPane getTabPane() {
+        return tabPane;
     }
 
     private void initEvents() {
@@ -256,7 +261,7 @@ public class QuantumScene {
                 hideMess(bobMess);
             }
 
-            else if (newVal.intValue() == FILTERS_TAB) {
+            if (newVal.intValue() == FILTERS_TAB) {
                 FXMLLoader loader = loadToTab(FILTERS_TAB, "../filters/filtersScene.fxml");
                 FiltersScene filtersController = loader.getController();
                 filtersController.start(this, bobQBitsStates, aliceFiltersValues);
@@ -280,14 +285,33 @@ public class QuantumScene {
                 FXMLLoader loader = loadToTab(EVE_FILTERS_CHECK_TAB, "../eveFiltersCheck/EveFiltersCheckScene.fxml");
                 EveFiltersCheckScene filtersCheckScene = loader.getController();
                 filtersCheckScene.start(this, aliceFiltersValues, bobQBitsStates, aliceQBitsValuesAfterEve);
+                addQberTab();
             }
-//            // TODO: 04.12.2019 later with good tab value
-//            else if (newVal.intValue() == 3) {
-//                FXMLLoader loader = loadToTab(3, "../qber/qberScene.fxml");
-//                QBERScene QBERController = loader.getController();
-//                QBERController.start(this);
-//            }
+            else if (newVal.intValue() == QBER_TAB) {
+                FXMLLoader loader = loadToTab(QBER_TAB, "../qber/qberScene.fxml");
+                QBERScene QBERController = loader.getController();
+                QBERController.start(this);
+            }
         };
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(getExplanationTabListener());
+    }
+
+    public ChangeListener<? super Number> getExplanationTabListener() {
+        return (ChangeListener<Number>) (observable, oldVal, newVal) -> {
+            if (newVal.intValue() == EXPLANATION_TAB) {
+                FXMLLoader loader = loadToTab(EXPLANATION_TAB, "../explanations/qBitExplanationScene.fxml");
+                QBitExplanationScene explanationScene = loader.getController();
+                explanationScene.start();
+            }
+        };
+    }
+
+    private void addQberTab() {
+        if (tabPane.getTabs().size() < QBER_TAB + 1) {
+            Tab qberTab = new Tab("QBER");
+            tabPane.getTabs().add(qberTab);
+        }
     }
 
     private FXMLLoader loadToTab(int tabPosition, String path) {
@@ -309,7 +333,7 @@ public class QuantumScene {
             AnchorPane body = loader.load();
             tabPane.getTabs().get(2).setContent(body);
             QuantumScene quantumScene = loader.getController();
-            quantumScene.start(introductionController, tabPane);
+            quantumScene.start(introductionController);
             hideMess(bobMess);
             showButton.setDisable(false);
         } catch (IOException e) {
@@ -737,7 +761,7 @@ public class QuantumScene {
         return returnDialog(message, "");
     }
 
-    private JFXDialog returnDialog(String message, String title) {
+    public JFXDialog returnDialog(String message, String title) {
         return introductionController.returnDialog(message, title);
     }
 

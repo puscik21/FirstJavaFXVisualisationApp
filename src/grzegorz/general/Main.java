@@ -8,12 +8,13 @@ import javafx.stage.Stage;
 
 
 // TODO: 10.12.2019 FOR NOW
+//  merge scenes
 //  swap Alice with Bob
-//  resizing
-//  fix transited objects
-//  refresh for every scene
 //  circles (probably arrows) on every scene
 //  check every comment
+//  resizing
+//  fix transited objects
+//  refresh for every scene - then its required to calculate every qbit and filter value in the IntroductionScene
 //  in EveFiltersCheckScene and FiltersCheckScene highlight rows that are incorrect (some1 was eavesdropping)
 
 public class Main extends Application {
@@ -41,8 +42,11 @@ public class Main extends Application {
 //  something why it works
 
 // TODO: 10.12.2019 EVENTUALLY
+//  In EveFiltersCheckScene for every wrong row transition move it outside the scene then remove
 //  think about something like preparation of every qbits/filters values on quantum scene start and then only get them by getters
 //  try to make reloadScene for every tab by pressing MenuItem (or by replay button (showButton))
+//  way to move slider of tabpane
+//  disable tabPane buttons when circle animation is being played
 
 
 // TODO: 10.12.2019 EVEN MORE EVENTUALLY

@@ -3,8 +3,8 @@ package grzegorz.scenes.parity;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.general.SceneDisplay;
-import grzegorz.scenes.introduction.IntroductionScene;
 import grzegorz.scenes.qber.QBERScene;
+import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -43,7 +43,7 @@ public class ParityScene {
     @FXML
     private Label hashLabel;
 
-    private IntroductionScene introductionController;
+    private QuantumScene quantumController;
     private QBERScene qberController;
     private List<SceneDisplay> sceneDisplays;
     private List<Image> valuesImages;
@@ -65,9 +65,9 @@ public class ParityScene {
         initiallyFillKey();
     }
 
-    public void start(QBERScene qberController, IntroductionScene introductionController) {
+    public void start(QBERScene qberController, QuantumScene quantumController) {
         this.qberController = qberController;
-        this.introductionController = introductionController;
+        this.quantumController = quantumController;
         keyValues = qberController.getKeyValues();
         prepareKeyValuesWithError();
         prepareKey();
@@ -322,7 +322,7 @@ public class ParityScene {
     }
 
     private void addHashDialog() {
-        JFXDialog hashDialog = introductionController.returnDialog("Some text about hash", "Title");
+        JFXDialog hashDialog = quantumController.returnDialog("Some text about hash", "Title");
         EventHandler<? super JFXDialogEvent> currentEvent = hashDialog.getOnDialogClosed();
         hashDialog.setOnDialogClosed(e -> {
             currentEvent.handle(e);

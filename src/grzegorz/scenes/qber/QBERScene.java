@@ -4,10 +4,11 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.general.SceneDisplay;
-import grzegorz.scenes.introduction.IntroductionScene;
 import grzegorz.scenes.parity.ParityScene;
+import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -46,10 +47,9 @@ public class QBERScene {
     @FXML
     private Label resultLabel;
 
-    private final int PARITY_TAB = 4;
-    private final int AMPLIFICATION_TAB = 5;
+    private final int PARITY_TAB = 9;
 
-    private IntroductionScene introductionController;
+    private QuantumScene quantumController;
     private JFXTabPane tabPane;
     private ChangeListener<? super Number> listener;
     private List<SceneDisplay> sceneDisplays;
@@ -73,11 +73,10 @@ public class QBERScene {
         receivedKeyHBox.setTranslateX(-outsideOffset);
         prepareKeys();
     }
-
-    // TODO: 04.12.2019 later Quenatum scene and remove listener from Quantum scene
-    public void start(IntroductionScene introductionController) {
-        this.introductionController = introductionController;
-        this.tabPane = introductionController.getTabPane();
+    
+    public void start(QuantumScene quantumController) {
+        this.quantumController = quantumController;
+        this.tabPane = quantumController.getTabPane();
         initMainTabPane();
         prepareSceneDisplays();
         initMouseEvents();
@@ -89,47 +88,6 @@ public class QBERScene {
 
     public int getRandomBitValue(int bound) {
         return generator.nextInt(bound);
-    }
-
-    private void initMainTabPane() {
-        if (isParitySceneLoaded) {
-            return;
-        }
-        addParityTab();
-
-        FXMLLoader explanationLoader = loadToTab(PARITY_TAB, "../parity/parityScene.fxml");
-        ParityScene parityController = explanationLoader.getController();
-
-        listener = getTabPaneListener(parityController);
-        tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
-    }
-
-    private void addParityTab() {
-        // TODO: 05.12.2019 change value later
-        if (tabPane.getTabs().size() < 5) {
-            Tab parityTab = new Tab("Key reconciliation");
-            tabPane.getTabs().add(parityTab);
-        }
-    }
-
-    private ChangeListener<? super Number> getTabPaneListener(ParityScene parityController) {
-        return (ChangeListener<Number>) (observable, oldVal, newVal) -> {
-            if (newVal.intValue() == PARITY_TAB) {
-                parityController.start(this, introductionController);
-            }
-        };
-    }
-
-    private FXMLLoader loadToTab(int tabPosition, String path) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
-            Pane body = loader.load();
-            tabPane.getTabs().get(tabPosition).setContent(body);
-            return loader;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void prepareKeys() {
@@ -176,6 +134,47 @@ public class QBERScene {
         }
     }
 
+    private void initMainTabPane() {
+        if (isParitySceneLoaded) {
+            return;
+        }
+
+        addParityTab();
+        FXMLLoader explanationLoader = loadToParityTab();
+        ParityScene parityController = explanationLoader.getController();
+
+        listener = getParityTabListener(parityController);
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(quantumController.getExplanationTabListener());
+    }
+
+    private void addParityTab() {
+        if (tabPane.getTabs().size() < PARITY_TAB + 1) {
+            Tab parityTab = new Tab("Key reconciliation");
+            tabPane.getTabs().add(parityTab);
+        }
+    }
+
+    private FXMLLoader loadToParityTab() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../parity/parityScene.fxml"));
+            Pane body = loader.load();
+            tabPane.getTabs().get(PARITY_TAB).setContent(body);
+            return loader;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private ChangeListener<? super Number> getParityTabListener(ParityScene parityController) {
+        return (ChangeListener<Number>) (observable, oldVal, newVal) -> {
+            if (newVal.intValue() == PARITY_TAB) {
+                parityController.start(this, quantumController);
+            }
+        };
+    }
+
     private void prepareSceneDisplays() {
         addIntroductionDialog();
         addCompareKeysTransition();
@@ -184,7 +183,7 @@ public class QBERScene {
     }
 
     private void addIntroductionDialog() {
-        JFXDialog dialog = introductionController.returnDialog("Some info", "Title");
+        JFXDialog dialog = quantumController.returnDialog("Some info", "Title");
         sceneDisplays.add(new SceneDisplay(dialog));
     }
 
@@ -259,7 +258,7 @@ public class QBERScene {
     }
 
     private void addQBERDialog() {
-        JFXDialog dialog = introductionController.returnDialog("Search for errors and measure Quantum Bit Error Rate");
+        JFXDialog dialog = quantumController.returnDialog("Search for errors and measure Quantum Bit Error Rate");
         EventHandler<? super JFXDialogEvent> currentEvent = dialog.getOnDialogClosed();
         dialog.setOnDialogClosed(e -> {
             currentEvent.handle(e);
@@ -324,12 +323,10 @@ public class QBERScene {
     private void useSceneDisplay(SceneDisplay sceneDisplay) {
         if (sceneDisplay.getState().equals("animation")) {
             Animation animation = sceneDisplay.getAnimation();
-            animation.setOnFinished(e -> isDisplayToShow = true);
-            animation.play();
+            playAnimation(animation);
         } else if (sceneDisplay.getState().equals("cAnimation")) {
             Animation animation = sceneDisplay.getCAnimation().getAnimation();
-            animation.setOnFinished(e -> isDisplayToShow = true);
-            animation.play();
+            playAnimation(animation);
         } else {
             JFXDialog dialog = sceneDisplay.getDialog();
             EventHandler<? super JFXDialogEvent> currentEvent = dialog.getOnDialogClosed();
@@ -339,6 +336,17 @@ public class QBERScene {
             });
             dialog.show();
         }
+    }
+
+    private void playAnimation(Animation animation) {
+        EventHandler<ActionEvent> currentEvent = animation.getOnFinished();
+        animation.setOnFinished(e -> {
+            if (currentEvent != null) {
+                currentEvent.handle(e);
+            }
+            isDisplayToShow = true;
+        });
+        animation.play();
     }
 
     private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {

@@ -8,7 +8,6 @@ import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.general.CommentedAnimation;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
-import grzegorz.scenes.qber.QBERScene;
 import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
@@ -95,7 +94,7 @@ public class IntroductionScene {
     private final double START_PANE_HEIGHT = 710;
 
     private final int EXPLANATION_TAB = 1;
-    private final int INTRODUCTION_TAB = 2;
+    private final int QUANTUM_TAB = 2;
 
     private final double TABS_Y = 50;
     private final double TABS_FIRST_X = 53;
@@ -133,7 +132,6 @@ public class IntroductionScene {
         tabPane.getSelectionModel().selectedIndexProperty().removeListener(listener);
     }
 
-    // TODO: 26.11.2019 refactor
     @FXML
     private void initialize() {
         initEvents();
@@ -205,26 +203,22 @@ public class IntroductionScene {
         addTabs();
 
         FXMLLoader explanationLoader = loadToTab(EXPLANATION_TAB, "../explanations/qBitExplanationScene.fxml");
-        FXMLLoader quantumLoader = loadToTab(INTRODUCTION_TAB, "../quantumScene/quantumScene.fxml");
-        FXMLLoader qberLoader = loadToTab(3, "../qber/qberScene.fxml"); // TODO: 04.12.2019 tests only
+        FXMLLoader quantumLoader = loadToTab(QUANTUM_TAB, "../quantumScene/quantumScene.fxml");
         QBitExplanationScene qBitExplanationScene = explanationLoader.getController();
         QuantumScene quantumScene = quantumLoader.getController();
-        QBERScene qberController = qberLoader.getController();
 
-        listener = getTabPaneListener(qBitExplanationScene, quantumScene, qberController);
+        listener = getTabPaneListener(qBitExplanationScene, quantumScene);
         tabPane.getSelectionModel().selectedIndexProperty().addListener(listener);
     }
 
     private void addTabs() {
         Tab explanationTab = new Tab("Qubit explanation");
         Tab quantumTab = new Tab("BB84");
-        Tab testTab = new Tab("QBER");
         tabPane.getTabs().add(explanationTab);
         tabPane.getTabs().add(quantumTab);
-        tabPane.getTabs().add(testTab);
     }
 
-    private ChangeListener<? super Number> getTabPaneListener(QBitExplanationScene qBitExplanationScene, QuantumScene quantumScene, QBERScene qberController) {
+    private ChangeListener<? super Number> getTabPaneListener(QBitExplanationScene qBitExplanationScene, QuantumScene quantumScene) {
         return (ChangeListener<Number>) (observable, oldVal, newVal) -> {
             if (oldVal.intValue() != 0) {
                 hideMess(aliceMess);
@@ -233,10 +227,8 @@ public class IntroductionScene {
 
             if (newVal.intValue() == EXPLANATION_TAB) {
                 qBitExplanationScene.start();
-            } else if (newVal.intValue() == INTRODUCTION_TAB) {
-                quantumScene.start(IntroductionScene.this, tabPane);
-            } else if (newVal.intValue() == 3) {
-                qberController.start(this);
+            } else if (newVal.intValue() == QUANTUM_TAB) {
+                quantumScene.start(IntroductionScene.this);
             }
         };
     }
