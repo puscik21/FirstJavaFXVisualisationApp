@@ -235,8 +235,8 @@ public class FiltersScene {
             if (!comparisonStarted && e.getButton() == MouseButton.PRIMARY) {
                 compare(0);
             } else if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Alice sends randomly chosen qubits for key establishment. \n" +
-                        "if Bob choose the wrong basis of detector \n" +
+                showDialog("Bob sends randomly chosen qubits for key establishment. \n" +
+                        "if Alice choose the wrong basis of detector \n" +
                         "photon will take 1 or 0 value with probability of 50%");
             }
         });
@@ -244,21 +244,21 @@ public class FiltersScene {
         qBitHBox.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 e.consume();
-                showDialog("Randomly chosen qubits by Alice");
+                showDialog("Randomly chosen qubits by Bob");
             }
         });
 
         filterHBox.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 e.consume();
-                showDialog("Randomly chosen detectors by Bob");
+                showDialog("Randomly chosen detectors by Alice");
             }
         });
 
         valuesHBox.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 e.consume();
-                showDialog("Result key that Bob receive");
+                showDialog("Result key that Alice receive");
             }
         });
     }
@@ -337,9 +337,9 @@ public class FiltersScene {
     }
 
     private int rotateQBit(int compNumber) {
-        QBitState bobQBit = sentQBitsStates[compNumber];
+        QBitState AliceQBit = sentQBitsStates[compNumber];
         QBitState eveQBit = eveQBits[compNumber];
-        int direction = bobQBit.getDirectionToState(eveQBit);
+        int direction = AliceQBit.getDirectionToState(eveQBit);
 
         RotateTransition transition = getRotateTransition(qBitImage, direction);
         transition.play();

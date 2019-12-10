@@ -38,8 +38,8 @@ public class FiltersCheckScene {
     private ArrayList<Image> filterImages;
     private ArrayList<Image> photonImages;
     private ArrayList<Image> valuesImages;
-    private int[] aliceFilters;
-    private QBitState[] bobQBitStates;
+    private int[] bobFilters;
+    private QBitState[] aliceQBitStates;
 
     private QuantumScene parentController;
     private DropShadow borderGlow;
@@ -48,10 +48,10 @@ public class FiltersCheckScene {
     private double timeScale = 4.0;
 
 
-    public void start(QuantumScene parentController, int[] aliceFilters, QBitState[] bobQBitStates) {
+    public void start(QuantumScene parentController, int[] bobFilters, QBitState[] aliceQBitStates) {
         this.parentController = parentController;
-        this.aliceFilters = aliceFilters;
-        this.bobQBitStates = bobQBitStates;
+        this.bobFilters = bobFilters;
+        this.aliceQBitStates = aliceQBitStates;
 
         prepareScene();
         scheduleAnimationStart();
@@ -89,7 +89,7 @@ public class FiltersCheckScene {
     }
 
     private void addImageViews() {
-        int quantity = aliceFilters.length;
+        int quantity = bobFilters.length;
         for (int i = 0; i < quantity; i++) {
             filtersVBox.getChildren().add(new ImageView(filterImages.get(0)));
             qBitsVBox.getChildren().add(new ImageView(photonImages.get(0)));
@@ -99,7 +99,7 @@ public class FiltersCheckScene {
 
     private void addValueImageView(int i) {
         ImageView valView;
-        if (bobQBitStates[i].isFilterWrong(aliceFilters[i])) {
+        if (aliceQBitStates[i].isFilterWrong(bobFilters[i])) {
             valView = new ImageView(valuesImages.get(3));
         } else {
             valView = new ImageView(valuesImages.get(2));
@@ -144,7 +144,7 @@ public class FiltersCheckScene {
 
     private void prepareQBitsHBox() {
         for (int i = 0; i < qBitsVBox.getChildren().size(); i++) {
-            int imageNumber = bobQBitStates[i].getState();
+            int imageNumber = aliceQBitStates[i].getState();
             ImageView imageView = (ImageView) qBitsVBox.getChildren().get(i);
             imageView.setImage(photonImages.get(imageNumber));
         }
@@ -152,7 +152,7 @@ public class FiltersCheckScene {
 
     private void prepareFiltersHBox() {
         for (int i = 0; i < filtersVBox.getChildren().size(); i++) {
-            int imageNumber = aliceFilters[i];
+            int imageNumber = bobFilters[i];
             ImageView imageView = (ImageView) filtersVBox.getChildren().get(i);
             imageView.setImage(filterImages.get(imageNumber));
         }
@@ -208,7 +208,7 @@ public class FiltersCheckScene {
         ArrayList<Integer> indexesOfCorrect = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
-            if (!bobQBitStates[i].isFilterWrong(aliceFilters[i])) {
+            if (!aliceQBitStates[i].isFilterWrong(bobFilters[i])) {
                 indexesOfCorrect.add(i);
             }
             Node node = ticksVBox.getChildren().get(i);
@@ -233,7 +233,7 @@ public class FiltersCheckScene {
         Animation[] transitions = new Animation[indexes.size()];
         int counter = 0;
         for (int i : indexes) {
-            int qBitVal = bobQBitStates[i].getValue();
+            int qBitVal = aliceQBitStates[i].getValue();
             ImageView node = (ImageView) ticksVBox.getChildren().get(i);
             SequentialTransition transition = getChangeNumberTransition(node, qBitVal);
             transitions[counter] = transition;

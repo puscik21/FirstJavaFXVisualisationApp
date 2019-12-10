@@ -73,7 +73,7 @@ public class EveFiltersScene {
         initListeners();
     }
 
-    public void startAliceScenario(QuantumScene parentController, QBitState[] originalQBits, QBitState[] sentQBitsStates, int[] filtersValues) {
+    public void startBobScenario(QuantumScene parentController, QBitState[] originalQBits, QBitState[] sentQBitsStates, int[] filtersValues) {
         this.parentController = parentController;
         this.originalQBits = originalQBits;
         isEveScenario = false;
@@ -139,7 +139,7 @@ public class EveFiltersScene {
         for (int i = 0; i < size; i++) {
             aliceQBitsValuesAfterEve[i] = eveQBits[i].getValue();
         }
-        parentController.setAliceQBitsValuesAfterEve(aliceQBitsValuesAfterEve);
+        parentController.setBobQBitsValuesAfterEve(aliceQBitsValuesAfterEve);
     }
 
     public void startEveScenario(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues) {

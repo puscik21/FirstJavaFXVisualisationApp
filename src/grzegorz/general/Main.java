@@ -8,7 +8,6 @@ import javafx.stage.Stage;
 
 
 // TODO: 10.12.2019 FOR NOW
-//  merge scenes
 //  swap Alice with Bob
 //  circles (probably arrows) on every scene
 //  check every comment
