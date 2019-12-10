@@ -37,24 +37,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class IntroductionScene {
-
-    // TODO przerozne roznosci
-    // ###############################
-    // tooltip
-//        Tooltip envelopeToolTip = new Tooltip("This is encrypted message");
-//        Tooltip.install(image, envelopeToolTip);
-
-    // fitProperty
-//        image1.fitWidthProperty().bind(imagePane2.widthProperty());
-//        image1.fitHeightProperty().bind(imagePane2.heightProperty());
-
-    // dialog button
-//        JFXButton button = new JFXButton("Click me!");
-//        button.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> dialog.close());
-//        dialogLayout.setActions(button);
-    // ###############################
-
-
     @FXML
     private StackPane rootPane;
 
@@ -109,9 +91,6 @@ public class IntroductionScene {
     @FXML
     private StackPane commentPane;
 
-    // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
-    //  primaryStage.setOnShowing(event -> {});     - try it
-    //  after initialize call method start I guess and take good value
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
 
@@ -133,8 +112,6 @@ public class IntroductionScene {
     private boolean nextIsDialog = false;
     private boolean animationsShowed = false;
 
-    // TODO: 26.11.2019 some flags(?) to recognize what tab has been closed
-    
     private Circle secondHighlightCircle;
     private Circle thirdHighlightCircle;
     private DropShadow borderGlow;
@@ -168,14 +145,6 @@ public class IntroductionScene {
                 "Alice and Bob have two keys - public and private. \nAlice use Ben's public key to send the message to him \n" +
                 "Message can be decrypted only with Bob's private key, which only Bob knows", "RSA algorithm")
                 .show();
-
-//        Tab explanationTab = new Tab("Qubit explanation");
-//        Tab quantumTab = new Tab("BB84");
-//        tabPane.getTabs().add(explanationTab);
-//        tabPane.getTabs().add(quantumTab);
-//
-//        Tab testTab = new Tab("test");
-//        tabPane.getTabs().add(testTab);
     }
 
     private void initEvents() {
@@ -255,7 +224,7 @@ public class IntroductionScene {
         tabPane.getTabs().add(testTab);
     }
 
-    private ChangeListener<? super Number> getTabPaneListener(QBitExplanationScene qBitExplanationScene,QuantumScene quantumScene, QBERScene qberController) {
+    private ChangeListener<? super Number> getTabPaneListener(QBitExplanationScene qBitExplanationScene, QuantumScene quantumScene, QBERScene qberController) {
         return (ChangeListener<Number>) (observable, oldVal, newVal) -> {
             if (oldVal.intValue() != 0) {
                 hideMess(aliceMess);
@@ -602,7 +571,7 @@ public class IntroductionScene {
         return dialog;
     }
 
-    private void showCommentDialog(String message) {
+    public void showCommentDialog(String message) {
         removeCommentDialog();
 
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
@@ -614,7 +583,7 @@ public class IntroductionScene {
         dialog.show();
     }
 
-    private void removeCommentDialog() {
+    public void removeCommentDialog() {
         if (commentPane.getChildren().size() > 0) {
             Node comment = commentPane.getChildren().get(0);
             TranslateTransition moveTrans = getTranslateTransition(comment, 0, 0, 0, 2000);

@@ -448,7 +448,6 @@ public class FiltersScene {
         return result;
     }
 
-    // TODO: 05.10.2019 1 class with many general methods like this one
     private void showDialog(String message) {
         BoxBlur blurEffect = new BoxBlur(3, 3, 3);
 

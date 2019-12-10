@@ -47,7 +47,7 @@ public class FiltersCheckScene {
     private double sizeScale = 1.0;
     private double timeScale = 4.0;
 
-    // TODO: 22.11.2019 check incorrect, but when everyone matches write some info
+
     public void start(QuantumScene parentController, int[] aliceFilters, QBitState[] bobQBitStates) {
         this.parentController = parentController;
         this.aliceFilters = aliceFilters;

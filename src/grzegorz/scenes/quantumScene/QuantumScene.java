@@ -87,9 +87,6 @@ public class QuantumScene {
     private StackPane commentPane;
 
     private StackPane mainPane;
-    // TODO: 10.10.2019 Eventually change that height and width values (or method to receive them)
-    //  primaryStage.setOnShowing(event -> {});     - try it
-    //  after initialize call method start I guess and take good value
     private final double START_PANE_WIDTH = 1076;
     private final double START_PANE_HEIGHT = 710;
 
@@ -115,7 +112,6 @@ public class QuantumScene {
     private boolean animationsShowed = false;
     private boolean isUserInput;
 
-    // TODO: 22.11.2019 special flag for every tab telling when showButton can be enabled
     private QBitState[] bobQBitsStates;
     private QBitState[] eveQBitsStates;
     private int[] aliceFiltersValues;
@@ -150,21 +146,6 @@ public class QuantumScene {
         sixthHighlightCircle = getHighlightCircle(TABS_SIXTH_X, TABS_Y);
         seventhHighlightCircle = getHighlightCircle(TABS_SEVEN_X, TABS_Y);
         eighthHighlightCircle = getHighlightCircle(TABS_EIGHT_X, TABS_Y);
-
-        // TODO: 13.10.2019
-        //  send back part of the current key to make sure that no one is eavesdropping
-        //  eavesdropper and why he cannot read qubits in quantum cable (?)
-
-// TODO: 12.11.2019 (tests) TBR
-
-//         filters
-//        isUserInput = true;
-//        enterCombinationDialog = returnEnterCombinationDialog();
-//        enterCombinationDialog.show();
-//        Tab filterTab1 = new Tab("Test tab");
-//        tabPane.getTabs().add(filterTab1);
-//        Tab filterTab2 = new Tab("Test tab");
-//        tabPane.getTabs().add(filterTab2);
     }
 
     public void start(IntroductionScene introductionController, JFXTabPane tabPane) {
@@ -267,7 +248,6 @@ public class QuantumScene {
 
     private void initMainTabPane() {
         listener = (ChangeListener<Number>) (observable, oldVal, newVal) -> {
-            // TODO: 28.11.2019 maybe remove this? maybe make flag for each tab
             if (oldVal.intValue() != 0) {
                 hideMess(aliceMess);
                 hideMess(bobMess);
@@ -529,7 +509,7 @@ public class QuantumScene {
         sceneCAnimations.add(sendKeyCAnimation);
     }
 
-    private void prepareAliceSendFiltersAfterEveAnimation() {       // TODO: 22.11.2019 same as  "prepareAliceSendFiltersAnimation" just need proper circle as parameter
+    private void prepareAliceSendFiltersAfterEveAnimation() {
         ScaleTransition showMessTrans = getScaleTransition(aliceMess, 0.0, 1.0, 0.25);
         SequentialTransition sendingTrans = getAliceReturnTransition();
         sendingTrans.setOnFinished(e -> {
@@ -753,50 +733,20 @@ public class QuantumScene {
         return fadeTransition;
     }
 
-    // TODO: 03.12.2019 use it from introduction scene
     public JFXDialog returnDialog(String message) {
         return returnDialog(message, "");
     }
 
-    public JFXDialog returnDialog(String message, String title) {
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        if (!title.isEmpty()) {
-            dialogLayout.setHeading(new Text(title));
-        }
-        Text text = new Text(message);
-//        text.setWrappingWidth(START_PANE_WIDTH / 1.5);
-        dialogLayout.setBody(text);
-
-        JFXDialog dialog = new JFXDialog(mainPane, dialogLayout, JFXDialog.DialogTransition.TOP);
-        dialog.setOnDialogOpened(e -> addSceneBlurEffect());
-        dialog.setOnDialogClosed(e -> removeSceneEffects());
-        return dialog;
+    private JFXDialog returnDialog(String message, String title) {
+        return introductionController.returnDialog(message, title);
     }
 
     private void showCommentDialog(String message) {
-        removeCommentDialog();
-
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        Text text = new Text(message);
-        text.setWrappingWidth(commentPane.getWidth());
-        dialogLayout.setBody(text);
-
-        JFXDialog dialog = new JFXDialog(commentPane, dialogLayout, JFXDialog.DialogTransition.LEFT);
-        dialog.show();
+        introductionController.showCommentDialog(message);
     }
 
     private void removeCommentDialog() {
-        if (commentPane.getChildren().size() > 0) {
-            Node comment = commentPane.getChildren().get(0);
-            TranslateTransition moveTrans = getTranslateTransition(comment, 0, 0, 0, 2000);
-            moveTrans.setInterpolator(Interpolator.EASE_IN);
-            moveTrans.setDuration(Duration.seconds(1));
-            FadeTransition fadeTrans = getFadeTransition(comment);
-
-            ParallelTransition commentRemovalAnim = new ParallelTransition(moveTrans, fadeTrans);
-            commentRemovalAnim.play();
-            commentRemovalAnim.setOnFinished(e -> commentPane.getChildren().remove(0));
-        }
+        introductionController.removeCommentDialog();
     }
 
     private void addSceneBlurEffect() {

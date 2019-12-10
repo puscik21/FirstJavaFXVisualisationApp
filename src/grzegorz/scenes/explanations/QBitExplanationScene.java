@@ -129,7 +129,6 @@ public class QBitExplanationScene {
         valField.setText(Integer.toString(diagImgCounter));
     }
 
-    // FIXME: 10.11.2019 pretty same method in introductionScene
     private ParallelTransition showNode() {
         ScaleTransition scaleTransition = getScaleTransition(imgView, 0.0, 1.0, 0.75);
         FadeTransition fadeTransition = getFadeTransition(imgView, 0.0, 1.0);

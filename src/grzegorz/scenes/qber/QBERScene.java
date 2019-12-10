@@ -64,7 +64,7 @@ public class QBERScene {
     private boolean isDisplayToShow = true;
     private boolean isParitySceneLoaded = false;
 
-    // TODO: 08.12.2019 probably remove 2 bits
+
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
