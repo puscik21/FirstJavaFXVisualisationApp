@@ -482,7 +482,7 @@ public class QuantumScene {
         SequentialTransition sendingTrans = getBobReturnTransition();
         sendingTrans.setOnFinished(e -> {
             fifthHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Eavesdropping");
+            Tab filterTab = new Tab("Comparison");
             tabPane.getTabs().add(filterTab);
             nextIsDialog = true;
             hideMess(bobMess);
@@ -503,7 +503,7 @@ public class QuantumScene {
         SequentialTransition sendKeyTrans = getSendingTransition(aliceMess, moveX, moveY);
         sendKeyTrans.setOnFinished(e -> {
             sixthHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Read disturbed qubits");
+            Tab filterTab = new Tab("Eavesdropping");
             tabPane.getTabs().add(filterTab);
             nextIsDialog = true;
         });
@@ -538,7 +538,7 @@ public class QuantumScene {
         SequentialTransition sendingTrans = getBobReturnTransition();
         sendingTrans.setOnFinished(e -> {
             eighthHighlightCircle.setVisible(true);
-            Tab filterTab = new Tab("Filters Comparison after eavesdropping");
+            Tab filterTab = new Tab("Comparison after eavesdropping");
             tabPane.getTabs().add(filterTab);
             nextIsDialog = true;
             hideMess(bobMess);

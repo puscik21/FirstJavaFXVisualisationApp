@@ -24,7 +24,7 @@ public class ChoosingQBitsScene {
     @FXML
     private HBox qBitImagesHBox;
 
-    private QBitState[] bobQBitsStates;
+    private QBitState[] aliceQBitsStates;
     private ArrayList<Image> qBitImages;
     private ArrayList<Image> valuesImages;
     private Random generator;
@@ -43,11 +43,11 @@ public class ChoosingQBitsScene {
         getRandomQBits();
         prepareScene();
         showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
-        return bobQBitsStates;
+        return aliceQBitsStates;
     }
 
     public void startWithUserInput(QBitState[] userInput) {
-        bobQBitsStates = userInput;
+        aliceQBitsStates = userInput;
         prepareScene();
         showChosenQBits(qBitValuesHBox.getChildren(), qBitImagesHBox.getChildren(), 0);
     }
@@ -68,12 +68,12 @@ public class ChoosingQBitsScene {
 
     private void getRandomQBits() {
         int size = getRandomInt(9) + 8;
-        bobQBitsStates = new QBitState[size];
+        aliceQBitsStates = new QBitState[size];
         int bound = 4;
 
         for (int i = 0; i < size; i++) {
             int randomStateValue = getRandomInt(bound);
-            bobQBitsStates[i] = QBitState.getNewQBit(randomStateValue);
+            aliceQBitsStates[i] = QBitState.getNewQBit(randomStateValue);
         }
     }
 
@@ -83,8 +83,8 @@ public class ChoosingQBitsScene {
     }
 
     private void addImageViews() {
-        for (QBitState bobQBitsState : bobQBitsStates) {
-            fillQBitValue(bobQBitsState);
+        for (QBitState aliceQBitsState : aliceQBitsStates) {
+            fillQBitValue(aliceQBitsState);
         }
     }
 
@@ -107,7 +107,7 @@ public class ChoosingQBitsScene {
     }
 
     private void prepareScaleValues() {
-        int size = bobQBitsStates.length;
+        int size = aliceQBitsStates.length;
         if (size == 0) {
             return;
         }

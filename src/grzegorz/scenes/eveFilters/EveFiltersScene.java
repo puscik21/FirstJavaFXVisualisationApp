@@ -90,7 +90,7 @@ public class EveFiltersScene {
         generator = new Random();
         prepareScene();
         prepareEavesDroppedQBits();
-        sendAliceQBitsValuesAfterEve();
+        sendBobQBitsValuesAfterEve();
         initCommentDialogs();
     }
 
@@ -133,13 +133,13 @@ public class EveFiltersScene {
         }
     }
 
-    private void sendAliceQBitsValuesAfterEve() {
+    private void sendBobQBitsValuesAfterEve() {
         int size = eveQBits.length;
-        int[] aliceQBitsValuesAfterEve = new int[size];
+        int[] bobQBitsValuesAfterEve = new int[size];
         for (int i = 0; i < size; i++) {
-            aliceQBitsValuesAfterEve[i] = eveQBits[i].getValue();
+            bobQBitsValuesAfterEve[i] = eveQBits[i].getValue();
         }
-        parentController.setBobQBitsValuesAfterEve(aliceQBitsValuesAfterEve);
+        parentController.setBobQBitsValuesAfterEve(bobQBitsValuesAfterEve);
     }
 
     public void startEveScenario(QuantumScene parentController, QBitState[] sentQBitsStates, int[] filtersValues) {
@@ -284,8 +284,8 @@ public class EveFiltersScene {
             if (!comparisonStarted && e.getButton() == MouseButton.PRIMARY) {
                 compare(0);
             } else if (e.getButton() == MouseButton.SECONDARY) {
-                showDialog("Alice sends randomly chosen qubits for key establishment. \n" +
-                        "if Bob choose the wrong basis of detector \n" +
+                showDialog("Bob sends randomly chosen qubits for key establishment. \n" +
+                        "if Alice choose the wrong basis of detector \n" +
                         "photon will take 1 or 0 value with probability of 50%");
             }
         });
@@ -293,21 +293,21 @@ public class EveFiltersScene {
         qBitHBox.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 e.consume();
-                showDialog("Randomly chosen qubits by Alice");
+                showDialog("Randomly chosen qubits by Bob");
             }
         });
 
         filterHBox.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 e.consume();
-                showDialog("Randomly chosen detectors by Bob");
+                showDialog("Randomly chosen detectors by Alice");
             }
         });
 
         valuesHBox.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {
                 e.consume();
-                showDialog("Result key that Bob receive");
+                showDialog("Result key that Alice receive");
             }
         });
     }
@@ -386,9 +386,9 @@ public class EveFiltersScene {
     }
 
     private int rotateQBit(int compNumber) {
-        QBitState bobQBit = sentQBitsStates[compNumber];
+        QBitState aliceQBit = sentQBitsStates[compNumber];
         QBitState eveQBit = eveQBits[compNumber];
-        int direction = bobQBit.getDirectionToState(eveQBit);
+        int direction = aliceQBit.getDirectionToState(eveQBit);
 
         RotateTransition transition = getRotateTransition(qBitImage, direction);
         transition.play();

@@ -22,9 +22,9 @@
       <AnchorPane fx:id="comparePane" maxHeight="600.0" minHeight="525.0" minWidth="900.0" prefHeight="525.0" prefWidth="900.0" BorderPane.alignment="BOTTOM_CENTER">
          <children>
             <VBox fx:id="aliceValuesVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="0.0" />
-            <VBox fx:id="filtersVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="0.0" />
+            <VBox fx:id="qBitsVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="0.0" />
             <VBox fx:id="ticksVBox" alignment="CENTER" layoutX="299.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="450.0" AnchorPane.rightAnchor="450.0" AnchorPane.topAnchor="0.0" />
-            <VBox fx:id="qBitsVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0" />
+            <VBox fx:id="filtersVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0" />
             <VBox fx:id="bobValuesVBox" alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>

@@ -8,9 +8,9 @@ import javafx.stage.Stage;
 
 
 // TODO: 10.12.2019 FOR NOW
-//  swap Alice with Bob
-//  circles (probably arrows) on every scene
+//  qber and parity scenes objects comments
 //  check every comment
+//  circles (probably arrows) on every scene
 //  resizing
 //  fix transited objects
 //  refresh for every scene - then its required to calculate every qbit and filter value in the IntroductionScene

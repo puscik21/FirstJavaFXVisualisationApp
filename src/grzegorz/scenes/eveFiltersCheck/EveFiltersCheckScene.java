@@ -27,7 +27,7 @@ public class EveFiltersCheckScene {
     private AnchorPane comparePane;
 
     @FXML
-    private VBox aliceValuesVBox;
+    private VBox bobValuesVBox;
 
     @FXML
     private VBox filtersVBox;
@@ -39,7 +39,7 @@ public class EveFiltersCheckScene {
     private VBox qBitsVBox;
 
     @FXML
-    private VBox bobValuesVBox;
+    private VBox aliceValuesVBox;
 
     @FXML
     private Label sceneTitle;
@@ -47,9 +47,9 @@ public class EveFiltersCheckScene {
     private ArrayList<Image> filterImages;
     private ArrayList<Image> photonImages;
     private ArrayList<Image> valuesImages;
-    private int[] aliceQBitsValuesAfterEve;
-    private int[] aliceFilters;
-    private QBitState[] bobQBitStates;
+    private int[] bobQBitsValuesAfterEve;
+    private int[] bobFilters;
+    private QBitState[] aliceQBitStates;
 
     private QuantumScene parentController;
     private DropShadow borderGlow;
@@ -58,11 +58,11 @@ public class EveFiltersCheckScene {
     private double timeScale = 4.0;
 
 
-    public void start(QuantumScene parentController, int[] aliceFilters, QBitState[] bobQBitStates, int[] aliceQBitsValuesAfterEve) {
+    public void start(QuantumScene parentController, int[] bobFilters, QBitState[] aliceQBitStates, int[] bobQBitsValuesAfterEve) {
         this.parentController = parentController;
-        this.aliceFilters = aliceFilters;
-        this.bobQBitStates = bobQBitStates;
-        this.aliceQBitsValuesAfterEve = aliceQBitsValuesAfterEve;
+        this.bobFilters = bobFilters;
+        this.aliceQBitStates = aliceQBitStates;
+        this.bobQBitsValuesAfterEve = bobQBitsValuesAfterEve;
 
         prepareScene();
         scheduleAnimationStart();
@@ -100,13 +100,13 @@ public class EveFiltersCheckScene {
     }
 
     private void addImageViews() {
-        int quantity = aliceFilters.length;
+        int quantity = bobFilters.length;
         for (int i = 0; i < quantity; i++) {
-            int aliceValueAfterEve = aliceQBitsValuesAfterEve[i];
-            int bobValue = bobQBitStates[i].getValue();
+            int bobValueAfterEve = bobQBitsValuesAfterEve[i];
+            int aliceValue = aliceQBitStates[i].getValue();
 
-            aliceValuesVBox.getChildren().add(new ImageView(valuesImages.get(aliceValueAfterEve)));
-            bobValuesVBox.getChildren().add(new ImageView(valuesImages.get(bobValue)));
+            bobValuesVBox.getChildren().add(new ImageView(valuesImages.get(bobValueAfterEve)));
+            aliceValuesVBox.getChildren().add(new ImageView(valuesImages.get(aliceValue)));
             filtersVBox.getChildren().add(new ImageView(filterImages.get(0)));
             qBitsVBox.getChildren().add(new ImageView(photonImages.get(0)));
             addValueImageView(i);
@@ -115,7 +115,7 @@ public class EveFiltersCheckScene {
 
     private void addValueImageView(int i) {
         ImageView valView;
-        if (bobQBitStates[i].isFilterWrong(aliceFilters[i])) {
+        if (aliceQBitStates[i].isFilterWrong(bobFilters[i])) {
             valView = new ImageView(valuesImages.get(3));
         } else {
             valView = new ImageView(valuesImages.get(2));
@@ -160,7 +160,7 @@ public class EveFiltersCheckScene {
 
     private void prepareQBitsHBox() {
         for (int i = 0; i < qBitsVBox.getChildren().size(); i++) {
-            int imageNumber = bobQBitStates[i].getState();
+            int imageNumber = aliceQBitStates[i].getState();
             ImageView imageView = (ImageView) qBitsVBox.getChildren().get(i);
             imageView.setImage(photonImages.get(imageNumber));
         }
@@ -168,7 +168,7 @@ public class EveFiltersCheckScene {
 
     private void prepareFiltersHBox() {
         for (int i = 0; i < filtersVBox.getChildren().size(); i++) {
-            int imageNumber = aliceFilters[i];
+            int imageNumber = bobFilters[i];
             ImageView imageView = (ImageView) filtersVBox.getChildren().get(i);
             imageView.setImage(filterImages.get(imageNumber));
         }
@@ -176,11 +176,11 @@ public class EveFiltersCheckScene {
 
     private void initCommentDialogs() {
         initBorderGlowEffectInstance();
-        initCommentForNode(aliceValuesVBox, "Comment");
+        initCommentForNode(bobValuesVBox, "Comment");
         initCommentForNode(filtersVBox, "Comment");
         initCommentForNode(ticksVBox, "Comment");
         initCommentForNode(qBitsVBox, "Comment");
-        initCommentForNode(bobValuesVBox, "Comment");
+        initCommentForNode(aliceValuesVBox, "Comment");
     }
 
     private void initBorderGlowEffectInstance() {
@@ -226,7 +226,7 @@ public class EveFiltersCheckScene {
         ArrayList<Integer> indexesOfCorrect = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
-            if (!bobQBitStates[i].isFilterWrong(aliceFilters[i])) {
+            if (!aliceQBitStates[i].isFilterWrong(bobFilters[i])) {
                 indexesOfCorrect.add(i);
             }
             Node node = ticksVBox.getChildren().get(i);
@@ -250,7 +250,7 @@ public class EveFiltersCheckScene {
         Animation[] transitions = new Animation[indexes.size()];
         int counter = 0;
         for (int i : indexes) {
-            int qBitVal = bobQBitStates[i].getValue();
+            int qBitVal = aliceQBitStates[i].getValue();
             ImageView node = (ImageView) ticksVBox.getChildren().get(i);
             SequentialTransition transition = getChangeNumberTransition(node, qBitVal);
             transitions[counter] = transition;
