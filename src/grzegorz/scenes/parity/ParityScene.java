@@ -23,6 +23,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ParityScene {
@@ -57,7 +58,6 @@ public class ParityScene {
     private boolean isDisplayToShow = true;
     private boolean isErrorBitFound = false;
 
-    // TODO: 08.12.2019  showDisplay only in right moment (actually like one transition, not on mouse click, I guess)
     @FXML
     private void initialize() {
         sceneDisplays = new ArrayList<>();
@@ -145,10 +145,8 @@ public class ParityScene {
 
     private void prepareSceneDisplays() {
         addReceiveKeyTransition();
-        addSearchParityTransition(1, keySize + 1, 0, 0); // +1 to indexes because of separator
+        addSearchParityTransition();
         addErrorBitTransition();
-        addMergeBitsTransition();
-        addKickErrorBitTransition();
         addHashDialog();
     }
 
@@ -177,32 +175,41 @@ public class ParityScene {
         return moveTransition;
     }
 
-    private void addSearchParityTransition(int from, int to, int cycle, double xOffset) {
+    private void addSearchParityTransition() {
+        List<Animation> animations = new LinkedList<>();
+        prepareSearchParityTransition(animations, 1, keySize + 1, 0, 0); // +1 to indexes because of separator
+        Animation[] animationsArray = new Animation[animations.size()];
+        animationsArray = animations.toArray(animationsArray);
+        SequentialTransition searchParityTransition = new SequentialTransition(animationsArray);
+        sceneDisplays.add(new SceneDisplay(searchParityTransition));
+    }
+
+    private void prepareSearchParityTransition(List<Animation> animations, int from, int to, int cycle, double xOffset) {
         if (to - from <= 2 || isErrorBitFound) {
             return;
         }
 
         int mid = from + (to - from) / 2;
         double nextXOffset = 200 / (1 + cycle);
-        prepareDivideTransition(from, to, cycle, xOffset);
+        animations.add(getDivideTransition(from, to, cycle, xOffset));
         cycle++;
         isErrorBitFound = checkIfErrorIsFound(from, mid, to);
 
         if (checkIfParityIsWrong(from - 1, mid - 1)) {
-            addSearchParityTransition(from, mid, cycle, xOffset - nextXOffset);
+            prepareSearchParityTransition(animations, from, mid, cycle, xOffset - nextXOffset);
         }
-        addSearchParityTransition(mid, to, cycle, xOffset + nextXOffset);
+        prepareSearchParityTransition(animations, mid, to, cycle, xOffset + nextXOffset);
     }
 
-    private void prepareDivideTransition(int from, int to, int cycle, double xOffset) {
+    private Animation getDivideTransition(int from, int to, int cycle, double xOffset) {
         int mid = from + (to - from) / 2;
         ParallelTransition takeLeftTransition = moveBitsDown(leftLabel, from, mid, -1, cycle, xOffset);
         ParallelTransition takeRightTransition = moveBitsDown(rightLabel, mid, to, 1, cycle, xOffset);
         ParallelTransition divideTransition = new ParallelTransition(takeLeftTransition, takeRightTransition);
-        sceneDisplays.add(new SceneDisplay(divideTransition));
+        divideTransition.setDelay(Duration.seconds(0.5));
+        return divideTransition;
     }
 
-    // TODO: 08.12.2019 then hash function on key (15 bits -> 12 (random 12?))
     private ParallelTransition moveBitsDown(Label label, int from, int to, int direction, int cycle, double xOffset) {
         double xpath = 200 / (1 + cycle);
         double yOffset = cycle * 100;
@@ -263,23 +270,33 @@ public class ParityScene {
     }
 
     private void addErrorBitTransition() {
+        Animation showErrorBitTransition = getShowErrorBitTransition();
+        addLeaveProperKeyTransition(showErrorBitTransition);
+        sceneDisplays.add(new SceneDisplay(showErrorBitTransition));
+    }
+
+    private Animation getShowErrorBitTransition() {
         ImageView bitView = (ImageView) keyHBox.getChildren().get(errorBitIndex + 1);
         Image redImage = valuesImagesRed.get(keyValuesWithError[errorBitIndex]);
 
         FadeTransition hideTransition = getHideTransition(bitView, 0.001);
         hideTransition.setOnFinished(e -> bitView.setImage(redImage));
         FadeTransition showTransition = getShowTransition(bitView);
-        SequentialTransition errorBitTransition = new SequentialTransition(hideTransition, showTransition);
-        sceneDisplays.add(new SceneDisplay(errorBitTransition));
+        return new SequentialTransition(hideTransition, showTransition);
     }
 
-    private void addMergeBitsTransition() {
-        Animation lastAnimation = sceneDisplays.get(sceneDisplays.size() - 1).getAnimation();
+    private void addLeaveProperKeyTransition(Animation lastAnimation) {
         lastAnimation.setOnFinished(e -> {
             leftLabel.setVisible(false);
             rightLabel.setVisible(false);
-            returnMergeBitsTransition().play();
+            returnLeaveProperKeyTransition().play();
         });
+    }
+
+    private Animation returnLeaveProperKeyTransition() {
+        Animation mergeBitsTransition = returnMergeBitsTransition();
+        mergeBitsTransition.setOnFinished(e -> getKickErrorBitTransition().play());
+        return mergeBitsTransition;
     }
 
     private ParallelTransition returnMergeBitsTransition() {
@@ -297,11 +314,11 @@ public class ParityScene {
         return mergeBitsTransition;
     }
 
-    private void addKickErrorBitTransition() {
-        Node errorBitView = keyHBox.getChildren().get(errorBitIndex + 1);
+    private Animation getKickErrorBitTransition() {
+        Node errorBitView = keyHBox.getChildren().get(errorBitIndex);
         Animation kickErrorBitTransition = getTranslateTransition(errorBitView, 0, scenePane.getHeight() * 0.4, 0, outsideOffset);
         kickErrorBitTransition.setOnFinished(e -> keyHBox.getChildren().remove(errorBitView));
-        sceneDisplays.add(new SceneDisplay(kickErrorBitTransition));
+        return kickErrorBitTransition;
     }
 
     private void addHashDialog() {
@@ -350,9 +367,9 @@ public class ParityScene {
 
     private void removeBitsForHashOperation() {
         for (int i = 0; i < 3; i++) {
-            int size = keyHBox.getChildren().size();
+            int size = keyHBox.getChildren().size() - 2;
             int index = qberController.getRandomBitValue(size) + 1;
-            if (--index == size - 1) {
+            if (index == size) {
                 index--;
             }
             keyHBox.getChildren().remove(index);
