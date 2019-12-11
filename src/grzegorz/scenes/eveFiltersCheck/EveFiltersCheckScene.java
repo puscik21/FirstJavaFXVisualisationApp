@@ -2,9 +2,8 @@ package grzegorz.scenes.eveFiltersCheck;
 
 import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
-import javafx.animation.Animation;
-import javafx.animation.FadeTransition;
-import javafx.animation.SequentialTransition;
+import javafx.animation.*;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -17,10 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class EveFiltersCheckScene {
     @FXML
@@ -47,6 +43,7 @@ public class EveFiltersCheckScene {
     private ArrayList<Image> filterImages;
     private ArrayList<Image> photonImages;
     private ArrayList<Image> valuesImages;
+    private ArrayList<Image> valuesImagesRed;
     private int[] bobQBitsValuesAfterEve;
     private int[] bobFilters;
     private QBitState[] aliceQBitStates;
@@ -91,12 +88,17 @@ public class EveFiltersCheckScene {
         Image tickIcon = new Image("grzegorz\\images\\tickIcon.png");
         Image xIcon = new Image("grzegorz\\images\\xIcon.png");
 
+        Image zeroIconRed = new Image("grzegorz\\images\\zeroIconRed.png");
+        Image oneIconRed = new Image("grzegorz\\images\\oneIconRed.png");
+
         photonImages = new ArrayList<>(4);
         filterImages = new ArrayList<>(2);
         valuesImages = new ArrayList<>(3);
+        valuesImagesRed = new ArrayList<>(2);
         photonImages.addAll(Arrays.asList(verPhoton, rightDiagPhoton, horPhoton, leftDiagPhoton));
         filterImages.addAll(Arrays.asList(whiteFilter, greenFilter));
         valuesImages.addAll(Arrays.asList(zeroIcon, oneIcon, tickIcon, xIcon));
+        valuesImagesRed.addAll(Arrays.asList(zeroIconRed, oneIconRed));
     }
 
     private void addImageViews() {
@@ -236,7 +238,39 @@ public class EveFiltersCheckScene {
         transArray = transitions.toArray(transArray);
         SequentialTransition showTicksTransition = new SequentialTransition(transArray);
         SequentialTransition showNumbersTransition = getTicksToNumbersTransition(indexesOfCorrect);
-        return new SequentialTransition(showTicksTransition, showNumbersTransition);
+        Animation removeWrongRowsTransition = getRemoveWrongRows(indexesOfCorrect);
+        Animation highlightDifferentBitsTransition = getHighlightDifferentBitsTransition(indexesOfCorrect);
+        return new SequentialTransition(showTicksTransition, showNumbersTransition, removeWrongRowsTransition, highlightDifferentBitsTransition);
+    }
+
+    private Animation getHighlightDifferentBitsTransition(ArrayList<Integer> indexes) {
+        List<Animation> animationList = new LinkedList<>();
+        for (int i : indexes) {
+            ImageView aliceValView = (ImageView) aliceValuesVBox.getChildren().get(i);
+            ImageView bobValView = (ImageView) bobValuesVBox.getChildren().get(i);
+            int aliceVal = aliceQBitStates[i].getValue();
+            int bobVal = bobQBitsValuesAfterEve[i];
+            if (aliceVal != bobVal) {
+                Animation aliceTrans = changeToRedValueImage(aliceValView, aliceVal);
+                Animation bobTrans = changeToRedValueImage(bobValView, bobVal);
+                animationList.add(new ParallelTransition(aliceTrans, bobTrans));
+            }
+        }
+
+        Animation[] animations = new Animation[animationList.size()];
+        animations = animationList.toArray(animations);
+        if (animations.length > 0) {
+            return new ParallelTransition(animations);
+        } else {
+            return new ParallelTransition();
+        }
+    }
+
+    private Animation changeToRedValueImage(ImageView node, int qBitVal) {
+        FadeTransition hideTransition = getFadeTransition(node, 1.0, 0.0, timeScale);
+        hideTransition.setOnFinished(e -> node.setImage(valuesImagesRed.get(qBitVal)));
+        FadeTransition showTransition = getFadeTransition(node, 0.0, 1.0, timeScale);
+        return new SequentialTransition(hideTransition, showTransition);
     }
 
     private SequentialTransition getShowInvisibleIconTransition(Node node) {
@@ -271,6 +305,47 @@ public class EveFiltersCheckScene {
         node.setImage(valuesImages.get(qBitVal));
     }
 
+    private Animation getRemoveWrongRows(ArrayList<Integer> indexesOfCorrect) {
+        List<Animation> animationList = new LinkedList<>();
+        int dir = 1;
+
+        for (int i = 0; i < qBitsVBox.getChildren().size(); i++) {
+            if (indexesOfCorrect.contains(i)) {
+                continue;
+            }
+            animationList.add(getMoveOutsideTrans(i, dir));
+            dir *= -1;
+        }
+        Animation[] animations = new Animation[animationList.size()];
+        animations = animationList.toArray(animations);
+        return new ParallelTransition(animations);
+    }
+
+    private Animation getMoveOutsideTrans(int i, int dir) {
+        double outsideOffset = 2500;
+
+        ObservableList<Node> aliceValues = aliceValuesVBox.getChildren();
+        ObservableList<Node> qBits = qBitsVBox.getChildren();
+        ObservableList<Node> ticks = ticksVBox.getChildren();
+        ObservableList<Node> filters = filtersVBox.getChildren();
+        ObservableList<Node> bobValues = bobValuesVBox.getChildren();
+
+        Node aliceValue = aliceValues.get(i);
+        Node qBit = qBits.get(i);
+        Node tick = ticks.get(i);
+        Node filter = filters.get(i);
+        Node bobValue = bobValues.get(i);
+
+        Animation aliceValueTrans = getTranslateTransitionAndRemove(aliceValue, aliceValues, 0, 0, dir * outsideOffset, 0);
+        Animation qBitTrans = getTranslateTransitionAndRemove(qBit, qBits, 0, 0, dir * outsideOffset, 0);
+        Animation tickTrans = getTranslateTransitionAndRemove(tick, ticks, 0, 0, dir * outsideOffset, 0);
+        Animation filterTrans = getTranslateTransitionAndRemove(filter, filters, 0, 0, dir * outsideOffset, 0);
+        Animation bobValueTrans = getTranslateTransitionAndRemove(bobValue, bobValues, 0, 0, dir * outsideOffset, 0);
+        ParallelTransition moveOutsideTrans = new ParallelTransition(aliceValueTrans, qBitTrans, tickTrans, filterTrans, bobValueTrans);
+        moveOutsideTrans.setDelay(Duration.seconds(0.15 * i));
+        return moveOutsideTrans;
+    }
+
     private FadeTransition getFadeTransition(Node node, double fromVal, double toVal, double time) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(node);
@@ -278,5 +353,22 @@ public class EveFiltersCheckScene {
         fadeTransition.setFromValue(fromVal);
         fadeTransition.setToValue(toVal);
         return fadeTransition;
+    }
+
+    private TranslateTransition getTranslateTransitionAndRemove(Node node, ObservableList<Node> parent, double fromX, double fromY, double toX, double toY) {
+        TranslateTransition transition = getTranslateTransition(node, fromX, fromY, toX, toY);
+        transition.setOnFinished(e -> parent.remove(node));
+        return transition;
+    }
+
+    private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.seconds(1.5));
+        transition.setNode(imageView);
+        transition.setFromX(fromX);
+        transition.setFromY(fromY);
+        transition.setToX(toX);
+        transition.setToY(toY);
+        return transition;
     }
 }

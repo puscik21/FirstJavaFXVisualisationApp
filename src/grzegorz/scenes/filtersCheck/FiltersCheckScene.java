@@ -3,6 +3,7 @@ package grzegorz.scenes.filtersCheck;
 import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -14,10 +15,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import java.util.*;
 
 public class FiltersCheckScene {
     @FXML
@@ -218,8 +217,9 @@ public class FiltersCheckScene {
         transArray = transitions.toArray(transArray);
         SequentialTransition showTicksTransition = new SequentialTransition(transArray);
         SequentialTransition showNumbersTransition = getTicksToNumbersTransition(indexesOfCorrect);
+        Animation removeWrongRowsTransition = getRemoveWrongRows(indexesOfCorrect);
 
-        return new SequentialTransition(showTicksTransition, showNumbersTransition);
+        return new SequentialTransition(showTicksTransition, showNumbersTransition, removeWrongRowsTransition);
     }
 
     private SequentialTransition getShowInvisibleIconTransition(Node node) {
@@ -254,6 +254,43 @@ public class FiltersCheckScene {
         node.setImage(valuesImages.get(qBitVal));
     }
 
+
+
+    private Animation getRemoveWrongRows(ArrayList<Integer> indexesOfCorrect) {
+        List<Animation> animationList = new LinkedList<>();
+        int dir = 1;
+
+        for (int i = 0; i < qBitsVBox.getChildren().size(); i++) {
+            if (indexesOfCorrect.contains(i)) {
+                continue;
+            }
+            animationList.add(getMoveOutsideTrans(i, dir));
+            dir *= -1;
+        }
+        Animation[] animations = new Animation[animationList.size()];
+        animations = animationList.toArray(animations);
+        return new ParallelTransition(animations);
+    }
+
+    private Animation getMoveOutsideTrans(int i, int dir) {
+        double outsideOffset = 2500;
+
+        ObservableList<Node> qBits = qBitsVBox.getChildren();
+        ObservableList<Node> ticks = ticksVBox.getChildren();
+        ObservableList<Node> filters = filtersVBox.getChildren();
+
+        Node qBit = qBits.get(i);
+        Node tick = ticks.get(i);
+        Node filter = filters.get(i);
+
+        Animation qBitTrans = getTranslateTransitionAndRemove(qBit, qBits, 0, 0, dir * outsideOffset, 0);
+        Animation tickTrans = getTranslateTransitionAndRemove(tick, ticks, 0, 0, dir * outsideOffset, 0);
+        Animation filterTrans = getTranslateTransitionAndRemove(filter, filters, 0, 0, dir * outsideOffset, 0);
+        ParallelTransition moveOutsideTrans = new ParallelTransition(qBitTrans, tickTrans, filterTrans);
+        moveOutsideTrans.setDelay(Duration.seconds(0.15 * i));
+        return moveOutsideTrans;
+    }
+
     private FadeTransition getFadeTransition(Node node, double fromVal, double toVal, double time) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setNode(node);
@@ -261,5 +298,22 @@ public class FiltersCheckScene {
         fadeTransition.setFromValue(fromVal);
         fadeTransition.setToValue(toVal);
         return fadeTransition;
+    }
+
+    private TranslateTransition getTranslateTransitionAndRemove(Node node, ObservableList<Node> parent, double fromX, double fromY, double toX, double toY) {
+        TranslateTransition transition = getTranslateTransition(node, fromX, fromY, toX, toY);
+        transition.setOnFinished(e -> parent.remove(node));
+        return transition;
+    }
+
+    private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.seconds(1.5));
+        transition.setNode(imageView);
+        transition.setFromX(fromX);
+        transition.setFromY(fromY);
+        transition.setToX(toX);
+        transition.setToY(toY);
+        return transition;
     }
 }

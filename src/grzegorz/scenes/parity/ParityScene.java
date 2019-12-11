@@ -52,7 +52,7 @@ public class ParityScene {
     private int[] keyValuesWithError;
 
     private int displayCounter = 0;
-    private int outsideOffset = 2000;
+    private int outsideOffset = 2500;
     private int keySize = 16;
     private int errorBitIndex;
     private boolean isDisplayToShow = true;

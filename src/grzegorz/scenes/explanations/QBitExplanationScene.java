@@ -53,7 +53,7 @@ public class QBitExplanationScene {
 
     public void start() {
         prepareImages();
-        int cycles = 4;
+        int cycles = 2;
         SequentialTransition rectPhotonsAnimation = getRectPhotonsPresentation(cycles);
         SequentialTransition diagPhotonsAnimation = getDiagPhotonsPresentation(cycles);
         SequentialTransition rotationTransition = getRotationAnimation();

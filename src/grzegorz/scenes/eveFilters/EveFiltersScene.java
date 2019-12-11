@@ -163,10 +163,10 @@ public class EveFiltersScene {
 
     private void initCommentDialogs() {
         initBorderGlowEffectInstance();
-        initCommentForNode(originalQBitHBox, "Comment");
-        initCommentForNode(qBitHBox, "Comment");
-        initCommentForNode(filterHBox, "Comment");
-        initCommentForNode(valuesHBox, "Comment");
+        initCommentForNode(originalQBitHBox, "Qubits sent by Alice");       // TODO: 11.12.2019 different comments for different scenarios
+        initCommentForNode(qBitHBox, "Qubits read by Eve - they will be retransmitted to Bob");
+        initCommentForNode(filterHBox, "Filters used by Eve");
+        initCommentForNode(valuesHBox, "Values of qubits read by Eve");
     }
 
     private void initBorderGlowEffectInstance() {

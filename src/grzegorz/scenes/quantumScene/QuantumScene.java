@@ -465,7 +465,7 @@ public class QuantumScene {
             if (currentOnFinishedEvent != null) {
                 currentOnFinishedEvent.handle(e);
             }
-            fourthHighlightCircle.setVisible(true);
+//            fourthHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Photons Measurement");
             tabPane.getTabs().add(filterTab);
         });
@@ -481,7 +481,7 @@ public class QuantumScene {
         SequentialTransition showMessTrans = getShowMessTransition(bobMess);
         SequentialTransition sendingTrans = getBobReturnTransition();
         sendingTrans.setOnFinished(e -> {
-            fifthHighlightCircle.setVisible(true);
+//            fifthHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Comparison");
             tabPane.getTabs().add(filterTab);
             nextIsDialog = true;
@@ -502,7 +502,7 @@ public class QuantumScene {
 
         SequentialTransition sendKeyTrans = getSendingTransition(aliceMess, moveX, moveY);
         sendKeyTrans.setOnFinished(e -> {
-            sixthHighlightCircle.setVisible(true);
+//            sixthHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Eavesdropping");
             tabPane.getTabs().add(filterTab);
             nextIsDialog = true;
@@ -521,7 +521,7 @@ public class QuantumScene {
 
         SequentialTransition sendKeyTrans = getSendingTransition(eveMess, moveX, moveY);
         sendKeyTrans.setOnFinished(e -> {
-            seventhHighlightCircle.setVisible(true);
+//            seventhHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Bob measure photons");
             tabPane.getTabs().add(filterTab);
         });
@@ -537,7 +537,7 @@ public class QuantumScene {
         ScaleTransition showMessTrans = getScaleTransition(bobMess, 0.0, 1.0, 0.25);
         SequentialTransition sendingTrans = getBobReturnTransition();
         sendingTrans.setOnFinished(e -> {
-            eighthHighlightCircle.setVisible(true);
+//            eighthHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Comparison after eavesdropping");
             tabPane.getTabs().add(filterTab);
             nextIsDialog = true;
