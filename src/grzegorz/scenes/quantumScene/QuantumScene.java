@@ -8,6 +8,7 @@ import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.general.Animator;
 import grzegorz.general.CommentedAnimation;
 import grzegorz.general.QBitState;
+import grzegorz.general.SceneDisplay;
 import grzegorz.scenes.choosingQBits.ChoosingQBitsScene;
 import grzegorz.scenes.enterQBitCombination.EnterQBitCombination;
 import grzegorz.scenes.eveFilters.EveFiltersScene;
@@ -35,6 +36,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -106,11 +108,9 @@ public class QuantumScene {
     private final double TABS_SEVEN_X = 950;
     private final double TABS_EIGHT_X = 1175;
 
-    private ArrayList<CommentedAnimation> sceneCAnimations;
-    private ArrayList<JFXDialog> sceneDialogs;
-    private int animCounter;
-    private int dialogCounter;
-    private boolean nextIsDialog = false;
+    private List<SceneDisplay> sceneDisplays;
+    private int displayCounter = 0;
+    private boolean isDisplayToShow = true;
     private boolean animationsShowed = false;
     private boolean isUserInput;
 
@@ -138,10 +138,8 @@ public class QuantumScene {
     private void initialize() {
         initEvents();
 
-        sceneCAnimations = new ArrayList<>(10);
-        animCounter = 0;
-        sceneDialogs = new ArrayList<>(10);
-        dialogCounter = 0;
+        sceneDisplays = new ArrayList<>(10);
+        displayCounter = 0;
 
         fourthHighlightCircle = getHighlightCircle(TABS_FOURTH_X, TABS_Y);
         fifthHighlightCircle = getHighlightCircle(TABS_FIFTH_X, TABS_Y);
@@ -164,8 +162,6 @@ public class QuantumScene {
         bb84Dialog.show();
 
         initMainTabPane();
-
-        nextIsDialog = true;
     }
 
     public StackPane getMainPane() {
@@ -244,8 +240,8 @@ public class QuantumScene {
             if (e.getButton() == MouseButton.PRIMARY) {
                 if (animationsShowed) {
                     reloadScene();
-                } else {
-                    showNextAnimation();
+                } else if (isDisplayToShow) {
+                    showDisplay();
                 }
             }
         });
@@ -374,30 +370,18 @@ public class QuantumScene {
         node.setOnMouseExited(e -> node.setEffect(null));
     }
 
-    private void showNextAnimation() {
-        if (animCounter == 0 && dialogCounter == 0) {
-            prepareAllAnimations();
-            prepareSceneDialogs();
+    // TODO: 27.12.2019 fix button
+    private void showDisplay() {
+        if (displayCounter == 0) {
+            playShowButtonTransition();
+            prepareSceneDisplays();
         }
 
-        if (nextIsDialog) {
-            showDialog();
-        } else {
-            playAnimation();
-        }
-        if (noMoreAnimationsOrDialogs()) {
-            showButton.setText("Replay scene");
-            animationsShowed = true;
-        }
-    }
-
-    private void prepareAllAnimations() {
-        playShowButtonTransition();
-        prepareQuantumAnimation();
-        prepareBobSendFiltersAnimation();
-        prepareAliceToEveAnimation();
-        prepareEveToBobAnimation();
-        prepareBobSendFiltersAfterEveAnimation();
+        SceneDisplay sceneDisplay = sceneDisplays.get(displayCounter);
+        useSceneDisplay(sceneDisplay);
+        displayCounter++;
+        isDisplayToShow = false;
+        showButton.setDisable(true);
     }
 
     private void playShowButtonTransition() {
@@ -408,47 +392,64 @@ public class QuantumScene {
         buttonTrans.play();
     }
 
-    private void playAnimation() {
-        showButton.setDisable(true);
-        CommentedAnimation cAnimation = sceneCAnimations.get(animCounter);
+    private void prepareSceneDisplays() {
+        enterCombinationDialog = returnEnterCombinationDialog();
+        sceneDisplays.add(new SceneDisplay(enterCombinationDialog));
+        sceneDisplays.add(new SceneDisplay(returnAliceDialog()));
+
+        prepareQuantumAnimation();
+        prepareBobSendFiltersAnimation();
+        sceneDisplays.add(new SceneDisplay(returnEveEavesdroppingDialog()));
+        prepareAliceToEveAnimation();
+        sceneDisplays.add(new SceneDisplay(returnEveForwardingDialog()));
+        prepareEveToBobAnimation();
+        prepareBobSendFiltersAfterEveAnimation();
+    }
+
+    private void useSceneDisplay(SceneDisplay sceneDisplay) {
+        if (sceneDisplay.getState().equals("animation")) {
+            playAnimation(sceneDisplay.getAnimation());
+        } else if (sceneDisplay.getState().equals("cAnimation")) {
+            playCAnimation(sceneDisplay.getCAnimation());
+        } else {
+            JFXDialog dialog = sceneDisplay.getDialog();
+            EventHandler<? super JFXDialogEvent> currentEvent = dialog.getOnDialogClosed();
+            dialog.setOnDialogClosed(e -> {
+                currentEvent.handle(e);
+                isDisplayToShow = true;
+                showButton.setDisable(false);
+            });
+            dialog.show();
+        }
+        checkIfDisplaysWereShowed();
+    }
+
+    private void playCAnimation(CommentedAnimation cAnimation) {
+        Animation animation = cAnimation.getAnimation();
         String comment = cAnimation.getComment();
         if (comment != null) {
             showCommentDialog(comment);
         }
-        cAnimation.getAnimation().play();
-        animCounter++;
+        playAnimation(animation);
+    }
 
-        Transition trans = (Transition) cAnimation.getAnimation();
-        EventHandler<ActionEvent> currentEvent = trans.getOnFinished();
-        trans.setOnFinished(e -> {
-            if (noMoreAnimationsOrDialogs()) {
-                showButton.setDisable(true);
-            } else {
-                showButton.setDisable(false);
-            }
+    private void playAnimation(Animation animation) {
+        EventHandler<ActionEvent> currentEvent = animation.getOnFinished();
+        animation.setOnFinished(e -> {
             if (currentEvent != null) {
                 currentEvent.handle(e);
             }
+            isDisplayToShow = true;
+            showButton.setDisable(true);
         });
+        animation.play();
     }
 
-    private void showDialog() {
-        showButton.setDisable(true);
-        JFXDialog dialog = sceneDialogs.get(dialogCounter);
-
-        EventHandler<? super JFXDialogEvent> currentOnCloseEvent = dialog.getOnDialogClosed();
-        dialog.setOnDialogClosed(e -> {
-            if (currentOnCloseEvent != null) {
-                currentOnCloseEvent.handle(e);
-                showButton.setDisable(false);
-            }
-        });
-        dialog.show();
-        dialogCounter++;
-    }
-
-    private boolean noMoreAnimationsOrDialogs() {
-        return animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size();
+    private void checkIfDisplaysWereShowed() {
+        if (displayCounter != 0 && displayCounter == sceneDisplays.size() - 1) {
+            showButton.setText("Replay scene");
+            animationsShowed = true;
+        }
     }
 
     private void prepareQuantumAnimation() {
@@ -466,11 +467,9 @@ public class QuantumScene {
             tabPane.getTabs().add(filterTab);
         });
         FadeTransition highlightTransition = getHighlightCircleAnimation(fourthHighlightCircle);
-
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
-        sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans, "Alice send random qubits by quantum cable");
-        sceneCAnimations.add(sendKeyCAnimation);
+        sceneDisplays.add(new SceneDisplay(sendKeyCAnimation));
     }
 
     private void prepareBobSendFiltersAnimation() {
@@ -480,16 +479,13 @@ public class QuantumScene {
 //            fifthHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Comparison");
             tabPane.getTabs().add(filterTab);
-            nextIsDialog = true;
             hideMess(bobMess);
-            showButton.setDisable(true);
+//            showButton.setDisable(true);
         });
         FadeTransition highlightTransition = getHighlightCircleAnimation(fifthHighlightCircle);
-
         SequentialTransition bobSendFiltersTrans = new SequentialTransition(showMessTrans, sendingTrans, highlightTransition);
-        bobSendFiltersTrans.setOnFinished(e -> showButton.setDisable(true));
         CommentedAnimation bobSendFiltersCAnimation = new CommentedAnimation(bobSendFiltersTrans, "Bob send filters that he chose");
-        sceneCAnimations.add(bobSendFiltersCAnimation);
+        sceneDisplays.add(new SceneDisplay(bobSendFiltersCAnimation));
     }
 
     private void prepareAliceToEveAnimation() {
@@ -501,14 +497,11 @@ public class QuantumScene {
 //            sixthHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Eavesdropping");
             tabPane.getTabs().add(filterTab);
-            nextIsDialog = true;
         });
         FadeTransition highlightTransition = getHighlightCircleAnimation(sixthHighlightCircle);
-
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
-        sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans, "Alice send random qubits by quantum cable, but now Eve is capturing the message");
-        sceneCAnimations.add(sendKeyCAnimation);
+        sceneDisplays.add(new SceneDisplay(sendKeyCAnimation));
     }
 
     private void prepareEveToBobAnimation() {
@@ -522,11 +515,9 @@ public class QuantumScene {
             tabPane.getTabs().add(filterTab);
         });
         FadeTransition highlightTransition = getHighlightCircleAnimation(seventhHighlightCircle);
-
         SequentialTransition sendAndHighlightTrans = new SequentialTransition(sendKeyTrans, highlightTransition);
-        sendAndHighlightTrans.setOnFinished(e -> showButton.setDisable(true));
         CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendAndHighlightTrans, "Eve send eavesdropped qubits to Bob");
-        sceneCAnimations.add(sendKeyCAnimation);
+        sceneDisplays.add(new SceneDisplay(sendKeyCAnimation));
     }
 
     private void prepareBobSendFiltersAfterEveAnimation() {
@@ -536,28 +527,18 @@ public class QuantumScene {
 //            eighthHighlightCircle.setVisible(true);   // TODO: 11.12.2019  uncomment after presentation
             Tab filterTab = new Tab("Comparison after eavesdropping");
             tabPane.getTabs().add(filterTab);
-            nextIsDialog = true;
             hideMess(bobMess);
         });
         FadeTransition highlightTransition = getHighlightCircleAnimation(eighthHighlightCircle);
-
         SequentialTransition bobSendFiltersTrans = new SequentialTransition(showMessTrans, sendingTrans, highlightTransition);
         CommentedAnimation bobSendFiltersCAnimation = new CommentedAnimation(bobSendFiltersTrans, "Bob send filters that he chose");
-        sceneCAnimations.add(bobSendFiltersCAnimation);
+        sceneDisplays.add(new SceneDisplay(bobSendFiltersCAnimation));
     }
 
     private SequentialTransition getBobReturnTransition() {
         double toX = alicePC.getLayoutX() - bobPC.getLayoutX();
         double toY = -bobMess.getFitHeight();
         return getSendingTransition(bobMess, toX, toY);
-    }
-
-    private void prepareSceneDialogs() {
-        enterCombinationDialog = returnEnterCombinationDialog();
-        sceneDialogs.add(enterCombinationDialog);
-        sceneDialogs.add(returnAliceDialog());
-        sceneDialogs.add(returnEveEavesdroppingDialog());
-        sceneDialogs.add(returnEveForwardingDialog());
     }
 
     private JFXDialog returnEveEavesdroppingDialog() {
@@ -567,7 +548,6 @@ public class QuantumScene {
         dialog.setOnDialogClosed(e -> {
             aliceMess.setTranslateX(0);
             getShowMessTransition(aliceMess).play();
-            nextIsDialog = false;
             makeEveShowUpTransition();
             currentCloseEvent.handle(e);
         });
@@ -580,7 +560,6 @@ public class QuantumScene {
         dialog.setOnDialogClosed(e -> {
             hideMess(eveMess);
             getShowMessTransition(eveMess).play();
-            nextIsDialog = false;
             currentCloseEvent.handle(e);
         });
         return dialog;
@@ -605,7 +584,6 @@ public class QuantumScene {
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
-                nextIsDialog = true;
             });
             return dialog;
 
@@ -639,7 +617,6 @@ public class QuantumScene {
             });
             dialog.setOnDialogClosed(e -> {
                 removeSceneEffects();
-                nextIsDialog = false;
             });
             return dialog;
 
@@ -740,11 +717,29 @@ public class QuantumScene {
     }
 
     private void showCommentDialog(String message) {
-        introductionController.showCommentDialog(message);
+        removeCommentDialog();
+
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        Text text = new Text(message);
+        text.setWrappingWidth(commentPane.getWidth());
+        dialogLayout.setBody(text);
+
+        JFXDialog dialog = new JFXDialog(commentPane, dialogLayout, JFXDialog.DialogTransition.LEFT);
+        dialog.show();
     }
 
     private void removeCommentDialog() {
-        introductionController.removeCommentDialog();
+        if (commentPane.getChildren().size() > 0) {
+            Node comment = commentPane.getChildren().get(0);
+            TranslateTransition moveTrans = getTranslateTransition(comment, 0, 0, 0, 2000);
+            moveTrans.setInterpolator(Interpolator.EASE_IN);
+            moveTrans.setDuration(Duration.seconds(1));
+            FadeTransition fadeTrans = getFadeTransition(comment);
+
+            ParallelTransition commentRemovalAnim = new ParallelTransition(moveTrans, fadeTrans);
+            commentRemovalAnim.play();
+            commentRemovalAnim.setOnFinished(e -> commentPane.getChildren().remove(0));
+        }
     }
 
     private void addSceneBlurEffect() {

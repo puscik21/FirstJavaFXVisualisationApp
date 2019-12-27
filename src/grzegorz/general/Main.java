@@ -8,8 +8,6 @@ import javafx.stage.Stage;
 
 
 // TODO: 10.12.2019 FOR NOW
-//  animator
-//  sceneDisplay in introduction & quantum scene
 //  remove unused things
 //  EveFiltersScene different comments for different scenarios
 //  /

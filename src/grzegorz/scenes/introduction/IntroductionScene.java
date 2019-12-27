@@ -7,6 +7,7 @@ import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import grzegorz.general.Animator;
 import grzegorz.general.CommentedAnimation;
+import grzegorz.general.SceneDisplay;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
 import javafx.animation.*;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class IntroductionScene {
@@ -105,11 +107,9 @@ public class IntroductionScene {
     private final String LOCKED_ENVELOPE_PATH = "grzegorz\\images\\envelopeLocked.png";
     private final String DEFAULT_ENVELOPE_PATH = "grzegorz\\images\\envelope.jpg";
 
-    private ArrayList<CommentedAnimation> sceneCAnimations;
-    private ArrayList<JFXDialog> sceneDialogs;
-    private int animCounter;
-    private int dialogCounter;
-    private boolean nextIsDialog = false;
+    private List<SceneDisplay> sceneDisplays;
+    private int displayCounter = 0;
+    private boolean isDisplayToShow = true;
     private boolean animationsShowed = false;
 
     private Circle secondHighlightCircle;
@@ -137,6 +137,7 @@ public class IntroductionScene {
     private void initialize() {
         initEvents();
 
+        sceneDisplays = new ArrayList<>(10);
         secondHighlightCircle = getHighlightCircle(TABS_SECOND_X, TABS_Y);
         thirdHighlightCircle = getHighlightCircle(TABS_THIRD_X, TABS_Y);
 
@@ -189,8 +190,8 @@ public class IntroductionScene {
             if (e.getButton() == MouseButton.PRIMARY) {
                 if (animationsShowed) {
                     reloadIntroductionScene();
-                } else {
-                    showNextAnimation();
+                } else if (isDisplayToShow) {
+                    showDisplay();
                 }
             }
         });
@@ -290,28 +291,17 @@ public class IntroductionScene {
         node.setOnMouseExited(e -> node.setEffect(null));
     }
 
-    private void showNextAnimation() {
-        if (animCounter == 0 && dialogCounter == 0) {
-            prepareAllAnimations();
-            prepareSceneDialogs();
+    private void showDisplay() {
+        if (displayCounter == 0) {
+            playShowButtonTransition();
+            prepareSceneDisplays();
         }
 
-        if (nextIsDialog) {
-            showDialog();
-        } else {
-            playAnimation();
-        }
-        if (noMoreAnimationsOrDialogs()) {
-            showButton.setText("Replay scene");
-            animationsShowed = true;
-        }
-    }
-
-    private void prepareAllAnimations() {
-        sceneCAnimations = new ArrayList<>(10);
-        playShowButtonTransition();
-        preparePublicKeyAnimation();
-        preparePrivateKeyAnimation();
+        SceneDisplay sceneDisplay = sceneDisplays.get(displayCounter);
+        useSceneDisplay(sceneDisplay);
+        displayCounter++;
+        isDisplayToShow = false;
+        showButton.setDisable(true);
     }
 
     private void playShowButtonTransition() {
@@ -322,42 +312,56 @@ public class IntroductionScene {
         buttonTrans.play();
     }
 
-    private void playAnimation() {
-        showButton.setDisable(true);
-        CommentedAnimation cAnimation = sceneCAnimations.get(animCounter);
+    private void prepareSceneDisplays() {
+        preparePublicKeyAnimation();
+        preparePrivateKeyAnimation();
+        sceneDisplays.add(new SceneDisplay(getRSADialogs()));
+    }
+
+    private void useSceneDisplay(SceneDisplay sceneDisplay) {
+        if (sceneDisplay.getState().equals("animation")) {
+            playAnimation(sceneDisplay.getAnimation());
+        } else if (sceneDisplay.getState().equals("cAnimation")) {
+            playCAnimation(sceneDisplay.getCAnimation());
+        } else {
+            JFXDialog dialog = sceneDisplay.getDialog();
+            EventHandler<? super JFXDialogEvent> currentEvent = dialog.getOnDialogClosed();
+            dialog.setOnDialogClosed(e -> {
+                currentEvent.handle(e);
+                isDisplayToShow = true;
+                showButton.setDisable(false);
+            });
+            dialog.show();
+        }
+        checkIfDisplaysWereShowed();
+    }
+
+    private void playCAnimation(CommentedAnimation cAnimation) {
+        Animation animation = cAnimation.getAnimation();
         String comment = cAnimation.getComment();
         if (comment != null) {
             showCommentDialog(comment);
         }
-        cAnimation.getAnimation().play();
-        animCounter++;
+        playAnimation(animation);
+    }
 
-        Transition trans = (Transition) cAnimation.getAnimation();
-        EventHandler<ActionEvent> currentEvent = trans.getOnFinished();
-        trans.setOnFinished(e -> {
+    private void playAnimation(Animation animation) {
+        EventHandler<ActionEvent> currentEvent = animation.getOnFinished();
+        animation.setOnFinished(e -> {
             showButton.setDisable(false);
             if (currentEvent != null) {
                 currentEvent.handle(e);
             }
+            isDisplayToShow = true;
         });
+        animation.play();
     }
 
-    private void showDialog() {
-        showButton.setDisable(true);
-        JFXDialog dialog = sceneDialogs.get(dialogCounter);
-
-        EventHandler<? super JFXDialogEvent> currentOnCloseEvent = dialog.getOnDialogClosed();
-        dialog.setOnDialogClosed(e -> {
-            currentOnCloseEvent.handle(e);
-            showButton.setDisable(false);
-        });
-
-        dialog.show();
-        dialogCounter++;
-    }
-
-    private boolean noMoreAnimationsOrDialogs() {
-        return animCounter == sceneCAnimations.size() && dialogCounter == sceneDialogs.size();
+    private void checkIfDisplaysWereShowed() {
+        if (displayCounter != 0 && displayCounter == sceneDisplays.size() - 1) {
+            showButton.setText("Replay scene");
+            animationsShowed = true;
+        }
     }
 
     private void preparePublicKeyAnimation() {
@@ -392,12 +396,14 @@ public class IntroductionScene {
     }
 
     private void addToCAnimations(SequentialTransition sendKeyTrans, SequentialTransition encryptionAnimation, SequentialTransition returnTrans) {
-        CommentedAnimation sendKeyCAnimation = new CommentedAnimation(sendKeyTrans, "Bob send his public key to Alice");
-        CommentedAnimation encryptionCAnimation = new CommentedAnimation(encryptionAnimation, "Alice encrypt message with Bob's public key");
-        CommentedAnimation returnCAnimation = new CommentedAnimation(returnTrans, "Then she send it back to Bob");
+        addCAnimationAsDisplay(sendKeyTrans, "Bob send his public key to Alice");
+        addCAnimationAsDisplay(encryptionAnimation, "Alice encrypt message with Bob's public key");
+        addCAnimationAsDisplay(returnTrans, "Then she send it back to Bob");
+    }
 
-        Collection<CommentedAnimation> cAnimations = Arrays.asList(sendKeyCAnimation, encryptionCAnimation, returnCAnimation);
-        sceneCAnimations.addAll(cAnimations);
+    private void addCAnimationAsDisplay(Animation animation, String comment) {
+        CommentedAnimation cAnimation = new CommentedAnimation(animation, comment);
+        sceneDisplays.add(new SceneDisplay(cAnimation));
     }
 
     private void preparePrivateKeyAnimation() {
@@ -406,23 +412,18 @@ public class IntroductionScene {
         TranslateTransition fromMessageTrans = getTranslateTransition(privateKey, toMessageTrans.getToX(), toMessageTrans.getToY(), 0, 0);
 
         SequentialTransition privateKeyTransition = new SequentialTransition(toMessageTrans, bumpUpAnimation, fromMessageTrans);
-        privateKeyTransition.setOnFinished(e -> nextIsDialog = true);
         CommentedAnimation privateKeyCAnimation = new CommentedAnimation(privateKeyTransition,
-                "Bob decrypt the message with his private key. Now he can read what Annie wanted to tell him.");
+                "Bob decrypt the message with his private key. Now he can read what Alice wanted to tell him.");
 
-        sceneCAnimations.add(privateKeyCAnimation);
+        sceneDisplays.add(new SceneDisplay(privateKeyCAnimation));
     }
 
     private TranslateTransition getBobUseKeyTransition() {
         double toMessageX = bobPC.getLayoutX() - privateKey.getLayoutX() + privateKey.getFitWidth();
         double toMessageY = bobPC.getLayoutY() - privateKey.getLayoutY();
 
-        return getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
-    }
-
-    private void prepareSceneDialogs() {
-        sceneDialogs = new ArrayList<>(10);
-        sceneDialogs.add(getRSADialogs());
+        TranslateTransition bobUseKeyTransition = getTranslateTransition(privateKey, 0, 0, toMessageX, toMessageY);
+        return bobUseKeyTransition;
     }
 
     private JFXDialog getRSADialogs() {
@@ -441,7 +442,6 @@ public class IntroductionScene {
         d1.setOnDialogClosed(ev -> d2.show());
         d2.setOnDialogClosed(ev -> d3.show());
         d3.setOnDialogClosed(ev -> {
-            nextIsDialog = true;
             removeSceneEffects();
         });
         return d1;
