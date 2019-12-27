@@ -2,6 +2,7 @@ package grzegorz.scenes.parity;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.events.JFXDialogEvent;
+import grzegorz.general.Animator;
 import grzegorz.general.SceneDisplay;
 import grzegorz.scenes.qber.QBERScene;
 import grzegorz.scenes.quantumScene.QuantumScene;
@@ -232,7 +233,7 @@ public class ParityScene {
         double labelYOffset = scale * (yOffset + 100);
         int paritySum = getSum(keyValues, from - 1, to - 1);
 
-        FadeTransition hideTransition = getHideTransition(label, 0.001);
+        FadeTransition hideTransition = getHideTransition(label);
         hideTransition.setOnFinished(e -> {
             changeParityLabelText(label, paritySum);
             leftLabel.setVisible(true);
@@ -279,7 +280,7 @@ public class ParityScene {
         ImageView bitView = (ImageView) keyHBox.getChildren().get(errorBitIndex + 1);
         Image redImage = valuesImagesRed.get(keyValuesWithError[errorBitIndex]);
 
-        FadeTransition hideTransition = getHideTransition(bitView, 0.001);
+        FadeTransition hideTransition = getHideTransition(bitView);
         hideTransition.setOnFinished(e -> bitView.setImage(redImage));
         FadeTransition showTransition = getShowTransition(bitView);
         return new SequentialTransition(hideTransition, showTransition);
@@ -383,7 +384,7 @@ public class ParityScene {
         for (int i = 0; i < size; i++) {
             Node node = nodes[i];
             ScaleTransition scaleTransition = getScaleTransition(node, from, to, time);
-            FadeTransition fadeTransition = getFadeTransition(node, from, to, time);
+            FadeTransition fadeTransition = Animator.getFadeTransition(node, from, to, time);
             animations[2 * i] = scaleTransition;
             animations[2 * i + 1] = fadeTransition;
         }
@@ -434,49 +435,26 @@ public class ParityScene {
         animation.play();
     }
 
-    private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(0.5));
-        transition.setNode(imageView);
-        transition.setFromX(fromX);
-        transition.setFromY(fromY);
-        transition.setToX(toX);
-        transition.setToY(toY);
-        return transition;
+    private TranslateTransition getTranslateTransition(Node node, double fromX, double fromY, double toX, double toY) {
+        return Animator.getTranslateTransition(node, fromX, fromY, toX, toY, 0.5);
     }
 
-    private ScaleTransition getScaleTransition(Node node, double from, double to, double time) {
-        ScaleTransition scaleTransition = new ScaleTransition();
-        scaleTransition.setNode(node);
-        scaleTransition.setDuration(Duration.seconds(time));
-        scaleTransition.setFromX(from);
-        scaleTransition.setFromY(from);
-        scaleTransition.setToX(to);
-        scaleTransition.setToY(to);
-        return scaleTransition;
+    private ScaleTransition getScaleTransition(Node node, double from, double to, double duration) {
+        return Animator.getScaleTransition(node, from, to, duration);
     }
 
     private SequentialTransition getShowInvisibleNodeTransition(Node node) {
-        FadeTransition hideTransition = getHideTransition(node, 0.001);
+        FadeTransition hideTransition = getHideTransition(node);
         hideTransition.setOnFinished(e -> node.setVisible(true));
         FadeTransition showTransition = getShowTransition(node);
         return new SequentialTransition(hideTransition, showTransition);
     }
 
-    private FadeTransition getHideTransition(Node node, double time) {
-        return getFadeTransition(node, 1.0, 0.0, time);
+    private FadeTransition getHideTransition(Node node) {
+        return Animator.getFadeTransition(node, 1.0, 0.0, 0.001);
     }
 
     private FadeTransition getShowTransition(Node node) {
-        return getFadeTransition(node, 0.0, 1.0, 0.5);
-    }
-
-    private FadeTransition getFadeTransition(Node node, double from, double to, double time) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(time));
-        fadeTransition.setFromValue(from);
-        fadeTransition.setToValue(to);
-        return fadeTransition;
+        return Animator.getFadeTransition(node, 0.0, 1.0, 0.5);
     }
 }

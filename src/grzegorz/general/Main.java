@@ -8,13 +8,17 @@ import javafx.stage.Stage;
 
 
 // TODO: 10.12.2019 FOR NOW
+//  animator
+//  sceneDisplay in introduction & quantum scene
+//  remove unused things
+//  EveFiltersScene different comments for different scenarios
+//  /
 //  qber and parity scenes objects comments
 //  check every comment
 //  circles (probably arrows) on every scene
 //  resizing
 //  fix transited objects
 //  refresh for every scene - then its required to calculate every qbit and filter value in the IntroductionScene
-//  in EveFiltersCheckScene and FiltersCheckScene highlight rows that are incorrect (some1 was eavesdropping)
 
 public class Main extends Application {
 
@@ -53,7 +57,7 @@ public class Main extends Application {
 //  -
 //  in IntroductionScene and QuantumScene change that height and width values (or method to receive them)
 //  primaryStage.setOnShowing(event -> {});     - try it
-//  after initialize call method start I guess and take good value
+//  after initialize call method start() I guess and take good value
 //  -
 //  in ParityScene probably remove 2 bits
 //  (Introduction and Quantum scenes) special flag for every tab telling when showButton can be enabled and telling what tab has been closed
@@ -61,11 +65,11 @@ public class Main extends Application {
 //  in QuantumScene prepareAliceSendFiltersAfterEveAnimation() is same as  "prepareAliceSendFiltersAnimation", just need proper circle as parameter
 
 
-
-
+// TODO: 27.12.2019 in Animator class hide/show node, dialogs methods
 // TODO: (LAST) 06.10.2019 .properties file for all comments
 // TODO: (LAST) 20.11.2019 clicking fast can make envelope go back to Alice after moving to Bob
-// TODO: (LAST) 05.12.2019 Do I want it to look in ParityScene like the whole half is checked for errors
 // TODO: (LAST) 13.11.2019 different languages comments
 // TODO: (LAST) 10.11.2019 check for the same methods like transitions or some effects(?)  that repeat and put them in
 //  a single static class like Animator
+
+// todo if I want to change language I need to make refresh method for every scene, but to do so, I need to prepare values at start

@@ -2,6 +2,7 @@ package grzegorz.scenes.eveFilters;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import grzegorz.general.Animator;
 import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
@@ -170,12 +171,7 @@ public class EveFiltersScene {
     }
 
     private void initBorderGlowEffectInstance() {
-        borderGlow = new DropShadow();
-        borderGlow.setColor(Color.WHITESMOKE);
-        borderGlow.setOffsetX(0f);
-        borderGlow.setOffsetY(0f);
-        borderGlow.setHeight(50);
-        borderGlow.setWidth(50);
+        borderGlow = Animator.getHighlightEffect();
     }
 
     private void initCommentForNode(Node node, String comment) {
@@ -471,20 +467,10 @@ public class EveFiltersScene {
 
     private void makeResultTransition() {
         double transitionLength = root.getHeight() - valuesHBox.getLayoutY();
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(1.0));
-        transition.setNode(valuesHBox);
-        transition.setToY(transitionLength);
-        transition.play();
-
+        TranslateTransition transition = Animator.getTranslateTransition(valuesHBox, 0.0, 0.0, 0.0, transitionLength, 1.0);
         double scale = getScaleForResultTransition();
-        ScaleTransition scaleTransition = new ScaleTransition();
-        scaleTransition.setNode(valuesHBox);
-        scaleTransition.setToX(scale);
-        scaleTransition.setToY(scale);
-        scaleTransition.setDuration(Duration.seconds(1.0));
-        scaleTransition.play();
-
+        ScaleTransition scaleTransition = Animator.getScaleTransition(valuesHBox, 1.0, scale, 1.0);
+        new ParallelTransition(transition, scaleTransition).play();
     }
 
     private double getScaleForResultTransition() {

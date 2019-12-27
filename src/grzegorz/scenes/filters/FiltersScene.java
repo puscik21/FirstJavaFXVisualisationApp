@@ -2,6 +2,7 @@ package grzegorz.scenes.filters;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import grzegorz.general.Animator;
 import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
@@ -112,12 +113,7 @@ public class FiltersScene {
     }
 
     private void initBorderGlowEffectInstance() {
-        borderGlow = new DropShadow();
-        borderGlow.setColor(Color.WHITESMOKE);
-        borderGlow.setOffsetX(0f);
-        borderGlow.setOffsetY(0f);
-        borderGlow.setHeight(50);
-        borderGlow.setWidth(50);
+        borderGlow = Animator.getHighlightEffect();
     }
 
     private void initCommentForNode(Node node, String comment) {
@@ -361,11 +357,7 @@ public class FiltersScene {
     }
 
     private RotateTransition getRotateTransition(Node node, int direction) {
-        RotateTransition transition = new RotateTransition();
-        transition.setDuration(Duration.seconds(timeScale));
-        transition.setNode(node);
-        transition.setByAngle(direction * 45);
-        return transition;
+        return Animator.getRotateTransition(node, direction, 45, timeScale);
     }
 
     private void fadeImage(int compNumber, ImageView imageView, boolean withDelay) {
@@ -391,13 +383,8 @@ public class FiltersScene {
         });
     }
 
-    private void showImage(ImageView imageView) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(imageView);
-        fadeTransition.setDuration(Duration.seconds(timeScale));
-        fadeTransition.setFromValue(0.0);
-        fadeTransition.setToValue(1.0);
-        fadeTransition.play();
+    private void showImage(ImageView node) {
+        Animator.getFadeTransition(node, 0.0, 1.0, timeScale).play();
     }
 
     private void highlightCompared(int compNumber) {
@@ -422,19 +409,10 @@ public class FiltersScene {
 
     private void makeResultTransition() {
         double transitionLength = root.getHeight() - valuesHBox.getLayoutY();
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(1.0));
-        transition.setNode(valuesHBox);
-        transition.setToY(transitionLength);
-        transition.play();
-
+        TranslateTransition transition = Animator.getTranslateTransition(valuesHBox, 0.0, 0.0, 0.0, transitionLength, 1.0);
         double scale = getScaleForResultTransition();
-        ScaleTransition scaleTransition = new ScaleTransition();
-        scaleTransition.setNode(valuesHBox);
-        scaleTransition.setToX(scale);
-        scaleTransition.setToY(scale);
-        scaleTransition.setDuration(Duration.seconds(1.0));
-        scaleTransition.play();
+        ScaleTransition scaleTransition = Animator.getScaleTransition(valuesHBox, 1.0, scale, 1.0);
+        new ParallelTransition(transition, scaleTransition).play();
     }
 
     private double getScaleForResultTransition() {

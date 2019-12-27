@@ -3,6 +3,7 @@ package grzegorz.scenes.qber;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
+import grzegorz.general.Animator;
 import grzegorz.general.SceneDisplay;
 import grzegorz.scenes.parity.ParityScene;
 import grzegorz.scenes.quantumScene.QuantumScene;
@@ -62,7 +63,6 @@ public class QBERScene {
     private int outsideOffset = 2000;
     private int errorBitIndex;
     private boolean isDisplayToShow = true;
-    private boolean isParitySceneLoaded = false;
 
 
     @FXML
@@ -135,10 +135,6 @@ public class QBERScene {
     }
 
     private void initMainTabPane() {
-        if (isParitySceneLoaded) {
-            return;
-        }
-
         addParityTab();
         FXMLLoader explanationLoader = loadToParityTab();
         ParityScene parityController = explanationLoader.getController();
@@ -349,25 +345,11 @@ public class QBERScene {
         animation.play();
     }
 
-    private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(0.5));
-        transition.setNode(imageView);
-        transition.setFromX(fromX);
-        transition.setFromY(fromY);
-        transition.setToX(toX);
-        transition.setToY(toY);
-
-        return transition;
+    private TranslateTransition getTranslateTransition(Node node, double fromX, double fromY, double toX, double toY) {
+        return Animator.getTranslateTransition(node, fromX, fromY, toX, toY, 0.5);
     }
 
     private FadeTransition getShowTransition(Node node) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(0.5));
-        fadeTransition.setFromValue(0.0);
-        fadeTransition.setToValue(1.0);
-
-        return fadeTransition;
+        return Animator.getFadeTransition(node, 0.0, 1.0, 0.5);
     }
 }

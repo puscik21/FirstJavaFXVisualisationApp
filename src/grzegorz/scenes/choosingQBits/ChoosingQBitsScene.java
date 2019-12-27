@@ -1,5 +1,6 @@
 package grzegorz.scenes.choosingQBits;
 
+import grzegorz.general.Animator;
 import grzegorz.general.QBitState;
 import javafx.animation.*;
 import javafx.collections.ObservableList;
@@ -159,24 +160,10 @@ public class ChoosingQBitsScene {
     }
 
     private ScaleTransition returnScaleTransition(Node node) {
-        ScaleTransition scaleTransition = new ScaleTransition();
-        scaleTransition.setNode(node);
-        scaleTransition.setDuration(Duration.seconds(timeScale));
-        scaleTransition.setFromX(0.0);
-        scaleTransition.setFromY(0.0);
-        scaleTransition.setToX(1.0);
-        scaleTransition.setToY(1.0);
-
-        return scaleTransition;
+        return Animator.getScaleTransition(node, 0.0, 1.0, timeScale);
     }
 
     private FadeTransition returnFadeTransition(Node node) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(timeScale));
-        fadeTransition.setFromValue(0.0);
-        fadeTransition.setToValue(1.0);
-
-        return fadeTransition;
+        return Animator.getFadeTransition(node, 0.0, 1.0, timeScale);
     }
 }

@@ -1,5 +1,6 @@
 package grzegorz.scenes.explanations;
 
+import grzegorz.general.Animator;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -141,24 +142,12 @@ public class QBitExplanationScene {
         return new ParallelTransition(scaleTransition, fadeTransition);
     }
 
-    private ScaleTransition getScaleTransition(Node node, double from, double to, double time) {
-        ScaleTransition scaleTransition = new ScaleTransition();
-        scaleTransition.setNode(node);
-        scaleTransition.setDuration(Duration.seconds(time));
-        scaleTransition.setFromX(from);
-        scaleTransition.setFromY(from);
-        scaleTransition.setToX(to);
-        scaleTransition.setToY(to);
-        return scaleTransition;
+    private ScaleTransition getScaleTransition(Node node, double from, double to, double duration) {
+        return Animator.getScaleTransition(node, from, to, duration);
     }
 
     private FadeTransition getFadeTransition(Node node, double fromVal, double toVal) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(0.5));
-        fadeTransition.setFromValue(fromVal);
-        fadeTransition.setToValue(toVal);
-        return fadeTransition;
+        return Animator.getFadeTransition(node, fromVal, toVal, 0.5);
     }
 
     private SequentialTransition getRotationAnimation() {

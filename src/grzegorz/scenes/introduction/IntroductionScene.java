@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTabPane;
 import com.jfoenix.controls.events.JFXDialogEvent;
+import grzegorz.general.Animator;
 import grzegorz.general.CommentedAnimation;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import grzegorz.scenes.explanations.QBitExplanationScene;
@@ -281,12 +282,7 @@ public class IntroductionScene {
     }
 
     private void initBorderGlowEffectInstance() {
-        borderGlow = new DropShadow();
-        borderGlow.setColor(Color.WHITESMOKE);
-        borderGlow.setOffsetX(0f);
-        borderGlow.setOffsetY(0f);
-        borderGlow.setHeight(50);
-        borderGlow.setWidth(50);
+        borderGlow = Animator.getHighlightEffect();
     }
 
     private void setBorderGlowEffect(Node node) {
@@ -485,38 +481,16 @@ public class IntroductionScene {
         return new SequentialTransition(scaleUpTransition, scaleDownTransition);
     }
 
-    private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(0.5));
-        transition.setNode(imageView);
-        transition.setFromX(fromX);
-        transition.setFromY(fromY);
-        transition.setToX(toX);
-        transition.setToY(toY);
-
-        return transition;
+    private TranslateTransition getTranslateTransition(Node node, double fromX, double fromY, double toX, double toY) {
+        return Animator.getTranslateTransition(node, fromX, fromY, toX, toY, 0.5);
     }
 
-    private ScaleTransition getScaleTransition(Node node, double from, double to, double time) {
-        ScaleTransition scaleTransition = new ScaleTransition();
-        scaleTransition.setNode(node);
-        scaleTransition.setDuration(Duration.seconds(time));
-        scaleTransition.setFromX(from);
-        scaleTransition.setFromY(from);
-        scaleTransition.setToX(to);
-        scaleTransition.setToY(to);
-
-        return scaleTransition;
+    private ScaleTransition getScaleTransition(Node node, double from, double to, double duration) {
+        return Animator.getScaleTransition(node, from, to, duration);
     }
 
     private FadeTransition getFadeTransition(Node node) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(0.5));
-        fadeTransition.setFromValue(1.0);
-        fadeTransition.setToValue(0.0);
-
-        return fadeTransition;
+        return Animator.getFadeTransition(node, 1.0, 0.0, 0.5);
     }
 
     private Circle getHighlightCircle(double x, double y) {

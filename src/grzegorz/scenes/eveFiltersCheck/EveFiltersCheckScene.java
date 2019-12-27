@@ -1,5 +1,6 @@
 package grzegorz.scenes.eveFiltersCheck;
 
+import grzegorz.general.Animator;
 import grzegorz.general.QBitState;
 import grzegorz.scenes.quantumScene.QuantumScene;
 import javafx.animation.*;
@@ -186,12 +187,7 @@ public class EveFiltersCheckScene {
     }
 
     private void initBorderGlowEffectInstance() {
-        borderGlow = new DropShadow();
-        borderGlow.setColor(Color.WHITESMOKE);
-        borderGlow.setOffsetX(0f);
-        borderGlow.setOffsetY(0f);
-        borderGlow.setHeight(50);
-        borderGlow.setWidth(50);
+        borderGlow = Animator.getHighlightEffect();
     }
 
     private void initCommentForNode(Node node, String comment) {
@@ -346,13 +342,8 @@ public class EveFiltersCheckScene {
         return moveOutsideTrans;
     }
 
-    private FadeTransition getFadeTransition(Node node, double fromVal, double toVal, double time) {
-        FadeTransition fadeTransition = new FadeTransition();
-        fadeTransition.setNode(node);
-        fadeTransition.setDuration(Duration.seconds(time));
-        fadeTransition.setFromValue(fromVal);
-        fadeTransition.setToValue(toVal);
-        return fadeTransition;
+    private FadeTransition getFadeTransition(Node node, double fromVal, double toVal, double duration) {
+        return Animator.getFadeTransition(node, fromVal, toVal, duration);
     }
 
     private TranslateTransition getTranslateTransitionAndRemove(Node node, ObservableList<Node> parent, double fromX, double fromY, double toX, double toY) {
@@ -361,14 +352,7 @@ public class EveFiltersCheckScene {
         return transition;
     }
 
-    private TranslateTransition getTranslateTransition(Node imageView, double fromX, double fromY, double toX, double toY) {
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(1.5));
-        transition.setNode(imageView);
-        transition.setFromX(fromX);
-        transition.setFromY(fromY);
-        transition.setToX(toX);
-        transition.setToY(toY);
-        return transition;
+    private TranslateTransition getTranslateTransition(Node node, double fromX, double fromY, double toX, double toY) {
+        return Animator.getTranslateTransition(node, fromX, fromY, toX, toY, 1.5);
     }
 }
